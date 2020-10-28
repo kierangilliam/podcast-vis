@@ -1,16 +1,34 @@
-import svelte from 'rollup-plugin-svelte';
-import resolve from '@rollup/plugin-node-resolve';
+import alias from '@rollup/plugin-alias';
 import commonjs from '@rollup/plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
+import path from "path";
 import livereload from 'rollup-plugin-livereload';
+import svelte from 'rollup-plugin-svelte';
 import { terser } from 'rollup-plugin-terser';
 import sveltePreprocess from 'svelte-preprocess';
-import typescript from '@rollup/plugin-typescript';
+
 
 const production = !process.env.ROLLUP_WATCH;
 
+const aliasEntries = [
+	{
+		find: "@types",
+		replacement: path.resolve(__dirname, "src/types")
+	},
+	{
+		find: "@components",
+		replacement: path.resolve(__dirname, "src/components")
+	},
+	{
+		find: "@lib/*",
+		replacement: path.resolve(__dirname, "src/lib/*")
+	},
+]
+
 function serve() {
 	let server;
-	
+
 	function toExit() {
 		if (server) server.kill(0);
 	}
@@ -59,6 +77,7 @@ export default {
 			dedupe: ['svelte']
 		}),
 		commonjs(),
+		alias({ entries: aliasEntries }),
 		typescript({
 			sourceMap: !production,
 			inlineSources: !production

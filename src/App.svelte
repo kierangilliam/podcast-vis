@@ -1,30 +1,27 @@
-<script lang="ts">
-	export let name: string;
+<script lang='ts'>
+	import { Theme, Section, Similarity, Topics, ScreenTime } from '@components'
+	import { H1, H5, Flex } from '@ollopa/cedar'
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
+<Theme>
+	<Flex column>
+		<H1>Average Joe.</H1>
+		<H5>Here we analyze facets of the Joe Rogan Experience.</H5>
 
-<style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+		<Section>
+			<ScreenTime />
+		</Section>
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
+		<!-- <Section>
+			<Guests />
+		</Section> -->
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
-</style>
+		<Section>
+			<Similarity />
+		</Section>
+
+		<Section>
+			<Topics />
+		</Section>
+	</Flex>
+</Theme>
