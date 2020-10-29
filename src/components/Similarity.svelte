@@ -44,11 +44,11 @@ import SimilarityComparedAll from './SimilarityComparedAll.svelte'
 
 <H3>Podcast Similarity</H3>
 
-<div class="container">
+<!-- <div class="container">
     <SimilarityMatrix {data} />
     <Spacer />
     <SimilarityComparedAll {data} />
-</div>
+</div> -->
 
 <style>
     @media screen and (min-width: 750px) {
