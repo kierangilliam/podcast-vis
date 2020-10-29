@@ -5,7 +5,9 @@
     Object.entries(COLORS).forEach(setCSSVar)
 </script>
 
-<slot></slot>
+<div>
+    <slot></slot>
+</div>
 
 <style>
     :global(:root) {
@@ -31,6 +33,7 @@
         --borderRadiusSmall: 12px;
         --borderRadiusFull: 999px;
         --buttonBorderRadius: var(--borderRadiusFull);
+        --line: 2px solid var(--lineColor);
         
         /* Typography */
         --headingFont: 'Average', serif;
@@ -101,4 +104,14 @@
     /* :global(.hide-scrollbar::-webkit-scrollbar) {
         display: none;
     } */
+
+    @media screen and (max-width: 1000px) {
+        :global(body) {
+            overflow-x: hidden !important;
+        }
+        div {
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+        }
+    }
 </style>
