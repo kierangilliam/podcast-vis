@@ -1,6 +1,6 @@
 <script lang='ts'>
-    import { H3, Flex, Spacer } from '@ollopa/cedar'
-import SimilarityComparedAll from './SimilarityComparedAll.svelte'
+    import { H3, H5, Spacer } from '@ollopa/cedar'
+    import SimilarityComparedAll from './SimilarityComparedAll.svelte'
     import SimilarityMatrix from './SimilarityMatrix.svelte'
 
     const data = [
@@ -43,12 +43,14 @@ import SimilarityComparedAll from './SimilarityComparedAll.svelte'
 </script>
 
 <H3>Podcast Similarity</H3>
+<H5>Compare similarities between podcasts.</H5>
+<Spacer />
 
-<!-- <div class="container">
+<div class="container">
     <SimilarityMatrix {data} />
     <Spacer />
     <SimilarityComparedAll {data} />
-</div> -->
+</div>
 
 <style>
     @media screen and (min-width: 750px) {
