@@ -94,10 +94,25 @@
 	}
 </script>
 
-<Flex>
+<div class='container'>
 	<div id='data'></div>
 	<div>
 		<H3>Screen time</H3>
 		<H5>On average, Joe is on screen 30% of the time per episode.</H5>
 	</div>
-</Flex>
+</div>
+
+<style>
+	.container {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+	
+    @media screen and (min-width: 750px) {
+        .container {
+            flex-direction: row;
+        }
+    }
+</style>
