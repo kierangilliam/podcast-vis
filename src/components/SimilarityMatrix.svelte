@@ -38,17 +38,11 @@
 
         const { width } = container.getBoundingClientRect()
         const [horizontalGrid, verticalGrid] = createGrid(Math.min(height, width))
-        const totalPadding = verticalGrid.bandwidth() * (rows+1) * PADDING
 
         const svg = d3.select(E)
             .append('svg')
             .attr('width', width)
             .attr('height', height)
-            // Right align
-            // .attr('transform', (_, i) => 
-            //     `translate(${(width - (totalPadding + rows * verticalGrid.bandwidth()))}, 
-            //         ${-1*verticalGrid.bandwidth() * PADDING})`
-            // )
         
         // https://codereview.stackexchange.com/a/200524
         const groups = svg.selectAll(null)
@@ -56,6 +50,7 @@
             .enter()
             .append('g')
             .attr('transform', (_, i) => 'translate(' + horizontalGrid(i) + ')')
+            
         
         let currentRow = 0
         const rects = groups.selectAll(null)
@@ -76,6 +71,44 @@
             .attr('y', (d, i) => verticalGrid(i))
             .attr('width', horizontalGrid.bandwidth())
             .attr('height', verticalGrid.bandwidth())
+            
+        currentRow = 0
+        const text = groups.selectAll(null)
+            .data((d, i) => ([...d, i]))
+            .enter()
+            .append('text')
+            .attr('y', (d, i) => verticalGrid(i) + (verticalGrid.bandwidth() / 2))
+            .attr('dx', '6rem')
+            .text(d => d[0])
+            .attr('text-anchor', 'end')
+            .attr('fill', (d, i) => {
+                const alpha = 'rgba(0,0,0,0)'
+                if (Number.isInteger(d)) {
+                    currentRow = d + 1                    
+                    return alpha
+                }
+                return i != currentRow ? alpha : COLORS.black
+            })
+
+        // Legend
+        const legendWidth = width / 3
+        const legendHeight = 30
+        const legend = svg.selectAll('legend')
+            .append('g')
+            
+        legend.data(d3.range(0, 1, 1 / legendWidth))
+            .enter()
+            .attr('stroke-width', '2px')
+            .attr('border-top', '2px solid black')
+            .append('rect')
+            .attr('height', legendHeight)
+            .attr('width', '1px')
+            .attr('x', d => d * legendWidth)
+            .attr('y', height - (legendHeight * 2))
+            .attr('fill', d => color(d))
+
+        legend.append('text')
+            .text('ELKs')
     }
 
     onMount(() => mounted = true)
@@ -83,7 +116,7 @@
 
 <div bind:this={container} class='container' style='height: {$height}px;'>
     <div bind:this={E}></div>
-    <label class="monospace">Calculated using TF-IDF cosime similarity</label>
+    <label class='monospace'>Calculated using TF-IDF cosime similarity</label>
 </div>
 
 <style>
