@@ -81,44 +81,6 @@
 
 			return paths	
 		})
-
-		paths.forEach(chart => {
-			chart.on('mousemove', (e, d) => {
-				// return paths.forEach(chart => 
-				chart
-					.attr("transform", function (d) {
-						const x = e.movementX
-						const y = e.movementY
-						let r = Math.sqrt(x * x + y * y)
-						r = x < 0 ? -1 * r : r
-						const angle = Math.sin(y / r)
-						const a = x < 0 ? 2 * angle : angle 
-						let rotate = 180 - a / Math.PI * 180
-						
-						if (isNaN(rotate)) {
-							return `rotate(${0})`
-						}
-
-						if (getRotation(this) != null) {
-							rotate += getRotation(this) * (1 / x)
-						}
-						
-						
-						return `rotate(${rotate})`
-					})
-				// )
-			})
-			.on('mouseout', (e, d) => {
-				// return paths.forEach(chart => 
-				// 	chart
-				// 		.attr("transform", d => {
-				// 			// const rotate = 180 - (d.startAngle + d.endAngle)/2 / Math.PI * 180
-				// 			return "rotate(" + d.endAngle + ")"
-				// 		})
-				// )
-			})
-		})
-
 	})
 
 	function getRotation(d3element): null | number {
