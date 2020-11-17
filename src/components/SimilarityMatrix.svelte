@@ -37,7 +37,7 @@
         if (!mounted) return
 
         const { width } = container.getBoundingClientRect()
-        const [horizontalGrid, verticalGrid] = createGrid(Math.min(height, width))
+        const [horizontalGrid, verticalGrid] = createGrid(width)
 
         const svg = d3.select(E)
             .append('svg')
@@ -93,22 +93,22 @@
         // Legend
         const legendWidth = width / 3
         const legendHeight = 30
-        const legend = svg.selectAll('legend')
-            .append('g')
+        // const legend = svg.selectAll('legend')
+        //     .append('g')
             
-        legend.data(d3.range(0, 1, 1 / legendWidth))
-            .enter()
-            .attr('stroke-width', '2px')
-            .attr('border-top', '2px solid black')
-            .append('rect')
-            .attr('height', legendHeight)
-            .attr('width', '1px')
-            .attr('x', d => d * legendWidth)
-            .attr('y', height - (legendHeight * 2))
-            .attr('fill', d => color(d))
+        // legend.data(d3.range(0, 1, 1 / legendWidth))
+        //     .enter()
+        //     .attr('stroke-width', '2px')
+        //     .attr('border-top', '2px solid black')
+        //     .append('rect')
+        //     .attr('height', legendHeight)
+        //     .attr('width', '1px')
+        //     .attr('x', d => d * legendWidth)
+        //     .attr('y', height - (legendHeight * 2))
+        //     .attr('fill', d => color(d))
 
-        legend.append('text')
-            .text('ELKs')
+        // legend.append('text')
+        //     .text('ELKs')
     }
 
     onMount(() => mounted = true)
