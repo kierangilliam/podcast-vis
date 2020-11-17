@@ -3,7 +3,7 @@
 	import * as d3 from 'd3'
     import { onMount } from 'svelte'
     import { chunk } from '@lib/utils'
-    import LineChart from './TopicsLineChart.svelte'
+    import Chart from './TopicsChart.svelte'
 
     interface Data {
         id: string
@@ -24,22 +24,20 @@
     const VISIBLE_WORDS_COUNT = 15
 
     let data: Data[]
-    let selectedWord, hoverWord = null
+    let selectedWord = 'mask', hoverWord = null
 
     $: bins = bin(data)
-    $: lineChartData = getLineChartData(bins, selectedWord)
+    $: chartData = getChartData(bins, selectedWord)
     
-    const getLineChartData = (bins: Bin[], word: string) => {
+    const getChartData = (bins: Bin[], word: string) => {
         if (!bins || !word) return
 
-        return bins.map(({ cfd, tfidf, start, end }) => {
-            const score = tfidf.find(([w, _]) => w == word)
-            return {
-                start, end, 
-                // value: cfd[word],
-                value: score ? score[1] : 0,
-            }
-        })
+        return data
+            .map(({ topWords, number }) => ({
+                number, 
+                termFrequency: topWords[word] || 0,
+            }))
+            .filter(({ number }) => number != 0)
     }
 
     /**
@@ -121,6 +119,7 @@
                             class:hover={selectedWord != word && word == hoverWord}
                             on:click={() => selectedWord = word}
                             on:mouseover={() => hoverWord = word}
+                            on:mouseout={() => hoverWord = null}
                         >
                             {word}
                         </p>
@@ -128,11 +127,11 @@
                 </div>
             </div>
         {/each}
-    </div>
-{/if}
 
-{#if lineChartData}
-    <LineChart word={selectedWord} data={lineChartData} />
+        {#if chartData}
+            <Chart word={selectedWord} data={chartData} />
+        {/if}
+    </div>
 {/if}
 
 <style>
