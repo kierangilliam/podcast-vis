@@ -1,6 +1,6 @@
 <script lang='ts'>
 	import { COLORS } from '@lib/constants'
-    import { H3, Search } from '@ollopa/cedar'
+    import { H3, Spacer, Search } from '@ollopa/cedar'
 	import * as d3 from 'd3'
 	import { onMount } from 'svelte'
 	import { episode as getEpisode } from '@lib/utils'
@@ -12,19 +12,18 @@
 		data: object
 	}
 
-	// const width = 400, height = 400, margin = 40
-	// const radius = Math.min(width, height) / 2 - margin
-	// const donutThickness = 50
-
 	let options = {
 		responsive: true,
 		aspectRatio: 1,
+		tooltips: {
+			enabled: false,
+			custom: () => {
+				// TODO: https://www.chartjs.org/docs/latest/configuration/tooltip.html#external-custom-tooltips
+			}
+		},
 		hover: {
-			onHover: function (event, element) {
-				// if (item.length) {
-				// 	const data = item[0]._chart.config.data.datasets[0].data[item[0]._index];
-				// 	console.log(item, data);
-				// }
+			onHover: (event, element) => {
+				// TODO
 			}
 		}
   	}
@@ -83,10 +82,11 @@
 
 <div class='container'>
 	{#if episode}
-		<div class="chart">
+		<div class='chart'>
 			<Doughnut data={episode} {options}/>
 		</div>
 	{/if}
+	<Spacer s={8} />
 	<div>
 		<H3>Screen time</H3>
 		<Search 
@@ -94,17 +94,20 @@
 			bind:search
 			stretch
 		/>
-		{#each searchResults as ep}
-			<div 
-				class='result'
-				on:click={() => {
-					episode = ep
-					searchResults = []
-				}}
-			>
-				{ ep.title }
-			</div>
-		{/each}
+		<div class='search-results'>
+			{#each searchResults as ep}
+				<div 
+					class='result'
+					on:click={() => {
+						episode = ep
+						searchResults = []
+						search = null
+					}}
+				>
+					{ ep.title }
+				</div>
+			{/each}
+		</div>
 	</div>
 </div>
 
@@ -126,7 +129,18 @@
         }
     }
 
+	.search-results {
+		overflow: scroll;
+		max-width: 30vw;
+		max-height: 200px;
+	}
+
 	.result {
 		cursor: pointer;
+		padding: var(--s-2);
+	}
+
+	.result:nth-child(odd) {
+		background: var(--lightGray);
 	}
 </style>
