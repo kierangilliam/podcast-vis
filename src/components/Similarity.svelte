@@ -4,6 +4,7 @@
     import SimilarityComparedAll from './SimilarityComparedAll.svelte'
     import SimilarityMatrix from './SimilarityMatrix.svelte'
 	import * as d3 from 'd3'
+import { episode } from '@lib/utils';
 
     let data, allData, comparedAllId: string
     
@@ -27,28 +28,36 @@
     onMount(async () => {
         allData = (await d3.csv('./cosine_similarity.csv'))
 
-        const choice = arr => arr[Math.floor(Math.random() * arr.length)]
+        // Choose a random main episode
+        const choice = () => {
+            const isNotMain = true
+            let choice
+            while (isNotMain) {
+                choice = allData[Math.floor(Math.random() * allData.length)]
+                if (episode(choice.id1).main) {
+                    return choice.id1
+                }
+            }   
+        }
 
-        data = [...Array(5)].map(_ => {
-            return choice(allData).id1
-        })        
+        data = [...Array(5)].map(_ => choice())
 
         // 5 rows with 5 items each containing [id, similairty]
         data = data.map(id => {
-            return data.map(idInner => {
-                if (id == idInner) {
-                    return [id, 0.0]
-                }
+                return data.map(idInner => {
+                    if (id == idInner) {
+                        return [id, 0.0]
+                    }
 
-                const hit = allData.find(({ id1, id2 }) => 
-                    (id1 == id && idInner == id2) || (id2 == id && idInner == id1)
-                )
+                    const hit = allData.find(({ id1, id2 }) => 
+                        (id1 == id && idInner == id2) || (id2 == id && idInner == id1)
+                    )
 
-                return [idInner, hit.similarity]
+                    return [idInner, hit.similarity]
+                })
             })
-        })
 
-        comparedAllId = data[0][0][0]
+        comparedAllId = choice()
     })
 </script>
 

@@ -3,6 +3,7 @@
     import { COLORS } from '@lib/constants'
     import { height } from './similarity-state'
     import * as d3 from 'd3'
+    import { episode } from '@lib/utils'    
 
     export let data: [string, number][][]
     
@@ -89,7 +90,13 @@
                 return verticalGrid(i) + (verticalGrid.bandwidth() / 2)
             })
             .attr('dx', '6rem')
-            .text(d => d[0])
+            .text(d => {
+                if (d[0]) {
+                    const { number, title, guests } = episode(d[0])
+                    return guests ? `${guests}, ${number}` : title
+                }
+                return d
+            })
             .attr('text-anchor', 'end')
             .attr('fill', (d, i) => {
                 const alpha = 'rgba(0,0,0,0)'

@@ -2,6 +2,7 @@
     import { H4, Spacer } from '@ollopa/cedar'
     import { onMount, tick } from 'svelte'
     import { height } from './similarity-state'
+    import { episode } from '@lib/utils'
 
     export let id: string
     export let data: [string, number, string][]
@@ -25,14 +26,14 @@
 </script>
 
 <div bind:this={container} class='container'>
-    <H4>{id}</H4>
+    <H4>{episode(id).guests}, {episode(id).number}</H4>
     <p>Most similar podcasts</p>
     <Spacer s={8} />
 
     {#if mount}
-        {#each data as [name, sim, words]}
+        {#each data as [id, sim, words]}
             <div class='details'>
-                <p>{name}</p>
+                <p>{episode(id).guests}, {episode(id).number}</p>
                 <p>{Math.round(sim*100)}%</p>
             </div>
             <div class='bar' style='width: {barWidth(sim)}px'></div>

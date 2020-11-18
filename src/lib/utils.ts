@@ -1,3 +1,14 @@
+import * as d3 from 'd3'
+
+interface Episode {
+    guests: string
+    published: Date
+    title: string
+    number: number
+    id: string
+    main: boolean
+}
+
 export const wait = async (ms: number) =>
     new Promise(res => setTimeout(() => res(), ms))
 
@@ -16,4 +27,19 @@ export const chunk = (arr, chunkSize) => {
     for (var i = 0, len = arr.length; i < len; i += chunkSize)
         R.push(arr.slice(i, i + chunkSize));
     return R;
+}
+
+export let episodes: Episode[] = [];
+(async () => {
+    episodes = (await d3.csv('./episodes.csv'))
+        .map(({ published, number, main, ...rest }) => ({
+            published: new Date(published),
+            number: +number,
+            main: main === "True" ? true : false,
+            ...rest,
+        }))
+})();
+
+export const episode = (id: string) => {
+    return episodes.find(e => e.id === id)
 }
