@@ -18,11 +18,14 @@
                 (id1 == comparedAllId) || (id2 == comparedAllId)
             )
             .sort((a, b) =>  b[1] - a[1])
-            .slice(0, 5)
             .map(({ similarity, id1, id2 }) => 
                 // [Other episode id, similarity, other episode high ranking tfidf words]
                 ([comparedAllId == id1 ? id2 : id1, similarity, '__'])
             )
+            // Filter non-main episodes
+            // TODO should also filter in MMA?
+            .filter(([id, _]) => episode(id).main)
+            .slice(0, 5)
     }
 
     onMount(async () => {
