@@ -97,7 +97,7 @@
 
     onMount(async () => {
         data = (await d3.csv('./word_occurrences.csv'))
-            .map(({ id, number, title, top_words }) => ({
+            .map(({ id, top_words }) => ({
                 id, 
                 number: episode(id).number, 
                 title: episode(id).title,
