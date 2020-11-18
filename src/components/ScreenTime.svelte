@@ -3,6 +3,8 @@
     import { H3, Search } from '@ollopa/cedar'
 	import * as d3 from 'd3'
 	import { onMount } from 'svelte'
+	import { episode as getEpisode } from '@lib/utils'
+	import Doughnut from 'svelte-chartjs/src/Doughnut.svelte'
 
 	interface Episode {
 		id: string
@@ -10,17 +12,29 @@
 		data: object
 	}
 
-	const width = 450, height = 450, margin = 40
-	const radius = Math.min(width, height) / 2 - margin
-	const donutThickness = 50
+	// const width = 400, height = 400, margin = 40
+	// const radius = Math.min(width, height) / 2 - margin
+	// const donutThickness = 50
+
+	let options = {
+		responsive: true,
+		aspectRatio: 1,
+		hover: {
+			onHover: function (event, element) {
+				// if (item.length) {
+				// 	const data = item[0]._chart.config.data.datasets[0].data[item[0]._index];
+				// 	console.log(item, data);
+				// }
+			}
+		}
+  	}
 
 	let data: Episode[]
 	let search: string = ''
 	let episode = null
-	let svg, pie
 
 	$: searchResults = filterSearch(data, search)
-	$: updateGraph(episode)
+	$: episodeUpdate(episode)
 
 	const filterSearch = (_, __) => {
 		if (!search || !data) return []
@@ -29,91 +43,50 @@
 		)
 	}
 
-	const formatData = data => {
-		data = (0, eval)('(' + data + ')')
-		// Remove small values
-		Object.entries(data).forEach(([cluster, amount]) => {
-			if (amount < 0.001) {
-				delete data[cluster]
-			}
-		})
-		return data
-	}
-
-	const updateGraph = (episode: Episode) => {
+	const episodeUpdate = (_) => {
 		if (!episode) return 
 
-		const color = d3.scaleOrdinal()
-			.domain(d3.extent(Object.values(episode.data)))
-			.range([
+		episode.labels = Object.keys(episode.data)
+		episode.datasets = [{
+			data: Object.values(episode.data),
+			backgroundColor: [
 				COLORS.orange, COLORS.blue, COLORS.green, 
 				COLORS.purple, COLORS.red, COLORS.black, COLORS.darkOrange
-			])
-
-		const pie = d3.pie().value(([_, value]) => value)
-
-		const arc = d3.arc()
-			.innerRadius(radius - donutThickness)
-			.outerRadius(radius)
-
-		const arcData = pie(Object.entries(episode.data))
-
-		const arcs = svg.selectAll('arcs')
-			.data(arcData)
-			.enter()
-			// .transition()
-			// .duration(1000)
-
-		const paths = arcs.append('path')
-			.attr('d', arc)
-			.attr('fill', d => color(d.data[0]))
-			.attr('stroke', COLORS.white)
-			.style('stroke-width', '4px')
-			.style('opacity', 0.7)
-
-		const legendText = arcs.append('text')
-			.attr('dx', `-1em`)
-			.attr('dy', (d, i) => `${2 * i - 2}em`)
-			.style('text-anchor', 'left')
-			.style('color', COLORS.black)
-			.text(({ data }) => data[0])
-
-		const legendColors = arcs.append("rect")
-			.attr("x", '-2.75em')
-			.attr('y', (_, i) => `${2 * i - 3}em`)
-			.attr("rx", "6px")
-			.attr("width", 20)
-			.attr("height", 20)
-			.attr('fill', d => color(d.data[0]))
-		
+			]
+		}]
 	}
 
 	onMount(async () => {
+		const formatData = data => {
+			data = (0, eval)('(' + data + ')')
+			// Remove small values
+			// TODO Play with the small values number
+			Object.entries(data).forEach(([cluster, amount]) => {
+				if (amount < 0.002) {
+					delete data[cluster]
+				}
+			})
+			return data
+		}
+
         data = (await d3.csv('./video_segments.csv'))
-            .map(({ id, number, title, data }) => ({
-                id, number: +number, title,
+            .map(({ id, data }) => ({
+				id, 
+				number: getEpisode(id).number, 
+				title: getEpisode(id).title,
                 data: formatData(data),
             }))
 
-		episode = data[0]
-		
-		pie = d3.pie().value(([_, value]) => value)
-		svg = d3.select('#data')
-			.append('svg')
-			.attr('width', width)
-			.attr('height', height)
-			.append('g')
-			.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');		
-
-		const arcData = pie(Object.entries(episode.data))		
-		const arcs = svg.selectAll('arcs')
-			.data(arcData)
-			.enter()
+		episode = data[0]		
 	})
 </script>
 
 <div class='container'>
-	<div id='data'></div>
+	{#if episode}
+		<div class="chart">
+			<Doughnut data={episode} {options}/>
+		</div>
+	{/if}
 	<div>
 		<H3>Screen time</H3>
 		<Search 
@@ -123,8 +96,11 @@
 		/>
 		{#each searchResults as ep}
 			<div 
-				class="result"
-				on:click={() => episode = ep}
+				class='result'
+				on:click={() => {
+					episode = ep
+					searchResults = []
+				}}
 			>
 				{ ep.title }
 			</div>
@@ -138,6 +114,10 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+	}
+
+	.chart {
+		width: 250px;
 	}
 	
     @media screen and (min-width: 750px) {
