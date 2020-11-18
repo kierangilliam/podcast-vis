@@ -85,7 +85,7 @@
 </script>
 
 <div class='container'>
-    <H5>{word} term frequency over time</H5>
+    <H5><strong><i>{word}</i></strong> term frequency over time</H5>
     <div bind:this={element}></div>
 </div>
 
