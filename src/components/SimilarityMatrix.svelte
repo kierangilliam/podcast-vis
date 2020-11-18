@@ -80,7 +80,14 @@
             .data((d, i) => ([...d, i]))
             .enter()
             .append('text')
-            .attr('y', (d, i) => verticalGrid(i) + (verticalGrid.bandwidth() / 2))
+            .attr('y', (d, i) => {
+                if (i == rows) return 
+                // Special styling for bottom right item to make it look more symmetrical 
+                if (i == rows - 1) {
+                    return verticalGrid(i) + (verticalGrid.bandwidth() / 3)
+                }
+                return verticalGrid(i) + (verticalGrid.bandwidth() / 2)
+            })
             .attr('dx', '6rem')
             .text(d => d[0])
             .attr('text-anchor', 'end')
@@ -119,7 +126,7 @@
 
 <div bind:this={container} class='container' style='height: {$height}px;'>
     <div bind:this={E}></div>
-    <label class='monospace'>Calculated using TF-IDF cosime similarity</label>
+    <label class='monospace'>Calculated using TF-IDF cosine similarity</label>
 </div>
 
 <style>

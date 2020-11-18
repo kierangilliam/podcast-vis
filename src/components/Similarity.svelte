@@ -5,7 +5,24 @@
     import SimilarityMatrix from './SimilarityMatrix.svelte'
 	import * as d3 from 'd3'
 
-    let data, allData
+    let data, allData, comparedAllId: string
+    
+    $: comparedAllData = filterComparedAllData(allData, comparedAllId)
+
+    const filterComparedAllData = (_, __) => {
+        // Return default blank 5 row array for DOM sizing purposes
+        if (!(allData && comparedAllId)) return [[], [], [], [], []]
+
+        return allData.filter(({ id1, id2 }) => 
+                (id1 == comparedAllId) || (id2 == comparedAllId)
+            )
+            .sort((a, b) =>  b[1] - a[1])
+            .slice(0, 5)
+            .map(({ similarity, id1, id2 }) => 
+                // [Other episode id, similarity, other episode high ranking tfidf words]
+                ([comparedAllId == id1 ? id2 : id1, similarity, '__'])
+            )
+    }
 
     onMount(async () => {
         allData = (await d3.csv('./cosine_similarity.csv'))
@@ -31,7 +48,7 @@
             })
         })
 
-        console.log(data)
+        comparedAllId = data[0][0][0]
     })
 </script>
 
@@ -43,7 +60,7 @@
     <div class="container">
         <SimilarityMatrix {data} />
         <Spacer />
-        <SimilarityComparedAll {data} />
+        <SimilarityComparedAll id={comparedAllId} data={comparedAllData} />
     </div>
 {/if}
 
