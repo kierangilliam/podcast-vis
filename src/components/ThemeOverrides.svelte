@@ -54,6 +54,15 @@
         --modalPaddingY: var(--s-6);
         --modalShadow: var(--level-2);
         --maxModalWidth: 600px;     
+
+        /* Inputs */
+        --inputBorderRadius: 4px;
+        --inputPadding: var(--s-2) var(--s-4);
+        /* --inputBorder: ; */
+        /* --inputBackground: ; */
+        --inputShadow: 0;
+        /* --inputWidth: ; */
+
     }
     :global(h1) {
         margin: 0 !important;
