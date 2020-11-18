@@ -4,9 +4,10 @@
     import { height } from './similarity-state'
     import * as d3 from 'd3'
 
-    export let data
+    export let data: [string, number][][]
     
-    let E, container: HTMLElement 
+    let E
+    let container: HTMLElement 
     let mounted = false
 
     const cols = data.length
@@ -29,9 +30,11 @@
         return [horizontalGrid, verticalGrid]
     }
     
+    const maxSimilarity = d3.max(data, d => d3.max(d, d => d[1]))
     const color = d3.scaleLinear()
         .range([COLORS.white, COLORS.orange])
-        .domain([0, 1])    
+        .domain([0, maxSimilarity])    
+
 
     const onHeightChange = (height) => {
         if (!mounted) return

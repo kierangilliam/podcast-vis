@@ -89,7 +89,7 @@
 	}
 
 	onMount(async () => {
-        data = (await d3.csv('./video-segments.csv'))
+        data = (await d3.csv('./video_segments.csv'))
             .map(({ id, number, title, data }) => ({
                 id, number: +number, title,
                 data: formatData(data),
