@@ -4,6 +4,7 @@
     import { onMount } from 'svelte'
     import { chunk } from '@lib/utils'
     import Chart from './TopicsChart.svelte'
+    import { episode } from '@lib/utils'
 
     interface Data {
         id: string
@@ -97,7 +98,9 @@
     onMount(async () => {
         data = (await d3.csv('./word_occurrences.csv'))
             .map(({ id, number, title, top_words }) => ({
-                id, number: +number, title,
+                id, 
+                number: episode(id).number, 
+                title: episode(id).title,
                 topWords: (0, eval)('(' + top_words + ')'),
             }))
     })

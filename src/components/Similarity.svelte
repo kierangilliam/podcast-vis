@@ -4,7 +4,7 @@
     import SimilarityComparedAll from './SimilarityComparedAll.svelte'
     import SimilarityMatrix from './SimilarityMatrix.svelte'
 	import * as d3 from 'd3'
-import { episode } from '@lib/utils';
+    import { episode } from '@lib/utils'
 
     let data, allData, comparedAllId: string
     
