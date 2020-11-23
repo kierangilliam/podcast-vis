@@ -5,6 +5,7 @@
     import SimilarityMatrix from './SimilarityMatrix.svelte'
 	import * as d3 from 'd3'
     import { episode } from '@lib/utils'
+    import * as pbf from 'pbf'
 
     let data, allData, comparedAllId: string
     
@@ -29,7 +30,21 @@
     }
 
     onMount(async () => {
+        // const buffer = (await fetch('./ep_sim'))
+        // console.log(buffer)
+        // const proto = new pbf.Pbf(buffer).readFields(readEpSim, {})
+        // function readEpSim(tag, data, pbf) {
+        //     if (tag === 1) data.rows = pbf.readMessage(readEpSimRow, {})
+        // }
+        // function readEpSimRow(tag, layer, pbf) {
+        //     if (tag === 1) layer.idNum1 = pbf.readFixed32()
+        //     else if (tag === 2) layer.idNum2 = pbf.readFixed32()
+        //     else if (tag === 3) layer.similarity = pbf.readFloat()
+        // }
+        // console.log(proto)
+
         allData = (await d3.csv('./cosine_similarity.csv'))
+
 
         // Choose a random main episode
         const choice = () => {
@@ -64,15 +79,15 @@
     })
 </script>
 
-<H3>Podcast Similarity</H3>
-<H5>Compare similarities between podcasts.</H5>
+<H3>Episode Similarity</H3>
+<H5>Compare topic contents between episodes.</H5>
 <Spacer />
 
 {#if data}
     <div class="container">
         <SimilarityMatrix {data} />
         <Spacer />
-        <SimilarityComparedAll id={comparedAllId} data={comparedAllData} />
+        <SimilarityComparedAll bind:id={comparedAllId} data={comparedAllData} />
     </div>
 {/if}
 
