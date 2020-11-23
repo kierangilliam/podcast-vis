@@ -32,8 +32,8 @@
 
 {#if visible}
     <div class='background' on:click={() => visible = false}>
-        <div class="container" on:click|stopPropagation>
-            <div class='search-input' class:stretch={true}>
+        <div class="container">
+            <div class='search-input' class:stretch={true} on:click|stopPropagation>
                 <Icon search small />
                 <input 
                     { placeholder } 
@@ -48,7 +48,7 @@
                 {#each results as ep}
                     <div 
                         class='result'
-                        on:click={() => { 
+                        on:click|stopPropagation={() => { 
                             episodeID = ep.id 
                             visible = false
                             results = []
