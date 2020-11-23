@@ -107,12 +107,23 @@
         justify-content: center;
         align-items: center;
     }
+    :global(.between) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
     :global(.stretch) {
         width: 100%;
     }
     /* :global(.hide-scrollbar::-webkit-scrollbar) {
         display: none;
     } */
+    
+    :global(.inline-button) {
+		color: var(--blue);
+		font-weight: bold;
+		cursor: pointer;
+	}
 
     @media screen and (max-width: 1000px) {
         :global(body) {
