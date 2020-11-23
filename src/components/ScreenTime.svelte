@@ -1,6 +1,7 @@
 <script lang='ts'>
 	import { COLORS } from '@lib/constants'
-    import { H3, Spacer, Search } from '@ollopa/cedar'
+	import { H3, Spacer } from '@ollopa/cedar'
+	import Search from './Search.svelte'
 	import * as d3 from 'd3'
 	import { onMount } from 'svelte'
 	import { episode as getEpisode } from '@lib/utils'
@@ -28,23 +29,19 @@
 		}
   	}
 
-	let data: Episode[]
-	let search: string = ''
+	let data: Episode[]	
 	let episode = null
+	// What search returns
+	let episodeID = null
+	let searchableEpisodes
+	let searchVisible = false
 
-	$: searchResults = filterSearch(data, search)
-	$: episodeUpdate(episode)
-
-	const filterSearch = (_, __) => {
-		if (!search || !data) return []
-		return data.filter(({ title }) => 
-			title.toLowerCase().includes(search.toLowerCase())
-		)
-	}
+	$: episodeUpdate(episodeID)
 
 	const episodeUpdate = (_) => {
-		if (!episode) return 
+		if (!episodeID) return 
 
+		episode = data.find(({ id }) => id === episodeID)
 		episode.labels = Object.keys(episode.data)
 		episode.datasets = [{
 			data: Object.values(episode.data),
@@ -74,11 +71,15 @@
 				number: getEpisode(id).number, 
 				title: getEpisode(id).title,
                 data: formatData(data),
-            }))
+			}))
+			
+		searchableEpisodes = data.map(({ id }) => id)
 
-		episode = data[0]		
+		episodeID = data[0].id	
 	})
 </script>
+
+<Search bind:episodeID bind:visible={searchVisible} {searchableEpisodes} />
 
 <div class='container'>
 	{#if episode}
@@ -88,26 +89,11 @@
 	{/if}
 	<Spacer s={8} />
 	<div>
-		<H3>Screen time</H3>
-		<Search 
-			placeholder='lex fridman' 
-			bind:search
-			stretch
-		/>
-		<div class='search-results'>
-			{#each searchResults as ep}
-				<div 
-					class='result'
-					on:click={() => {
-						episode = ep
-						searchResults = []
-						search = null
-					}}
-				>
-					{ ep.title }
-				</div>
-			{/each}
-		</div>
+		<H3>Screen time</H3>	
+		<p>Some explanatory text yada yada yada. Lorem ipsum yada yada yada.</p>	
+		<p class='inline-button' on:click={() => searchVisible=true}>
+			Search for a different episode
+		</p>
 	</div>
 </div>
 
@@ -120,27 +106,19 @@
 	}
 
 	.chart {
-		width: 250px;
+		width: 450px;
 	}
 	
     @media screen and (min-width: 750px) {
         .container {
             flex-direction: row;
         }
-    }
+    }	
 
-	.search-results {
-		overflow: scroll;
-		max-width: 30vw;
-		max-height: 200px;
-	}
-
-	.result {
+	/* TODO Move */
+	.inline-button {
+		color: var(--blue);
+		font-weight: bold;
 		cursor: pointer;
-		padding: var(--s-2);
-	}
-
-	.result:nth-child(odd) {
-		background: var(--lightGray);
 	}
 </style>
