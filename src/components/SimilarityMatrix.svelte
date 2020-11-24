@@ -176,7 +176,7 @@
         box-shadow: var(--level-1);
     }
     .scale-indicator {
-        width: 1.5px;
+        width: var(--s-1);
         height: 100%;
         position: relative;
         background: var(--darkOrange);
