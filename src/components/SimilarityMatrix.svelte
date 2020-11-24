@@ -7,132 +7,61 @@
 
     export let data: [string, number][][]
     
-    let E
+    
+    const PADDING = .15
+
     let container: HTMLElement 
     let mounted = false
-
-    const cols = data.length
-    const rows = data.length
-    const PADDING = .15
+    let size = 0
 
     $: onHeightChange($height)
 
-    const createGrid = (containerHeight: number) => {    
-        const horizontalGrid = d3.scaleBand()
-            .range([0, containerHeight])
-            .domain(d3.range(cols))
-            .padding(PADDING)
-    
-        const verticalGrid = d3.scaleBand()
-            .range([0, containerHeight])
-            .domain(d3.range(rows))
-            .padding(PADDING)
-
-        return [horizontalGrid, verticalGrid]
-    }
-    
-    const maxSimilarity = d3.max(data, d => d3.max(d, d => d[1]))
-    const color = d3.scaleLinear()
+    $: rows = data.length
+    $: maxSimilarity = d3.max(data, d => d3.max(d, d => d[1]))
+    $: color = d3.scaleLinear()
         .range([COLORS.white, COLORS.orange])
         .domain([0, maxSimilarity])    
-
 
     const onHeightChange = (height) => {
         if (!mounted) return
 
         const { width } = container.getBoundingClientRect()
-        const [horizontalGrid, verticalGrid] = createGrid(width)
+        size = d3.scaleBand()
+            .range([0, width])
+            .domain(d3.range(rows))
+            .padding(PADDING)
+            .bandwidth()
+    }
 
-        const svg = d3.select(E)
-            .append('svg')
-            .attr('width', width)
-            .attr('height', height)
-        
-        // https://codereview.stackexchange.com/a/200524
-        const groups = svg.selectAll(null)
-            .data(data)
-            .enter()
-            .append('g')
-            .attr('transform', (_, i) => 'translate(' + horizontalGrid(i) + ')')
-            
-        
-        let currentRow = 0
-        const rects = groups.selectAll(null)
-            .data((d, i) => ([...d, i]))
-            .enter()
-            .append('rect')
-            // Draws upper right matrix only
-            .attr('fill', (d, i) => {
-                const alpha = 'rgba(0,0,0,0)'
-                if (Number.isInteger(d)) {
-                    currentRow = d + 1                    
-                    return alpha
-                }
-
-                const [_, sim] = d
-                return i >= currentRow ? alpha : color(sim)
-            })
-            .attr('y', (d, i) => verticalGrid(i))
-            .attr('width', horizontalGrid.bandwidth())
-            .attr('height', verticalGrid.bandwidth())
-            
-        currentRow = 0
-        const text = groups.selectAll(null)
-            .data((d, i) => ([...d, i]))
-            .enter()
-            .append('text')
-            .attr('y', (d, i) => {
-                if (i == rows) return 
-                // Special styling for bottom right item to make it look more symmetrical 
-                if (i == rows - 1) {
-                    return verticalGrid(i) + (verticalGrid.bandwidth() / 3)
-                }
-                return verticalGrid(i) + (verticalGrid.bandwidth() / 2)
-            })
-            .attr('dx', '6rem')
-            .text(d => {
-                if (d[0]) {
-                    const { number, title, guests } = episode(d[0])
-                    return guests ? `${guests}, ${number}` : title
-                }
-                return d
-            })
-            .attr('text-anchor', 'end')
-            .attr('fill', (d, i) => {
-                const alpha = 'rgba(0,0,0,0)'
-                if (Number.isInteger(d)) {
-                    currentRow = d + 1                    
-                    return alpha
-                }
-                return i != currentRow ? alpha : COLORS.black
-            })
-
-        // Legend
-        const legendWidth = width / 3
-        const legendHeight = 30
-        // const legend = svg.selectAll('legend')
-        //     .append('g')
-            
-        // legend.data(d3.range(0, 1, 1 / legendWidth))
-        //     .enter()
-        //     .attr('stroke-width', '2px')
-        //     .attr('border-top', '2px solid black')
-        //     .append('rect')
-        //     .attr('height', legendHeight)
-        //     .attr('width', '1px')
-        //     .attr('x', d => d * legendWidth)
-        //     .attr('y', height - (legendHeight * 2))
-        //     .attr('fill', d => color(d))
-
-        // legend.append('text')
-        //     .text('ELKs')
+    const getStyle = (similarity: number, size: number) => `
+            background: ${color(similarity)};
+            height: ${size}px; 
+            width: ${size}px;
+        `
+    
+    const getTitle = (id: string) => {
+        const { number, title, guests } = episode(id)
+        return guests ? `${guests}, ${number}` : title 
     }
 
     onMount(() => mounted = true)
 </script>
 
 <div bind:this={container} class='container' style='height: {$height}px;'>
-    <div bind:this={E}></div>
+    {#each data as column, i}
+        <div class="row">        
+            <div class="row-title">{getTitle(column[i][0])}</div>
+            {#each column as [_, sim], j}
+                {#if i != j && i < j}
+                    <div 
+                        class='cell' 
+                        style={getStyle(sim, size)}
+                    ></div>
+                {/if}
+            {/each}
+        </div>
+    {/each}
+
     <label class='monospace'>Calculated using TF-IDF cosine similarity</label>
 </div>
 
@@ -142,6 +71,20 @@
         width: 100%;
         border: var(--line);
         padding: var(--s-3);
+    }
+
+    .row {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    .row-title {
+        text-align: right;
+    }
+
+    .cell {
+        margin: var(--s-2);
     }
 </style>
 
