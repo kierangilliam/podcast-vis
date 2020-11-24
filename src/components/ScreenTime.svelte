@@ -114,11 +114,4 @@
             flex-direction: row;
         }
     }	
-
-	/* TODO Move */
-	.inline-button {
-		color: var(--blue);
-		font-weight: bold;
-		cursor: pointer;
-	}
 </style>
