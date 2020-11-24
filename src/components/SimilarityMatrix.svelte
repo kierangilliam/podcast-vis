@@ -54,8 +54,12 @@
         `
     
     const getTitle = (id: string) => {
-        const { number, title, guests } = episode(id)
-        return guests ? `${guests}, ${number}` : title 
+        let { title, guests } = episode(id)
+        if (guests.toLowerCase().includes("part")) {
+            guests = guests.replace(/\(Part?.*\)/g, "")
+            console.log(guests, "HERE")
+        }
+        return guests ? guests : title 
     }
 
     // Get details of element being hovered over
@@ -86,6 +90,7 @@
                 class:not-focused={focused && focused.index[0] != i && focused.index[1] != i}
             >
                 {getTitle(column[i][0])}
+                <p class="number-chip">{episode(column[i][0]).number}</p>
             </div>
 
             {#each column as [_, sim], j}
@@ -140,16 +145,24 @@
         align-items: center;
     }
 
+
     .row-title {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
         text-align: right;
         transition: all 250ms;
+    }
+    .row-title:last-of-type {
+        text-align: center;
+        align-items: center;
     }
     .row-title.focused {
         font-size: 1.1rem;
     }
     .row-title.not-focused {
         font-size: .5rem;
-    }
+    }    
 
     .cell {
         margin: var(--s-2);

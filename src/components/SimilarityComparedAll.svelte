@@ -46,7 +46,10 @@
         <div class="results">        
             {#each data as [ID, sim, words]}
                 <div class='details'>
-                    <p class='title' on:click={() => id = ID}>{episode(ID).guests}, {episode(ID).number}</p>
+                    <div class='title' on:click={() => id = ID}>
+                        <p class="number-chip">{episode(ID).number}</p>
+                        {episode(ID).guests}
+                    </div>
                     <p>{Math.round(sim*100)}%</p>
                 </div>
                 <div class='bar' style='width: {barWidth(sim)}px'></div>
@@ -80,10 +83,15 @@
         display: flex;
         justify-content: space-between;
         width: 95%;
+        margin-bottom: var(--s-2);
     }
     .details .title {
         cursor: pointer;
         transition: all 250ms ease-in;
+        display: flex;
+    }
+    .details .title .number-chip {
+        margin-right: var(--s-2);
     }
     .details .title:hover {
         font-size: 1.1rem;

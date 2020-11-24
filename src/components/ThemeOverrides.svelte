@@ -125,6 +125,14 @@
 		cursor: pointer;
 	}
 
+    :global(.number-chip) {
+        font-size: var(--textSmall);
+        background: var(--gray);
+        padding: var(--s-1) var(--s-2);
+        border-radius: var(--s-4);
+        width: fit-content;
+    }
+
     @media screen and (max-width: 1000px) {
         :global(body) {
             overflow-x: hidden !important;
