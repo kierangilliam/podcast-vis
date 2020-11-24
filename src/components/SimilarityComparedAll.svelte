@@ -1,6 +1,6 @@
 <script lang='ts'>
     import { H4, H5, Spacer } from '@ollopa/cedar'
-    import { onMount, tick } from 'svelte'
+    import { onMount } from 'svelte'
     import { height } from './similarity-state'
     import { episode } from '@lib/utils'
     import Search from './Search.svelte'
@@ -11,7 +11,7 @@
     let container: HTMLElement
     let totalWidth = 0
     let mounted = false
-    let searchVisible
+    let searchVisible: boolean
 
     const barWidth = (sim) => {
         return totalWidth * sim 
@@ -20,10 +20,6 @@
     onMount(async () => {
         totalWidth = container.getBoundingClientRect().width
         mounted = true
-
-        // Wait for progress bars to enter the DOM
-        await tick()
-        $height = container.getBoundingClientRect().height
     })
 </script>
 
@@ -31,7 +27,7 @@
 <!-- {searchableEpisodes} -->
 <Search bind:episodeID={id} bind:visible={searchVisible}  />
 
-<div bind:this={container} class='container'>
+<div bind:this={container} class='container' style='height: {$height}px;'>
     <p class='description'>Most similar podcasts</p>
     
     <div class='title'>
@@ -44,19 +40,21 @@
         </div>
     </div>
 
-    <Spacer s={8} />
+    <Spacer s={12} />
 
     {#if mounted}
-        {#each data as [ID, sim, words]}
-            <div class='details'>
-                <p class='title' on:click={() => id = ID}>{episode(ID).guests}, {episode(ID).number}</p>
-                <p>{Math.round(sim*100)}%</p>
-            </div>
-            <div class='bar' style='width: {barWidth(sim)}px'></div>
-            <!-- TODO -->
-            <label class='monospace words'>{words}</label>
-            <Spacer s={6} />
-        {/each}
+        <div class="results">        
+            {#each data as [ID, sim, words]}
+                <div class='details'>
+                    <p class='title' on:click={() => id = ID}>{episode(ID).guests}, {episode(ID).number}</p>
+                    <p>{Math.round(sim*100)}%</p>
+                </div>
+                <div class='bar' style='width: {barWidth(sim)}px'></div>
+                <!-- TODO -->
+                <label class='monospace words'>{words}</label>
+                <Spacer s={6} />
+            {/each}
+        </div>  
     {/if}
 </div>
 
@@ -73,15 +71,22 @@
         color: var(--darkGray);
     }
 
+    .results {
+        overflow-y: scroll;
+        height: 70%;
+    }
+
     .details {
         display: flex;
         justify-content: space-between;
+        width: 95%;
     }
     .details .title {
         cursor: pointer;
+        transition: all 250ms ease-in;
     }
     .details .title:hover {
-        font-weight: bolder;
+        font-size: 1.1rem;
     }
 
     .bar {

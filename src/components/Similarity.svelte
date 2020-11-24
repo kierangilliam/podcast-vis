@@ -27,8 +27,7 @@
             // Filter non-main episodes
             // TODO should also filter in MMA?
             .filter(([id, _]) => episode(id).main)
-            .slice(0, 5)
-        console.log("ITEMS", items)
+            .slice(0, 100)
         return items
     }
 
@@ -79,8 +78,6 @@
             
             function reverseIdLookup (id: string): number {
                 if (!id) return
-                console.log("HERE")
-                console.log(id)
                 return rows.find(item => item.id === id).idNum
             }
 
