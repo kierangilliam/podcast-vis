@@ -133,8 +133,7 @@
                                 on:mouseover={() => hoverWord = word}
                                 on:mouseout={() => hoverWord = null}
                             >
-                                <!-- <ReverseStem stem={word} /> -->
-                                {word}
+                                <ReverseStem stem={word} />
                             </p>
                         {/each}
                     </div>

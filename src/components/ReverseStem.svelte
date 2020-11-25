@@ -44,13 +44,12 @@
 
     onDestroy(() => clearInterval(indexInterval))
 
-    function fade (node: HTMLSpanElement, v) {
-        const DELAY = 75
-        let prevValue = v
-        let prevContainerWidth = node.parentElement.getBoundingClientRect().width
+    /* Watches when reverseStem changes to transition it's change */
+    function fade (node: HTMLSpanElement, _) {
+        const DELAY = 150
 		
 		return {
-			async update(newValue) {
+			update(__) {
                 node.style.setProperty('top', '-10px')
                 node.style.setProperty('opacity', '0')
                 
@@ -58,20 +57,6 @@
                     node.style.setProperty('top', '0')
                     node.style.setProperty('opacity', '1')
                 }, DELAY)        
-                
-                // Wait till DOM renders width with new stem
-                // await tick()
-                // let { width } = node.parentElement.getBoundingClientRect()                
-                // node.parentElement.style.setProperty('width', `${prevContainerWidth}px`)
-
-                // console.log(node.parentElement, prevContainerWidth, width)
-                
-                // setTimeout(() => {
-                //     node.parentElement.style.setProperty('width', `${width}px`)
-                // }, DELAY)
-
-                prevValue = newValue
-                // prevContainerWidth = width
             }
         }
     }
@@ -84,7 +69,7 @@
 <style>
     .reverse-stem {
         color: var(--darkGray);
-        transition: all 200ms ease-in-out;
+        transition: all 150ms ease-in-out;
         top: 0;
         position: relative;
     }
