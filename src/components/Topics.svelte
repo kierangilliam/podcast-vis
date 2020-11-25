@@ -5,11 +5,9 @@
     import { chunk } from '@lib/utils'
     import Chart from './TopicsChart.svelte'
     import { episode } from '@lib/utils'
+    import type { Episode } from '@lib/utils'
 
-    interface Data {
-        id: string
-        number: number
-        title: string
+    interface Data extends Episode {
         topWords: object
     }
 
@@ -34,8 +32,8 @@
         if (!bins || !word) return
 
         return data
-            .map(({ topWords, number }) => ({
-                number, 
+            .map(({ topWords, ...rest }) => ({
+                ...rest, 
                 termFrequency: topWords[word] || 0,
             }))
             .filter(({ number }) => number != 0)
@@ -99,9 +97,8 @@
         data = (await d3.csv('./word_occurrences.csv'))
             .map(({ id, top_words }) => ({
                 id, 
-                number: episode(id).number, 
-                title: episode(id).title,
                 topWords: (0, eval)('(' + top_words + ')'),
+                ...episode(id), 
             }))
     })
 </script>
