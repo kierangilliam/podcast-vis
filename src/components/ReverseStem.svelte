@@ -16,7 +16,10 @@
         }
 
         if (stemToWord[stem].length == 1) {
-            stem = stemToWord[stem][0]
+            const reversed = stemToWord[stem][0]
+            // If the only item in the array is the word itself, return that word
+            // else, combine that word with the stem ex: "polic" : ["e"]
+            stem = reversed.length >= stem ? reversed : stem + reversed
             clearInterval(indexInterval)
             return
         }
