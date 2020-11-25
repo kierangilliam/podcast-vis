@@ -1,35 +1,26 @@
 <script lang='ts'>
-    import { H3, H5 } from '@ollopa/cedar'
+    import { H3 } from '@ollopa/cedar'
 	import * as d3 from 'd3'
     import { onMount } from 'svelte'
     import { chunk } from '@lib/utils'
     import Chart from './TopicsChart.svelte'
     import { episode } from '@lib/utils'
     import type { Episode } from '@lib/utils'
-    import Slider from './Slider.svelte'
-    import ReverseStem from './ReverseStem.svelte'
+    import TopicsBins from './TopicsBins.svelte'
+    
+    import type { Bin } from './topics'
 
     interface Data extends Episode {
         topWords: object
-    }
-
-    interface Bin {
-        start: number
-        end: number
-        cfd: {[key: string]: number}
-        tfidf: [string, number][]
-    }
-
-    // Number of bins visible
-    const BIN_COUNT = 5  
-    const VISIBLE_WORDS_COUNT = 15
+    }            
 
     let data: Data[]
-    let selectedWord = 'mask', hoverWord = null
-    let binsStart = 0
+    // Episode ids that are emphasized on the chart
+    let highlighted: string[]
+    let pinnedWord = 'mask'
 
-    $: bins = bin(data)
-    $: chartData = getChartData(bins, selectedWord)
+    $: bins = bin(data)    
+    $: chartData = getChartData(bins, pinnedWord)
     
     const getChartData = (bins: Bin[], word: string) => {
         if (!bins || !word) return
@@ -64,7 +55,8 @@
                     return {
                         cfd,
                         start: d3.min(bin, d => d.number),
-                        end: d3.max(bin, d => d.number),                        
+                        end: d3.max(bin, d => d.number),    
+                        episodeIDs: bin.map(({ id }) => id)                    
                     }
                 })
 
@@ -106,8 +98,7 @@
                 ...episode(id), 
             }))
         
-        bins = bin(data)
-        binsStart = bins.length - BIN_COUNT
+        bins = bin(data)        
     })
 </script>
 
@@ -115,35 +106,11 @@
 
 {#if bins}
     <div class='container'>
-        <div class='bins'>
-            <div class='slider'>
-                <Slider bind:value={binsStart} min={0} max={bins.length - BIN_COUNT} />
-            </div>
-            {#each bins.slice(binsStart, binsStart + BIN_COUNT) as item}
-                <div class='bin'>
-                    <div class='bin-title'>
-                        <H5>{item.start} - {item.end}</H5>
-                    </div>
-                    <div class='bin-inner'>
-                        {#each item.tfidf.slice(0, VISIBLE_WORDS_COUNT) as [word, _]}
-                            <p 
-                                class:selected={selectedWord == word}
-                                class:hover={selectedWord != word && word == hoverWord}
-                                on:click={() => selectedWord = word}
-                                on:mouseover={() => hoverWord = word}
-                                on:mouseout={() => hoverWord = null}
-                            >
-                                <ReverseStem stem={word} />
-                            </p>
-                        {/each}
-                    </div>
-                </div>
-            {/each}
-        </div>            
+        <TopicsBins {bins} bind:pinnedWord bind:highlighted />           
 
         {#if chartData}
             <div class='chart'>
-                <Chart word={selectedWord} data={chartData} />
+                <Chart {pinnedWord} data={chartData} {highlighted} />
             </div>
         {/if}
     </div>
@@ -152,53 +119,5 @@
 <style>
     .container {
         display: flex;
-    }
-
-    .bins {
-        display: flex;
-        flex: 1.5;
-        justify-content: space-between;
-        /* So that .slider can be positioned relative to this div */
-        position: relative;
-    }
-
-    .bin {
-        text-align: center;        
-        transition: all 250ms ease-in;
-        width: 100%;
-        margin: 0 var(--s-2);
-    }
-    .bin:first-of-type {
-        margin-left: var(--s-8);
-    }
-
-    .bin-inner {
-        padding: var(--s-2) var(--s-3);
-        background-color: var(--lightGray);
-        border: var(--line);
-    }
-    .bin-inner p {
-        cursor: pointer;
-        font-family: var(--headingFont);
-    }
-
-    .slider {
-        --sliderHeight: 425px;
-        --sliderXOffset: 15px;
-        position: absolute;
-        width: var(--sliderHeight);
-        left: calc(var(--sliderHeight) / -2 - var(--sliderXOffset));
-        top: calc(var(--sliderHeight) / 2);
-        transform: rotate(270deg);
-    }
-
-    .selected {
-        border-radius: var(--s-3);
-        background: var(--peach);
-    }
-    .hover {
-        opacity: .75;
-        border-radius: var(--s-3);
-        background: var(--peach);
-    }
+    }    
 </style>

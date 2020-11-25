@@ -5,16 +5,16 @@
     import { COLORS } from '@lib/constants'
     import { getTitle } from '@lib/utils'
     import type { Episode } from '@lib/utils'
-    
     import Tooltip from './Tooltip.svelte'
-import ReverseStem from './ReverseStem.svelte'
+    import ReverseStem from './ReverseStem.svelte'
 
     interface DataPoint extends Episode {
         termFrequency: number
     }
 
-    export let word: string
+    export let pinnedWord: string
     export let data: DataPoint[]
+    export let highlighted: string[]
 
     const DOT_SIZE = 4.5
 
@@ -25,10 +25,14 @@ import ReverseStem from './ReverseStem.svelte'
     let tooltip
 
     $: updateData(data, mounted)
+    $: updateHighlighted(highlighted)
 
     const margin = { top: 10, right: 30, bottom: 30, left: 60 },
         width = 460 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom
+
+    const dotOpacity = (d: DataPoint, defaultValue='1') => 
+        d.termFrequency == 0 ? '0' : defaultValue
     
     const updateData = (data: DataPoint[], mounted: boolean) => {
         if (!mounted) return
@@ -68,10 +72,34 @@ import ReverseStem from './ReverseStem.svelte'
             .data(data)      
             .transition()      
             .duration(750)
-            .attr('opacity', (d: DataPoint) => d.termFrequency == 0 ? '0' : '1')
+            .attr('opacity', dotOpacity)
             .attr('cx', (d: DataPoint) => x(d.published))
             .attr('cy', (d: DataPoint) => y(d.termFrequency))
             .attr('r', DOT_SIZE)            
+    }    
+
+    const updateHighlighted = (_) => {
+        if (!mounted) return 
+        const toggled = highlighted && highlighted.length > 0
+
+        svg.selectAll('circle')
+            .data(data)      
+            .transition()      
+            .duration(250)
+            .attr('opacity', (d: DataPoint) => {
+                if (toggled) {
+                    return highlighted.includes(d.id) ? dotOpacity(d) : dotOpacity(d, '.25')
+                }
+
+                return dotOpacity(d)
+            })
+            .attr('r', (d: DataPoint) => {
+                if (toggled) {
+                    return highlighted.includes(d.id) ? DOT_SIZE * 1.5 : DOT_SIZE
+                }
+
+                return DOT_SIZE
+            })
     }
 
     onMount(() => {
@@ -133,7 +161,7 @@ import ReverseStem from './ReverseStem.svelte'
     <Spacer s={2} />
     <div class='flex between'>
         <div>
-            {tooltip.termFrequency} {tooltip.termFrequency > 1 ? 'occurrences' : 'occurrence'} of {word}
+            {tooltip.termFrequency} {tooltip.termFrequency > 1 ? 'occurrences' : 'occurrence'} of {pinnedWord}
         </div>
         <p class='published'>{tooltip.published.toDateString()}</p>
     </div>
@@ -141,7 +169,7 @@ import ReverseStem from './ReverseStem.svelte'
 
 <div class='container'>
     <H5>
-        <strong style="font-family: auto"><i><ReverseStem stem={word} /></i></strong> 
+        <strong style="font-family: auto"><i><ReverseStem stem={pinnedWord} /></i></strong> 
         term frequency over time
     </H5>
     <div bind:this={element}></div>
