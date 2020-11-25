@@ -53,3 +53,10 @@ export const getTitle = (id: string) => {
 
     return guests ? guests : title
 }
+
+
+export let stemToWord = null;
+(async () => {
+    stemToWord = (await (await fetch('./reverse_stem.json')).json())
+})();
+

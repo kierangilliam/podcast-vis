@@ -7,6 +7,7 @@
     import { episode } from '@lib/utils'
     import type { Episode } from '@lib/utils'
     import Slider from './Slider.svelte'
+    import ReverseStem from './ReverseStem.svelte'
 
     interface Data extends Episode {
         topWords: object
@@ -132,6 +133,7 @@
                                 on:mouseover={() => hoverWord = word}
                                 on:mouseout={() => hoverWord = null}
                             >
+                                <!-- <ReverseStem stem={word} /> -->
                                 {word}
                             </p>
                         {/each}
@@ -155,14 +157,20 @@
 
     .bins {
         display: flex;
+        flex: 1.5;
+        justify-content: space-between;
         /* So that .slider can be positioned relative to this div */
         position: relative;
     }
 
     .bin {
-        text-align: center;
-        margin-left: var(--s-6);
+        text-align: center;        
         transition: all 250ms ease-in;
+        width: 100%;
+        margin: 0 var(--s-2);
+    }
+    .bin:first-of-type {
+        margin-left: var(--s-8);
     }
 
     .bin-inner {
@@ -177,9 +185,10 @@
 
     .slider {
         --sliderHeight: 425px;
+        --sliderXOffset: 15px;
         position: absolute;
         width: var(--sliderHeight);
-        left: calc(var(--sliderHeight) / -2);
+        left: calc(var(--sliderHeight) / -2 - var(--sliderXOffset));
         top: calc(var(--sliderHeight) / 2);
         transform: rotate(270deg);
     }

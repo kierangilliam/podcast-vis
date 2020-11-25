@@ -7,6 +7,7 @@
     import type { Episode } from '@lib/utils'
     
     import Tooltip from './Tooltip.svelte'
+import ReverseStem from './ReverseStem.svelte'
 
     interface DataPoint extends Episode {
         termFrequency: number
@@ -15,7 +16,7 @@
     export let word: string
     export let data: DataPoint[]
 
-    const DOT_SIZE = 4
+    const DOT_SIZE = 4.5
 
     let element: HTMLElement
     // d3 x y scales and main svg
@@ -139,7 +140,10 @@
 </Tooltip>
 
 <div class='container'>
-    <H5><strong><i>{word}</i></strong> term frequency over time</H5>
+    <H5>
+        <strong style="font-family: auto"><i><ReverseStem stem={word} /></i></strong> 
+        term frequency over time
+    </H5>
     <div bind:this={element}></div>
 </div>
 
