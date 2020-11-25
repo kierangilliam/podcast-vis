@@ -1,6 +1,6 @@
 <script lang='ts'>
     import { stemToWord } from '@lib/utils'
-    import { onDestroy, tick } from 'svelte'
+    import { onDestroy } from 'svelte'
 
     export let stem: string
     
