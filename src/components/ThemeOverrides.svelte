@@ -99,6 +99,9 @@
         background: var(--lightGray);
         color: var(--black);
     }
+    :global(.small) {
+        font-size: var(--textSmall);
+    }
     :global(.monospace) {
         font-family: monospace;
     }
