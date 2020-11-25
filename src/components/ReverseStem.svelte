@@ -9,7 +9,6 @@
 
     $: reverseStem = getRestOfWord(stem, stemToWord, reverseIndex)
 
-
     const getRestOfWord = (_, __, ___) => {
         if (!stemToWord || !stem || !stemToWord[stem]) {
             clearInterval(indexInterval)
@@ -33,13 +32,7 @@
             return 
         }
         
-        const reverse = stemToWord[stem][reverseIndex % stemToWord[stem].length]
-        // if (reverse.length == stem.length) {
-        //     stem = 
-        // }
-        console.log(reverse)
-
-        return reverse
+        return stemToWord[stem][reverseIndex % stemToWord[stem].length]
     }
 
     onDestroy(() => clearInterval(indexInterval))
