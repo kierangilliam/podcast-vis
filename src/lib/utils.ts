@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 
-interface Episode {
+export interface Episode {
     guests: string
     published: Date
     title: string
@@ -42,4 +42,14 @@ export let episodes: Episode[] = [];
 
 export const episode = (id: string) => {
     return episodes.find(e => e.id === id)
+}
+
+export const getTitle = (id: string) => {
+    let { title, guests } = episode(id)
+
+    if (guests.toLowerCase().includes("part")) {
+        guests = guests.replace(/\(Part?.*\)/g, "")
+    }
+
+    return guests ? guests : title
 }

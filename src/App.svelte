@@ -18,11 +18,11 @@ TODO add to sections:
 		<H5>Here we analyze facets of the Joe Rogan Experience.</H5>
 
 		<Section>
-			<ScreenTime />
-		</Section>
-		
-		<Section>
 			<Similarity />
+		</Section>
+
+		<Section>
+			<ScreenTime />
 		</Section>
 
 		<Section>

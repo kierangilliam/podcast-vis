@@ -71,7 +71,7 @@
     }
 
     .description {
-        color: var(--darkGray);
+        opacity: .75;
     }
 
     .results {

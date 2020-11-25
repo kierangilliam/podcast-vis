@@ -3,7 +3,7 @@
     import { COLORS } from '@lib/constants'
     import { height } from './similarity-state'
     import * as d3 from 'd3'
-    import { episode } from '@lib/utils'    
+    import { episode, getTitle } from '@lib/utils'    
     import { Spacer } from '@ollopa/cedar'
 
     export let data: [string, number][][]
@@ -52,15 +52,6 @@
             height: ${size}px !important; 
             width: ${size}px !important;
         `
-    
-    const getTitle = (id: string) => {
-        let { title, guests } = episode(id)
-        if (guests.toLowerCase().includes("part")) {
-            guests = guests.replace(/\(Part?.*\)/g, "")
-            console.log(guests, "HERE")
-        }
-        return guests ? guests : title 
-    }
 
     // Get details of element being hovered over
     const getHoveringDetails = (_: [number, number]) => {

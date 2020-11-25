@@ -40,7 +40,7 @@
         const bottomAxis = T.select('.x.axis')
             .duration(750)
             .call(d3.axisBottom(x)
-                .tickSize(1)
+                .tickSize(4)
                 .tickFormat((x, i) => {
                     const d = new Date(x)
                     const month = d.toLocaleString('default', { month: 'short' });
@@ -105,18 +105,26 @@
             .on('mouseover', function({ clientX, clientY }, dataPoint) {
                 if (dataPoint.termFrequency == 0) return
                 tooltip = { x: clientX, y: clientY, ...dataPoint }
-                d3.select(this).attr('r', DOT_SIZE * 1.5).style('fill', COLORS.darkOrange)
+                d3.select(this)
+                    .transition()
+                    .duration(100)
+                    .attr('r', DOT_SIZE * 1.5)
+                    .style('fill', COLORS.darkOrange)
             })
             .on('mouseleave', function(e, d) {
                 tooltip = null
-                d3.select(this).attr('r', DOT_SIZE).style('fill', COLORS.orange)
+                d3.select(this)
+                    .transition()
+                    .duration(100)
+                    .attr('r', DOT_SIZE)
+                    .style('fill', COLORS.orange)
             })
 
         mounted = true
     })    
 </script>
 
-<Tooltip bind:tooltip>
+<Tooltip {tooltip}>
     <div class='flex between'>
         <p class='tooltip-title'>{getTitle(tooltip.id)}</p>
         <p class='number-chip'>{tooltip.number}</p>
@@ -142,6 +150,9 @@
 
     .tooltip-title {
         margin-right: var(--s-6);
+    }
+    .published {
+        margin-left: var(--s-12);
     }
 
     .published {
