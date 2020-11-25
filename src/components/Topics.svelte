@@ -6,6 +6,7 @@
     import Chart from './TopicsChart.svelte'
     import { episode } from '@lib/utils'
     import type { Episode } from '@lib/utils'
+    import Slider from './Slider.svelte'
 
     interface Data extends Episode {
         topWords: object
@@ -24,6 +25,7 @@
 
     let data: Data[]
     let selectedWord = 'mask', hoverWord = null
+    let binsStart = 0
 
     $: bins = bin(data)
     $: chartData = getChartData(bins, selectedWord)
@@ -80,17 +82,19 @@
         })
 
         return bins.map(bin => {
-            const tfidf = {}
-            Object.entries(bin.cfd).forEach(([word, tf]) => {
-                const idf = bins.length / (binFrequency[word] + 1)
-                tfidf[word] = tf * Math.log(idf)                
+                const tfidf = {}
+                Object.entries(bin.cfd).forEach(([word, tf]) => {
+                    const idf = bins.length / (binFrequency[word] + 1)
+                    tfidf[word] = tf * Math.log(idf)                
+                })
+                return { 
+                    ...bin, 
+                    tfidf: Object.entries<number>(tfidf)
+                        .sort((a, b) => b[1] - a[1]) 
+                }
             })
-            return { 
-                ...bin, 
-                tfidf: Object.entries<number>(tfidf)
-                    .sort((a, b) => b[1] - a[1]) 
-            }
-        })
+            .filter(({ start }) => start != 0)
+            .reverse()
     }
 
     onMount(async () => {
@@ -100,36 +104,46 @@
                 topWords: (0, eval)('(' + top_words + ')'),
                 ...episode(id), 
             }))
+        
+        bins = bin(data)
+        binsStart = bins.length - BIN_COUNT
     })
 </script>
 
-<H3>Topics</H3>
+<H3>Topics over time</H3>
 
 {#if bins}
-    <div class="container">
-        {#each bins.slice(0, BIN_COUNT) as item}
-            <div class="bin">
-                <div class="bin-title">
-                    <H5>{item.start} - {item.end}</H5>
-                </div>
-                <div class="bin-inner">
-                    {#each item.tfidf.slice(0, VISIBLE_WORDS_COUNT) as [word, _]}
-                        <p 
-                            class:selected={selectedWord == word}
-                            class:hover={selectedWord != word && word == hoverWord}
-                            on:click={() => selectedWord = word}
-                            on:mouseover={() => hoverWord = word}
-                            on:mouseout={() => hoverWord = null}
-                        >
-                            {word}
-                        </p>
-                    {/each}
-                </div>
+    <div class='container'>
+        <div class='bins'>
+            <div class='slider'>
+                <Slider bind:value={binsStart} min={0} max={bins.length - BIN_COUNT} />
             </div>
-        {/each}
+            {#each bins.slice(binsStart, binsStart + BIN_COUNT) as item}
+                <div class='bin'>
+                    <div class='bin-title'>
+                        <H5>{item.start} - {item.end}</H5>
+                    </div>
+                    <div class='bin-inner'>
+                        {#each item.tfidf.slice(0, VISIBLE_WORDS_COUNT) as [word, _]}
+                            <p 
+                                class:selected={selectedWord == word}
+                                class:hover={selectedWord != word && word == hoverWord}
+                                on:click={() => selectedWord = word}
+                                on:mouseover={() => hoverWord = word}
+                                on:mouseout={() => hoverWord = null}
+                            >
+                                {word}
+                            </p>
+                        {/each}
+                    </div>
+                </div>
+            {/each}
+        </div>            
 
         {#if chartData}
-            <Chart word={selectedWord} data={chartData} />
+            <div class='chart'>
+                <Chart word={selectedWord} data={chartData} />
+            </div>
         {/if}
     </div>
 {/if}
@@ -139,9 +153,16 @@
         display: flex;
     }
 
+    .bins {
+        display: flex;
+        /* So that .slider can be positioned relative to this div */
+        position: relative;
+    }
+
     .bin {
         text-align: center;
-        margin-right: var(--s-6);
+        margin-left: var(--s-6);
+        transition: all 250ms ease-in;
     }
 
     .bin-inner {
@@ -152,6 +173,15 @@
     .bin-inner p {
         cursor: pointer;
         font-family: var(--headingFont);
+    }
+
+    .slider {
+        --sliderHeight: 425px;
+        position: absolute;
+        width: var(--sliderHeight);
+        left: calc(var(--sliderHeight) / -2);
+        top: calc(var(--sliderHeight) / 2);
+        transform: rotate(270deg);
     }
 
     .selected {
