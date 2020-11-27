@@ -8,7 +8,6 @@
 
     export let data: [string, number][][]
     
-    
     const PADDING = .15
 
     let mounted = false

@@ -1,7 +1,7 @@
 <script>
     import { Spacer } from '@ollopa/cedar'
 
-    const GAP = 16
+    const GAP = 24
 </script>
 
 <Spacer s={GAP}/>

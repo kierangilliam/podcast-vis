@@ -13,8 +13,21 @@
     
     $: expanded = clusters && expandAt && filtered()
 
+     const as_timestamp = (frames: number, playhead: number): string => {
+        const FPS = 29.97
+        let sec: string | number = (frames * playhead) / FPS
+        const hour = Math.floor(sec / 60 / 60)
+        const min = `${Math.floor(sec / 60) % 60}`.padStart(2, '0')
+        sec = `${Math.floor(sec) % 60}`.padStart(2, '0')
+        return `${hour}:${min}:${sec}`
+    }
+
+    const as_timestamp_ = (frames: number, start: number, end: number) => {
+        return `${as_timestamp(frames, start)} - ${as_timestamp(frames, end)}`
+    }
+
     const withinExpandedRegion = ([start, end]) => 
-        start > expandAt - (expandAmount / 2) && end < expandAt + (expandAmount / 2)
+        start >= expandAt - (expandAmount / 2) && end <= expandAt + (expandAmount / 2)
                     
     const filtered = (): [string, number[][]] => {
         // @ts-ignore

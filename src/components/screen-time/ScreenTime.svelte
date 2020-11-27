@@ -4,7 +4,8 @@
 	import * as d3 from 'd3'
 	import { onMount } from 'svelte'
 	import DonutChart from './DonutChart.svelte'
-import Timeline from './Timeline.svelte'
+	import Timeline from './Timeline.svelte'
+	import { Timelines } from '@lib/proto/screen-time'
 
 	let data
 	let segments: {}
@@ -12,6 +13,7 @@ import Timeline from './Timeline.svelte'
 	let episodeID = null
 	let searchableEpisodes
 	let searchVisible = false
+	let timelines
 
 	$: episodeUpdate(episodeID)
 
@@ -31,6 +33,16 @@ import Timeline from './Timeline.svelte'
 		segments = data
 			.find(({ id }) => id === episodeID)
 			.segments
+	}
+
+	async function loadTimelines() {
+		const response = await fetch('./screen_time_timelines')
+		const bufferRes = await response.arrayBuffer();
+		// @ts-ignore
+		const pbf = new Pbf(new Uint8Array(bufferRes));
+		// @ts-ignore
+		const { timelines } = Timelines.read(pbf);
+		return timelines
 	}
 
 	onMount(async () => {
@@ -53,11 +65,17 @@ import Timeline from './Timeline.svelte'
             .map(({ id, data }) => ({
 				id, 
                 segments: formatData(data),
-			}))
+			}))		
 			
 		searchableEpisodes = data.map(({ id }) => id)
 
 		episodeID = data[0].id	
+
+		// TODO just make a folder with the timelines as protobufs
+		// do same for sim matrix
+		timelines = await loadTimelines()
+
+		console.log(timelines)
 	})
 </script>
 
