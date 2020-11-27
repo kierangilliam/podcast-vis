@@ -153,7 +153,7 @@
     })    
 </script>
 
-<Tooltip {tooltip}>
+<Tooltip x={tooltip?.x} y={tooltip?.y} yOffset={25}>
     <div class='flex between'>
         <p class='tooltip-title'>{getTitle(tooltip.id)}</p>
         <p class='number-chip'>{tooltip.number}</p>

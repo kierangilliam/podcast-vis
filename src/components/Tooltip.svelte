@@ -1,19 +1,19 @@
 <script lang='ts'>
     import { fly } from 'svelte/transition'
 
-    export let tooltip: { x: number, y: number }
+    export let x: number
+    export let y: number
+    export let yOffset = 0
 
     let tooltipElem: HTMLElement
 
-    $: tooltipStyle = tooltip && tooltipElem && (() => {
-        const { x, y } = tooltip
+    $: tooltipStyle = x && y && tooltipElem && (() => {
         const { height, width } = tooltipElem.getBoundingClientRect()
-        const tooltipOffset = 25
-        return `left: ${x - width / 2}px; top: ${y - height - tooltipOffset}px`
+        return `left: ${x - width / 2}px; top: ${y - height - yOffset}px`
     })()
 </script>
 
-{#if tooltip}
+{#if x && y}
     <div 
         bind:this={tooltipElem} 
         class='tooltip' 
