@@ -6,18 +6,18 @@
 
     export let episode: Episode
     export let segments: { [key: number]: number }
-    export let width = 500
-    export let height = 500
+    export let width
+    export let height
+    export let imageSize
 
-    const IMAGE_SIZE = 100
 
     let element: SVGSVGElement, svg
     let images: { image: string, x: number, y: number }[] = []
 
     const donutChart = makeDonutChart({ 
         animationDuration: 750,
-        outerRadius: 220,
-        innerRadius: 150
+        outerRadius: (width / 2),
+        innerRadius: (width / 2) - 50
     })
 
     $: updateData(svg, episode)
@@ -40,8 +40,10 @@
     const getImageStyle = ({ x, y }) => {
         const { top, left, width, height } = element.getBoundingClientRect()
         return `
-            left: ${left + x + (width / 2) - (IMAGE_SIZE / 2)}px;
-            top: ${top + y + (height / 2) + (IMAGE_SIZE / 2)}px;
+            width: ${imageSize}px;
+            height: ${imageSize}px;
+            left: ${left + x + (width / 2) - (imageSize / 2)}px;
+            top: ${top + y + (height / 2) - (imageSize / 2)}px;
         `
     }
 
@@ -70,8 +72,6 @@
         position: absolute;
         object-fit: cover;
         border-radius: 50%;
-        height: 100px;
-        width: 100px;
         transition: all 100ms ease-in-out;
     }
     img:hover {

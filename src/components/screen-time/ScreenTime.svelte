@@ -70,7 +70,13 @@
 <div class='container'>
 	{#if episode}
 		<div class='chart'>
-			<DonutChart {episode} {segments} />
+			<DonutChart 
+				width={350}
+				height={350}
+				imageSize={75}
+				{episode} 
+				{segments} 
+			/>
 		</div>
 	{/if}
 	<Spacer s={8} />
