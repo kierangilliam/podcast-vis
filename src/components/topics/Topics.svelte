@@ -4,17 +4,12 @@
     import { onMount } from 'svelte'
     import { chunk } from '@lib/utils'
     import Chart from './TopicsChart.svelte'
-    import { episode } from '@lib/utils'
-    import type { Episode } from '@lib/utils'
+    import type { WordOccurrence } from '@lib/types'
     import TopicsBins from './TopicsBins.svelte'
-    
+    import { wordOccurrences } from '@lib/data'
     import type { Bin } from './topics'
 
-    interface Data extends Episode {
-        topWords: object
-    }            
-
-    let data: Data[]
+    let data: WordOccurrence[]
     // Episode ids that are emphasized on the chart
     let highlighted: string[]
     let pinnedWord = 'mask'
@@ -91,13 +86,7 @@
     }
 
     onMount(async () => {
-        data = (await d3.csv('./word_occurrences.csv'))
-            .map(({ id, top_words }) => ({
-                id, 
-                topWords: (0, eval)('(' + top_words + ')'),
-                ...episode(id), 
-            }))
-        
+        data = await wordOccurrences()
         bins = bin(data)        
     })
 </script>

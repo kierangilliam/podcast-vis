@@ -1,15 +1,6 @@
 import * as d3 from 'd3'
 import { writable } from 'svelte/store'
 
-export interface Episode {
-    guests: string
-    published: Date
-    title: string
-    number: number
-    id: string
-    main: boolean
-}
-
 export const wait = async (ms: number) =>
     new Promise(res => setTimeout(() => res(), ms))
 
