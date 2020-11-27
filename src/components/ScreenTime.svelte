@@ -65,7 +65,7 @@
 			return data
 		}
 
-        data = (await d3.csv('./video_segments.csv'))
+        data = (await d3.csv('./screen_time.csv'))
             .map(({ id, data }) => ({
 				id, 
 				number: getEpisode(id).number, 
