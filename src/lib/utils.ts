@@ -63,3 +63,19 @@ export let stemToWord = null;
     stemToWord = (await (await fetch('./reverse_stem.json')).json())
 })();
 
+/** Dispatch event on click outside of node */
+export function clickOutside(node, handler: () => any) {
+    const handleClick = event => {
+        if (node && !node.contains(event.target) && !event.defaultPrevented) {
+            handler()
+        }
+    }
+
+    document.addEventListener('click', handleClick, true)
+
+    return {
+        destroy() {
+            document.removeEventListener('click', handleClick, true);
+        }
+    }
+}
