@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { H5 } from '@ollopa/cedar'
     import Slider from './Slider.svelte'
-    import ReverseStem from './ReverseStem.svelte'
+    import ReverseStem from '../ReverseStem.svelte'
     import type { Bin } from './topics'
 
     export let bins: Bin[]

@@ -5,8 +5,8 @@
     import { COLORS } from '@lib/constants'
     import { getTitle } from '@lib/utils'
     import type { Episode } from '@lib/utils'
-    import Tooltip from './Tooltip.svelte'
-    import ReverseStem from './ReverseStem.svelte'
+    import Tooltip from '../Tooltip.svelte'
+    import ReverseStem from '../ReverseStem.svelte'
 
     interface DataPoint extends Episode {
         termFrequency: number

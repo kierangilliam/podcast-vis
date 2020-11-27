@@ -1,7 +1,7 @@
 <script lang='ts'>
 	import { COLORS } from '@lib/constants'
 	import { H3, Spacer } from '@ollopa/cedar'
-	import Search from './Search.svelte'
+	import Search from '../Search.svelte'
 	import * as d3 from 'd3'
 	import { onMount } from 'svelte'
 	import { episode as getEpisode } from '@lib/utils'

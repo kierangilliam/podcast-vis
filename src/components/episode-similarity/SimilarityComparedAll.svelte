@@ -3,7 +3,7 @@
     import { onMount } from 'svelte'
     import { height } from './similarity-state'
     import { episode } from '@lib/utils'
-    import Search from './Search.svelte'
+    import Search from '../Search.svelte'
 
     export let id: string
     export let data: [string, number, string][]
