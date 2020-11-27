@@ -1,4 +1,5 @@
 import * as d3 from 'd3'
+import { writable } from 'svelte/store'
 
 export interface Episode {
     guests: string
@@ -29,6 +30,7 @@ export const chunk = (arr, chunkSize) => {
     return R;
 }
 
+export let episodesLoaded = writable(false);
 export let episodes: Episode[] = [];
 (async () => {
     episodes = (await d3.csv('./episodes.csv'))
@@ -38,6 +40,7 @@ export let episodes: Episode[] = [];
             main: main === "True" ? true : false,
             ...rest,
         }))
+    episodesLoaded.set(true)
 })();
 
 export const episode = (id: string) => {
