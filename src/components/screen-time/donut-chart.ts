@@ -1,4 +1,5 @@
-import * as d3 from 'd3';
+import { COLORS } from '@lib/constants'
+import * as d3 from 'd3'
 
 //https://bl.ocks.org/guilhermesimoes/49ba71346a956ed0a12e9bc515be5804
 export function makeDonutChart({ animationDuration = 750, innerRadius = 0, outerRadius = 100 }) {
@@ -9,8 +10,10 @@ export function makeDonutChart({ animationDuration = 750, innerRadius = 0, outer
         .value(d => d.value)
     let data = []
 
-    // COLORS.orange, COLORS.blue, COLORS.green, 
-    // 			COLORS.purple, COLORS.red, COLORS.black, COLORS.darkOrange
+    const colors = [COLORS.orange, COLORS.blue, COLORS.green,
+    COLORS.purple, COLORS.red, COLORS.black, COLORS.darkOrange]
+
+    console.log(d3.schemeCategory10)
 
     function updateTween(d) {
         var i = d3.interpolate(this._current, d);

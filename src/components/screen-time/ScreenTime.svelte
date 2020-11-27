@@ -1,16 +1,12 @@
-<script lang='ts'>
-	import { COLORS } from '@lib/constants'
+<script lang='ts'>	
 	import { H3, Spacer } from '@ollopa/cedar'
 	import Search from '../Search.svelte'
 	import * as d3 from 'd3'
 	import { onMount } from 'svelte'
-	import { episode as getEpisode } from '@lib/utils'
-	import type { Episode } from '@lib/utils'
 	import DonutChart from './DonutChart.svelte'
 
 	let data
 	let segments: {}
-	let episode: Episode = null
 	// What search returns
 	let episodeID = null
 	let searchableEpisodes
@@ -31,7 +27,6 @@
 	const episodeUpdate = (_) => {
 		if (!episodeID) return 
 
-		episode = getEpisode(episodeID)
 		segments = data
 			.find(({ id }) => id === episodeID)
 			.segments
@@ -68,13 +63,13 @@
 <Search bind:episodeID bind:visible={searchVisible} {searchableEpisodes} />
 
 <div class='container'>
-	{#if episode}
+	{#if episodeID}
 		<div class='chart'>
 			<DonutChart 
 				width={350}
 				height={350}
 				imageSize={75}
-				{episode} 
+				{episodeID}
 				{segments} 
 			/>
 		</div>

@@ -2,14 +2,14 @@
     import * as d3 from 'd3'
     import { onMount, tick } from 'svelte'
     import { makeDonutChart } from './donut-chart'
-    import type { Episode } from '@lib/utils'
+    import { episode, getTitle } from '@lib/utils'
+    import { H5, Spacer } from '@ollopa/cedar'
 
-    export let episode: Episode
+    export let episodeID: string
     export let segments: { [key: number]: number }
-    export let width
-    export let height
-    export let imageSize
-
+    export let width: number
+    export let height: number
+    export let imageSize: number
 
     let element: SVGSVGElement, svg
     let images: { image: string, x: number, y: number }[] = []
@@ -20,16 +20,16 @@
         innerRadius: (width / 2) - 50
     })
 
-    $: updateData(svg, episode)
+    $: updateData(svg, episodeID)
 
     const updateData = async (..._) => {
-        if (!svg || !segments || !episode) return
+        if (!svg || !segments || !episodeID) return
 
         const dataset = Object.entries(segments)
             .map(([cluster, value]) => ({ 
                 series: cluster, 
                 value,
-                image: `images/${episode.id}.cluster.${cluster}.jpg`
+                image: `images/${episodeID}.cluster.${cluster}.jpg`
             }))
 
         svg.call(donutChart.data(dataset))
@@ -57,26 +57,49 @@
 
 </script>
 
-<svg bind:this={element} class='container'></svg>
+<div class="container">
+    <svg bind:this={element}></svg>
+    <Spacer />
+    <div class='title'>
+        <div class='number-chip'>{episode(episodeID).number}</div>
+        <Spacer s={2} />
+        <H5>{getTitle(episodeID)}</H5> 
+    </div>
+</div>
 
 {#each images as { image, x, y }}
     <img 
         src={image} 
-        alt={`Screenshot from episode ${episode.title}`}
+        alt={`Screenshot from episode ${getTitle(episodeID)}`}
         style={getImageStyle({ x, y })} 
     />
 {/each}
 
 <style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .title {
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
     img {
         position: absolute;
         object-fit: cover;
         border-radius: 50%;
-        transition: all 100ms ease-in-out;
+        transition: all 175ms ease-in-out;
+        box-shadow: var(--level-1);
     }
     img:hover {
         width: initial;
-        transform: scale(1.5);
+        transform: scale(3);
         border-radius: 0;
     }
 </style>
