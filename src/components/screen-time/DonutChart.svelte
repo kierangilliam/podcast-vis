@@ -4,8 +4,8 @@
     import { onMount, tick } from 'svelte'
     import { makeDonutChart } from './donut-chart'
     import { episode, getTitle } from '@lib/utils'
-    import { H5, Spacer } from '@ollopa/cedar'
-import { COLORS } from '@lib/constants';
+    import { H5 } from '@ollopa/cedar'
+    import { COLORS } from '@lib/constants';
 
     export let episodeID: string
     export let segments: { [key: number]: number }
@@ -14,6 +14,7 @@ import { COLORS } from '@lib/constants';
     export let imageSize: number
 
     let element: SVGSVGElement, svg
+    let titleSize = width / 2 - 70
     let images: { image: string, x: number, y: number }[] = []
 
     const donutChart = makeDonutChart({ 
@@ -43,25 +44,23 @@ import { COLORS } from '@lib/constants';
         images = donutChart.getImages(svg)
     }
 
-    const imageStyle = ({ x, y }) => {
+    const centerOfChart = (offset) => {
         const { top, left, width, height } = element.getBoundingClientRect()
-        return `
-            width: ${imageSize}px;
-            height: ${imageSize}px;
-            left: ${left + x + (width / 2) - (imageSize / 2)}px;
-            top: ${top + y + (height / 2) - (imageSize / 2)}px;
-        `
+        
+        return {
+            cx: left + (width / 2) - offset + window.scrollX,
+            cy: top + (height / 2) - offset + window.scrollY,
+        }
+    }
+
+    const imageStyle = ({ x, y }) => {
+        const { cx, cy } = centerOfChart(imageSize / 2)
+        return `width: ${imageSize}px; height: ${imageSize}px; left: ${x + cx}px; top: ${y + cy}px;`
     }
     
     const titleStyle = () => {
-        const { top, left, width, height } = element.getBoundingClientRect()
-        const titleSize = width / 2
-        return `
-            width: ${titleSize}px;
-            height: ${titleSize}px;
-            left: ${left + (width / 2) - (titleSize / 2)}px;
-            top: ${top + (height / 2) - (titleSize / 2)}px;
-        `
+        const { cx, cy } = centerOfChart(titleSize / 2)
+        return `width: ${titleSize}px; height: ${titleSize}px; left: ${cx}px; top: ${cy}px;`
     }
 
     onMount(() => {

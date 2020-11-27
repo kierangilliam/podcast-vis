@@ -4,6 +4,7 @@
 	import * as d3 from 'd3'
 	import { onMount } from 'svelte'
 	import DonutChart from './DonutChart.svelte'
+import Timeline from './Timeline.svelte'
 
 	let data
 	let segments: {}
@@ -83,6 +84,8 @@
 		</p>
 	</div>
 </div>
+
+<Timeline />
 
 <style>
 	.container {
