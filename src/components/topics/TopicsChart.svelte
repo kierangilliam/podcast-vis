@@ -4,7 +4,7 @@
     import { H5, Spacer } from '@ollopa/cedar'
     import { COLORS } from '@lib/constants'
     import { getTitle } from '@lib/utils'
-    import type { Episode } from '@lib/utils'
+    import type { Episode } from '@lib/types'
     import Tooltip from '../Tooltip.svelte'
     import ReverseStem from '../ReverseStem.svelte'
 

@@ -7,6 +7,7 @@ export interface Episode {
     main: boolean
 }
 
-export interface WordOccurrence extends Episode {
+export interface WordOccurrence {
+    id: string
     topWords: object
 }

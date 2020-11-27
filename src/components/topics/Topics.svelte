@@ -2,14 +2,14 @@
     import { H3 } from '@ollopa/cedar'
 	import * as d3 from 'd3'
     import { onMount } from 'svelte'
-    import { chunk } from '@lib/utils'
+    import { chunk, episode } from '@lib/utils'
     import Chart from './TopicsChart.svelte'
-    import type { WordOccurrence } from '@lib/types'
+    import type { Episode, WordOccurrence } from '@lib/types'
     import TopicsBins from './TopicsBins.svelte'
-    import { wordOccurrences } from '@lib/data'
+    import { getWordOccurrences } from '@lib/data'
     import type { Bin } from './topics'
 
-    let data: WordOccurrence[]
+    let data: (WordOccurrence & Episode)[]
     // Episode ids that are emphasized on the chart
     let highlighted: string[]
     let pinnedWord = 'mask'
@@ -31,13 +31,13 @@
     /**
      * Bin episode CFDs into
     */
-    const bin = (data: Data[]): Bin[] => {
+    const bin = (data: WordOccurrence[]): Bin[] => {
         if (!data) return
 
         const binLength = 10              
 
         const bins: Omit<Bin, 'tfidf'>[] = chunk(data, binLength)
-            .map((bin: Data[]) => {
+            .map((bin: WordOccurrence[]) => {
                     // Sum items in bin
                     const cfd = bin.reduce((prev, curr) => {
                             Object.entries(curr.topWords).forEach(([key, value]) => {
@@ -86,7 +86,11 @@
     }
 
     onMount(async () => {
-        data = await wordOccurrences()
+        data = (await getWordOccurrences())
+            .map<WordOccurrence & Episode>(({ id, ...rest }) => 
+                ({ ...rest, ...episode(id) })
+            )
+
         bins = bin(data)        
     })
 </script>
