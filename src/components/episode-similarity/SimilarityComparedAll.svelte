@@ -3,11 +3,12 @@
     import { onMount } from 'svelte'
     import { height } from './similarity-state'
     import { episode } from '@lib/utils'
-    import Search from '../Search.svelte'
+    import Search from '../Search.svelte'    
+    import { wordOccurrences } from '@lib/data'
 
     export let id: string
     export let data: [string, number, string][]
-
+    
     let container: HTMLElement
     let totalWidth = 0
     let mounted = false
@@ -17,7 +18,7 @@
         return totalWidth * sim 
     }
 
-    onMount(async () => {
+    onMount(async () => {        
         totalWidth = container.getBoundingClientRect().width
         mounted = true
     })

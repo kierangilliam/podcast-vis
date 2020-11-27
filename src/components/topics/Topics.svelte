@@ -1,28 +1,28 @@
 <script lang='ts'>
     import { H3 } from '@ollopa/cedar'
 	import * as d3 from 'd3'
-    import { onMount } from 'svelte'
     import { chunk, episode } from '@lib/utils'
     import Chart from './TopicsChart.svelte'
-    import type { Episode, WordOccurrence } from '@lib/types'
+    import type { Episode } from '@lib/types'
     import TopicsBins from './TopicsBins.svelte'
-    import { getWordOccurrences } from '@lib/data'
+    import { wordOccurrences } from '@lib/data'
     import type { Bin } from './topics'
 
-    let data: (WordOccurrence & Episode)[]
+    type ChartDataPoint = Episode & { termFrequency: number }
+
     // Episode ids that are emphasized on the chart
     let highlighted: string[]
     let pinnedWord = 'mask'
 
-    $: bins = bin(data)    
+    $: bins = bin($wordOccurrences)    
     $: chartData = getChartData(bins, pinnedWord)
     
     const getChartData = (bins: Bin[], word: string) => {
         if (!bins || !word) return
 
-        return data
-            .map(({ topWords, ...rest }) => ({
-                ...rest, 
+        return Object.entries($wordOccurrences)
+            .map<ChartDataPoint>(([id, topWords]) => ({
+                ...episode(id),
                 termFrequency: topWords[word] || 0,
             }))
             .filter(({ number }) => number != 0)
@@ -31,13 +31,17 @@
     /**
      * Bin episode CFDs into
     */
-    const bin = (data: WordOccurrence[]): Bin[] => {
-        if (!data) return
+    const bin = (_): Bin[] => {
+        if (!$wordOccurrences) return
 
         const binLength = 10              
+        
+        let data = Object.entries($wordOccurrences).map(([id, topWords]) => 
+            ({ ...episode(id), topWords })
+        )
 
         const bins: Omit<Bin, 'tfidf'>[] = chunk(data, binLength)
-            .map((bin: WordOccurrence[]) => {
+            .map((bin: (Episode & { topWords: object })[]) => {
                     // Sum items in bin
                     const cfd = bin.reduce((prev, curr) => {
                             Object.entries(curr.topWords).forEach(([key, value]) => {
@@ -84,15 +88,6 @@
             .filter(({ start }) => start != 0)
             .reverse()
     }
-
-    onMount(async () => {
-        data = (await getWordOccurrences())
-            .map<WordOccurrence & Episode>(({ id, ...rest }) => 
-                ({ ...rest, ...episode(id) })
-            )
-
-        bins = bin(data)        
-    })
 </script>
 
 <H3>Topics over time</H3>
