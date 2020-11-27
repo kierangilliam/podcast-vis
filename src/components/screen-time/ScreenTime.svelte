@@ -5,32 +5,12 @@
 	import * as d3 from 'd3'
 	import { onMount } from 'svelte'
 	import { episode as getEpisode } from '@lib/utils'
-	import Doughnut from 'svelte-chartjs/src/Doughnut.svelte'
+	import type { Episode } from '@lib/utils'
+	import DonutChart from './DonutChart.svelte'
 
-	interface Episode {
-		id: string
-		title: string
-		data: object
-	}
-
-	let options = {
-		responsive: true,
-		aspectRatio: 1,
-		tooltips: {
-			enabled: false,
-			custom: () => {
-				// TODO: https://www.chartjs.org/docs/latest/configuration/tooltip.html#external-custom-tooltips
-			}
-		},
-		hover: {
-			onHover: (event, element) => {
-				// TODO
-			}
-		}
-  	}
-
-	let data: Episode[]	
-	let episode = null
+	let data
+	let segments: {}
+	let episode: Episode = null
 	// What search returns
 	let episodeID = null
 	let searchableEpisodes
@@ -38,27 +18,35 @@
 
 	$: episodeUpdate(episodeID)
 
+	// TODO set interval to change episode
+	// window.setInterval(() => {
+	//     if (toggle) {
+	//         svg.call(donutChart.data(dataset2))
+	//     } else {
+	//         svg.call(donutChart.data(dataset1))
+	//     }
+	//     toggle = !toggle;
+	// }, 3500)
+
 	const episodeUpdate = (_) => {
 		if (!episodeID) return 
 
-		episode = data.find(({ id }) => id === episodeID)
-		episode.labels = Object.keys(episode.data)
-		episode.datasets = [{
-			data: Object.values(episode.data),
-			backgroundColor: [
-				COLORS.orange, COLORS.blue, COLORS.green, 
-				COLORS.purple, COLORS.red, COLORS.black, COLORS.darkOrange
-			]
-		}]
+		episode = getEpisode(episodeID)
+		segments = data
+			.find(({ id }) => id === episodeID)
+			.segments
 	}
 
 	onMount(async () => {
 		const formatData = data => {
 			data = (0, eval)('(' + data + ')')
-			// Remove small values
-			// TODO Play with the small values number
-			Object.entries(data).forEach(([cluster, amount]) => {
-				if (amount < 0.002) {
+
+			const total = Object.entries<number>(data)
+				.reduce((acc, [_, a]) => acc + a, 0)
+
+			Object.entries<number>(data).forEach(([cluster, amount]) => {
+				// Remove items that make up less than 2% of the total
+				if (amount / total * 100 < 2) {
 					delete data[cluster]
 				}
 			})
@@ -68,9 +56,7 @@
         data = (await d3.csv('./screen_time.csv'))
             .map(({ id, data }) => ({
 				id, 
-				number: getEpisode(id).number, 
-				title: getEpisode(id).title,
-                data: formatData(data),
+                segments: formatData(data),
 			}))
 			
 		searchableEpisodes = data.map(({ id }) => id)
@@ -84,7 +70,7 @@
 <div class='container'>
 	{#if episode}
 		<div class='chart'>
-			<Doughnut data={episode} {options}/>
+			<DonutChart {episode} {segments} />
 		</div>
 	{/if}
 	<Spacer s={8} />
