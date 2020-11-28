@@ -71,34 +71,40 @@
 
 </script>
 
-<svg bind:this={element}></svg>
-
-{#if element}
-    <div class='title' style={titleStyle()} in:fly={{ y: 150 }}>
-        <span>
-            <h5>{getTitle(episodeID)}</h5>        
-            <span class='number-chip'>{episode(episodeID).number}</span>
-        </span>
-        {formatViews(episodeID)} views
-        <div class="likes"><div class="ratio" style={`--ratio: ${likeRatio(episodeID)}`}></div></div>
-    </div>
-
-    <div class="images">
-        {#each images as { image, x, y, id }}
-            <img 
-                src={image} 
-                alt={`Screenshot from episode ${getTitle(episodeID)}`}
-                style={imageStyle({ x, y })} 
-            />
-            <div class="img-details" style={imageStyle({ x, y }, true)}>
-                {Math.floor(segments && segments[id] / sum * 100)}<span>%</span>
-            </div>
-        {/each}
-    </div>
-{/if}
+<div class="container">
+    <svg bind:this={element}></svg>
+    
+    {#if element}
+        <div class='title' style={titleStyle()} in:fly={{ y: 150 }}>
+            <span>
+                <h5>{getTitle(episodeID)}</h5>        
+                <span class='number-chip'>{episode(episodeID).number}</span>
+            </span>
+            {formatViews(episodeID)} views
+            <div class="likes"><div class="ratio" style={`--ratio: ${likeRatio(episodeID)}`}></div></div>
+        </div>
+    
+        <div class="images">
+            {#each images as { image, x, y, id }}
+                <img 
+                    src={image} 
+                    alt={`Screenshot from episode ${getTitle(episodeID)}`}
+                    style={imageStyle({ x, y })} 
+                />
+                <div class="img-details" style={imageStyle({ x, y }, true)}>
+                    {Math.floor(segments && segments[id] / sum * 100)}<span>%</span>
+                </div>
+            {/each}
+        </div>
+    {/if}
+</div>
 
 
 <style>
+    .container {
+        display: relative;
+    }
+
     .title {
         display: flex;
         flex-direction: column;
