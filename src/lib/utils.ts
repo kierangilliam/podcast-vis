@@ -54,10 +54,6 @@ export const getTitle = (id: string) => {
 
 export const likeRatio = (id: string): number => {
     const { likes, dislikes } = episode(id)
-    console.log(likes, dislikes, likes + dislikes)
-    console.log(likes, dislikes, likes / dislikes)
-    console.log(likes, dislikes, likes / likes)
-    console.log(typeof likes, typeof dislikes)
     return likes / (likes + dislikes)
 }
 
