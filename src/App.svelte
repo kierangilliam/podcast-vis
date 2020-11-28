@@ -1,7 +1,7 @@
 <script lang='ts'>
 	import { Theme, Topics, Section, Similarity, ScreenTime, Intro } from '@components'
 	import { episodesLoaded } from '@lib/utils'
-	import { H1, H5, Flex } from '@ollopa/cedar'
+	import { H1, H5, Flex, Spacer } from '@ollopa/cedar'
 </script>
 
 <!--
@@ -19,7 +19,7 @@ TODO add to sections:
 		<H5>Here we analyze facets of the Joe Rogan Experience.</H5>
 		
 		{#if $episodesLoaded}
-			<Section>
+			<Section intro>
 				<Intro />
 			</Section>
 
@@ -34,6 +34,8 @@ TODO add to sections:
 			<Section>
 				<Similarity />
 			</Section>
+
+			<Spacer s={48} />
 		{:else}
 			Loading...
 		{/if}
