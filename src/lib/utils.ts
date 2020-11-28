@@ -96,3 +96,5 @@ export function clickOutside(node, handler: () => any) {
         }
     }
 }
+
+export const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);

@@ -1,7 +1,7 @@
 <script lang='ts'>
 	import { Theme, Topics, Section, Similarity, ScreenTime, Intro } from '@components'
 	import { episodesLoaded } from '@lib/utils'
-	import { H1, H5, Flex, Spacer } from '@ollopa/cedar'
+	import { Flex, Spacer } from '@ollopa/cedar'
 </script>
 
 <!--
@@ -15,11 +15,12 @@ TODO add to sections:
 
 <Theme>
 	<Flex column>
-		<H1>Average Joe.</H1>
-		<H5>Here we analyze facets of the Joe Rogan Experience.</H5>
+		<Spacer s={8} />
+		<h1 class="title">Average Joe.</h1>
+		<h5 class='subtitle'>Here we analyze facets of the Joe Rogan Experience.</h5>
 		
 		{#if $episodesLoaded}
-			<Spacer s={16} />
+			<Spacer s={24} />
 			<Intro />
 
 			<Section>
@@ -34,7 +35,7 @@ TODO add to sections:
 				<Similarity />
 			</Section>
 
-			<Spacer s={48} />
+			<Spacer s={64} />
 		{:else}
 			Loading...
 		{/if}
@@ -44,3 +45,13 @@ TODO add to sections:
 		</Section> -->
 	</Flex>
 </Theme>
+
+<style>
+	.title {
+		text-align: center;
+	}
+
+	.subtitle {
+		text-align: center;
+	}
+</style>

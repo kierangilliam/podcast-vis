@@ -32,7 +32,7 @@
 
 {#if visible}
     <div class='background' on:click={() => visible = false}>
-        <div class="container">
+        <div class="container" on:drag|stopPropagation>
             <div class='search-input' class:stretch={true} on:click|stopPropagation>
                 <Icon search small />
                 <input 
@@ -51,7 +51,6 @@
                         on:click|stopPropagation={() => { 
                             episodeID = ep.id 
                             visible = false
-                            results = []
                         }}
                     >
                         { ep.title }
@@ -76,8 +75,8 @@
     }
 
     .container {
-        padding-top: var(--s-8);
-        min-width: 60vw;
+        padding-top: var(--s-4);
+        min-width: 90vw;
     }
 
     .search-input {
@@ -102,7 +101,7 @@
     .search-results {
         background-color: var(--background);
 		overflow: scroll;
-		max-width: 80vw;
+		max-width: 100%;		
 	}
 
 	.result {
@@ -113,4 +112,15 @@
 	.result:nth-child(odd) {
 		background: var(--lightGray);
 	}
+
+    /* Big screens */
+    @media screen and (min-width: 750px) {
+        .container {
+            padding-top: var(--s-8);
+            min-width: 60vw;
+        }
+        .search-results {
+            max-width: 80vw;
+        }
+    }	
 </style>

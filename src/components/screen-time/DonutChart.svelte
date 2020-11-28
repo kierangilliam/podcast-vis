@@ -7,19 +7,18 @@
 
     export let episodeID: string
     export let segments: { [key: number]: number }
-    export let width: number
-    export let height: number
+    export let chartSize: number
     export let imageSize: number
     export let colors
 
     let images: { image: string, x: number, y: number, id: string }[] = []
     let element: SVGSVGElement, svg
-    let titleSize = width / 2 - 10
+    let titleSize = chartSize / 2 - 10
 
     const donutChart = makeDonutChart({ 
         animationDuration: 750,
-        outerRadius: (width / 2),
-        innerRadius: (width / 2) - 50
+        outerRadius: (chartSize / 2),
+        innerRadius: (chartSize / 2) - 50
     })
 
     $: updateData(svg, episodeID)
@@ -42,38 +41,36 @@
     }
 
     const centerOfChart = (offset) => {
-        const { top, left, width, height } = element.getBoundingClientRect()
+        const { width, height } = element.getBoundingClientRect()
         
         return {
-            cx: left + (width / 2) - offset + window.scrollX,
-            cy: top + (height / 2) - offset + window.scrollY,
+            cx: (width / 2) - offset,
+            cy: (height / 2) - offset
         }
     }
 
     const imageStyle = ({ x, y }, isIcon=false) => {
         const size = isIcon ? imageSize / 1.5 : imageSize
         const { cx, cy } = centerOfChart(size / 2)
-        return `width: ${size}px; height: ${size}px; left: ${x + cx}px; top: ${y + cy}px;`
+        return `--size: ${size}px; transform: translate(${x + cx}px, ${y + cy}px);`
     }
     
     const titleStyle = () => {
-        const { cx, cy } = centerOfChart(titleSize / 2)
-        return `width: ${titleSize}px; height: ${titleSize}px; left: ${cx}px; top: ${cy}px;`
+        const { cx, cy } = centerOfChart(titleSize / 2)        
+        return `--size: ${titleSize}px; transform: translate(${cx}px, ${cy}px);`
     }
 
     onMount(() => {
         svg = d3.select(element)
-            .attr('width', width)
-            .attr('height', height)
+            .attr('width', chartSize)
+            .attr('height', chartSize)
             .append('g')
-            .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
+            .attr('transform', 'translate(' + chartSize / 2 + ',' + chartSize / 2 + ')')
     })
 
 </script>
 
 <div class="container">
-    <svg bind:this={element}></svg>
-    
     {#if element}
         <div class='title' style={titleStyle()} in:fly={{ y: 150 }}>
             <span>
@@ -97,12 +94,19 @@
             {/each}
         </div>
     {/if}
+
+    <svg bind:this={element}></svg>
 </div>
 
 
 <style>
     .container {
-        display: relative;
+        position: relative;
+    }
+
+    .title, img {
+        width: var(--size);
+        height: var(--size);
     }
 
     .title {
@@ -146,6 +150,7 @@
         font-weight: bolder;
         font-family: 'Times New Roman', Times, serif;
         padding: var(--s-4);
+        touch-action: none;
     }
     .img-details span {
         font-size: .7rem;

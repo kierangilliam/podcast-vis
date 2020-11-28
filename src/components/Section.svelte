@@ -8,7 +8,7 @@
 
 <Spacer s={GAP}/>
 
-<IntersectionObserver let:intersecting once center>
+<IntersectionObserver let:intersecting once center threshold={.8}>
     {#if intersecting}
         <div class='main' in:fade><slot /></div> 
     {:else}

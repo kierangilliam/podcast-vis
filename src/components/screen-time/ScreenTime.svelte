@@ -2,10 +2,10 @@
 	import { H3, Spacer } from '@ollopa/cedar'
 	import Search from '../Search.svelte'
 	import * as d3 from 'd3'
-	import { onMount } from 'svelte'
+	import { onMount, tick } from 'svelte'
 	import DonutChart from './DonutChart.svelte'
 	import Timeline from './Timeline.svelte'	
-	import { episode } from '@lib/utils'
+	import { episode, isMobile } from '@lib/utils'
 	import { COLORS } from '@lib/constants'
 
 	let data
@@ -13,7 +13,8 @@
 	// What search returns
 	let episodeID = null
 	let searchableEpisodes
-	let searchVisible = false	
+	let searchVisible = false
+	let containerWidth: number	
 
 	$: episodeUpdate(episodeID)
 
@@ -40,6 +41,9 @@
 	}
 
 	onMount(async () => {
+		// Wait for width to render
+		await tick() 
+
 		const formatData = data => {
 			data = (0, eval)('(' + data + ')')
 
@@ -75,19 +79,8 @@
 
 <Search bind:episodeID bind:visible={searchVisible} {searchableEpisodes} />
 
-<div class='container'>
-	{#if episodeID}
-		<DonutChart 
-			width={400}
-			height={400}
-			imageSize={75}
-			{episodeID}
-			{segments} 
-			{colors}
-		/>
-	{/if}
-	<Spacer s={8} />
-	<div>
+<div class='container' bind:clientWidth={containerWidth}>
+	<div class='details'>
 		<H3>Screen time</H3>	
 		<p>Some explanatory text yada yada yada. Lorem ipsum yada yada yada.</p>	
 		<div class='navigation'>
@@ -98,6 +91,20 @@
 			<p class='inline-button' on:click={navigate().forward}>Next</p>
 		</div>
 	</div>
+
+	<div class="spacer"></div>
+
+	{#if episodeID}
+		<div>
+			<DonutChart 
+				chartSize={isMobile ? containerWidth : 400}
+				imageSize={75}
+				{episodeID}
+				{segments} 
+				{colors}
+			/>
+		</div>
+	{/if}
 </div>
 
 {#if episodeID}
@@ -112,15 +119,24 @@
 		justify-content: center;
 		align-items: center;
 	}
+	.spacer {
+		--size: var(--s-16);
+		width: var(--size);
+		height: var(--size);
+	}
 
 	.navigation {
 		display: flex;
 		justify-content: space-between;
 	}
 	
+	/* Big screens */
     @media screen and (min-width: 750px) {
         .container {
-            flex-direction: row;
+            flex-direction: row-reverse;
         }
+		.spacer {
+			--size: var(--s-8);
+		}
     }	
 </style>
