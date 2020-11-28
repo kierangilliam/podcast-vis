@@ -10,3 +10,7 @@ export interface Episode {
 export interface WordOccurrences {
     [id: string]: object
 }
+
+export interface TopTFIDF {
+    [id: string]: string[]
+}
