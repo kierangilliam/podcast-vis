@@ -19,6 +19,8 @@
     let focusedClicked: [number, number] = null
 
     let containerHeight, containerWidth
+
+    $: console.log(containerHeight)
     
     $: focused = getHoveringDetails(focusHovering)
     
@@ -68,6 +70,7 @@
         
         await tick()
         $height = containerHeight
+        console.log($height, 'here')
     })
 </script>
 

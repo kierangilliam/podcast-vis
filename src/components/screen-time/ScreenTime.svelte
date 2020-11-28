@@ -6,7 +6,7 @@
 	import DonutChart from './DonutChart.svelte'
 	import Timeline from './Timeline.svelte'	
 	import { episode } from '@lib/utils'
-import { COLORS } from '@lib/constants';
+	import { COLORS } from '@lib/constants'
 
 	let data
 	let segments: {}
@@ -19,7 +19,7 @@ import { COLORS } from '@lib/constants';
 
 	const colors = [
 		COLORS.pink, COLORS.gray, COLORS.green, COLORS.yellow, COLORS.purple,
-		COLORS.orange, "#63ACEF", COLORS.red, '#CE6D6D', COLORS.black
+		COLORS.orange, '#63ACEF', COLORS.red, '#CE6D6D', COLORS.black
 	]
 
 	const episodeUpdate = (_) => {
@@ -61,6 +61,7 @@ import { COLORS } from '@lib/constants';
                 segments: formatData(data),
 			}))
 			.sort((a, b) => 
+				// @ts-ignore
 				episode(a.id).published - episode(b.id).published
 			)
 			// If there is just 1 segment, the video averaging did not go as planned
@@ -68,7 +69,7 @@ import { COLORS } from '@lib/constants';
 			
 		searchableEpisodes = data.map(({ id }) => id)
 
-		episodeID = "qxOeWuAHOiw" // Kanye Episode
+		episodeID = 'qxOeWuAHOiw' // Kanye Episode
 	})
 </script>
 
@@ -76,22 +77,20 @@ import { COLORS } from '@lib/constants';
 
 <div class='container'>
 	{#if episodeID}
-		<div class='chart'>
-			<DonutChart 
-				width={400}
-				height={400}
-				imageSize={75}
-				{episodeID}
-				{segments} 
-				{colors}
-			/>
-		</div>
+		<DonutChart 
+			width={400}
+			height={400}
+			imageSize={75}
+			{episodeID}
+			{segments} 
+			{colors}
+		/>
 	{/if}
 	<Spacer s={8} />
 	<div>
 		<H3>Screen time</H3>	
 		<p>Some explanatory text yada yada yada. Lorem ipsum yada yada yada.</p>	
-		<div class="navigation">
+		<div class='navigation'>
 			<p class='inline-button' on:click={navigate().back}>Previous</p>
 			<p class='inline-button' on:click={() => searchVisible=true}>
 				Search for a different episode
@@ -112,10 +111,6 @@ import { COLORS } from '@lib/constants';
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-	}
-
-	.chart {
-		width: 450px;
 	}
 
 	.navigation {

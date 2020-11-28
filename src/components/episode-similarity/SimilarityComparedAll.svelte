@@ -5,7 +5,7 @@
     import { episode } from '@lib/utils'
     import Search from '../Search.svelte'    
     import { topTFIDF } from '@lib/data'
-import ReverseStem from '../ReverseStem.svelte'
+    import ReverseStem from '../ReverseStem.svelte'
 
     export let id: string
     export let data: [string, number, string][]

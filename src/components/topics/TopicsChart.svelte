@@ -3,7 +3,7 @@
     import * as d3 from 'd3'
     import { H5, Spacer } from '@ollopa/cedar'
     import { COLORS } from '@lib/constants'
-    import { getTitle } from '@lib/utils'
+    import { formatDate, getTitle } from '@lib/utils'
     import type { Episode } from '@lib/types'
     import Tooltip from '../Tooltip.svelte'
     import ReverseStem from '../ReverseStem.svelte'
@@ -46,12 +46,8 @@
             .duration(750)
             .call(d3.axisBottom(x)
                 .tickSize(4)
-                .tickFormat((x, i) => {
-                    const d = new Date(x)
-                    const month = d.toLocaleString('default', { month: 'short' });
-                    return i % 2 == 0 ? `${month}, ${d.getFullYear().toString().slice(-2)}'` : ''
-                })
-            )
+                .tickFormat((x, i) => i % 2 == 0 ? formatDate(x) : '')
+            )        
            
         // Rotate axis text
         bottomAxis.selectAll('text')
