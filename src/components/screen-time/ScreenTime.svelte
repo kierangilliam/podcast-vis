@@ -82,8 +82,8 @@
 	{#if episodeID}
 		<div class='chart'>
 			<DonutChart 
-				width={350}
-				height={350}
+				width={400}
+				height={400}
 				imageSize={75}
 				{episodeID}
 				{segments} 

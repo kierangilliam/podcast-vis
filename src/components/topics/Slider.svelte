@@ -21,6 +21,8 @@
         --lineColor: var(--gray);
 
         border: var(--line);
+        border-radius: 99px;
+
         -webkit-appearance: none;
         width: 100%;
         height: var(--s-3);
@@ -41,6 +43,7 @@
         width: var(--thumbWidth);
         height: var(--thumbHeight);
         background: var(--thumbColor);
+        border-radius: 99px;
         cursor: pointer;
         opacity: .7;
     }
@@ -49,6 +52,7 @@
         width: var(--thumbWidth);
         height: var(--thumbHeight);
         background: var(--thumbColor);
+        border-radius: 99px;
         cursor: pointer;
         opacity: .7;
     }

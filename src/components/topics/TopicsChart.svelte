@@ -169,7 +169,7 @@
 
 <div class='container'>
     <H5>
-        <strong style="font-family: auto"><i><ReverseStem stem={pinnedWord} /></i></strong> 
+        <strong style="font-family: times-new-roman"><i><ReverseStem stem={pinnedWord} /></i></strong> 
         term frequency over time
     </H5>
     <div bind:this={element}></div>

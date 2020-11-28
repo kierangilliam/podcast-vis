@@ -12,12 +12,12 @@
 <style>
     :global(:root) {
         /* Colors: defined using js */        
-        --white: magenta;
-        --lightGray: magenta;
-        --darkGray: magenta;
-        --red: magenta;
-        --orange: magenta;
-        --lightOrange: magenta;
+        --white: white;
+        --lightGray: white;
+        --darkGray: white;
+        --red: white;
+        --orange: white;
+        --lightOrange: white;
 
         /* Color intetntions */
         --danger: var(--red);

@@ -180,7 +180,6 @@
         width: 100%;
         height: 100%;
         transition: border 250ms ease-in;
-        border-radius: 2px;
     }
 
     .row {

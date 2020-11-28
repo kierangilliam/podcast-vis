@@ -4,7 +4,6 @@
     import { onMount, tick } from 'svelte'
     import { makeDonutChart } from './donut-chart'
     import { episode, formatViews, getTitle, likeRatio } from '@lib/utils'
-    import { H5 } from '@ollopa/cedar'    
 
     export let episodeID: string
     export let segments: { [key: number]: number }
@@ -52,7 +51,7 @@
     }
 
     const imageStyle = ({ x, y }, isIcon=false) => {
-        const size = isIcon ? imageSize / 2 : imageSize
+        const size = isIcon ? imageSize / 1.5 : imageSize
         const { cx, cy } = centerOfChart(size / 2)
         return `width: ${size}px; height: ${size}px; left: ${x + cx}px; top: ${y + cy}px;`
     }
@@ -76,8 +75,10 @@
 
 {#if element}
     <div class='title' style={titleStyle()} in:fly={{ y: 150 }}>
-        <H5>{getTitle(episodeID)}</H5> 
-        <div class='number-chip'>{episode(episodeID).number}</div>
+        <span>
+            <h5>{getTitle(episodeID)}</h5>        
+            <span class='number-chip'>{episode(episodeID).number}</span>
+        </span>
         {formatViews(episodeID)} views
         <div class="likes"><div class="ratio" style={`--ratio: ${likeRatio(episodeID)}`}></div></div>
     </div>
@@ -90,7 +91,7 @@
                 style={imageStyle({ x, y })} 
             />
             <div class="img-details" style={imageStyle({ x, y }, true)}>
-                {Math.floor(segments && segments[id] / sum * 100)}%
+                {Math.floor(segments && segments[id] / sum * 100)}<span>%</span>
             </div>
         {/each}
     </div>
@@ -104,6 +105,17 @@
         justify-content: center;
         align-items: center;
         position: absolute;
+    }
+    .title span {
+        display: flex;
+        align-items: center;
+    }
+    .title span h5 {
+        font-family: 'Times New Roman', Times, serif;
+        font-style: italic;
+        font-weight: bold;
+        font-size: var(--h5);
+        margin-right: var(--s-2);
     }
 
     .images:hover img:not(:hover) {
@@ -123,11 +135,14 @@
         opacity: 0;
         transition: opacity 250ms ease-out;
         background: var(--lightGray);
-        border: var(--line);
-        border-radius: var(--s-8);
-        font-family: monospace;
+        box-shadow: var(--level-1);
+        border-radius: 999px;
         font-weight: bolder;
-        padding: var(--s-2);
+        font-family: 'Times New Roman', Times, serif;
+        padding: var(--s-4);
+    }
+    .img-details span {
+        font-size: .7rem;
     }
 
     img {
