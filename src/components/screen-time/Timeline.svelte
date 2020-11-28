@@ -6,6 +6,7 @@
     import { Timelines } from '@lib/proto/screen-time'
     
     export let episodeID: string
+    export let colors: string[]
 
     interface Timestamp { start: number, end: number }
     interface Cluster { id: string, timestamps: Timestamp[] }
@@ -22,36 +23,38 @@
     $: timeline = timelines && timelines.find(t => t.id === episodeID)
     $: expanded = timeline && expandAt && filtered()
 
-     const as_timestamp = (frames: number, playhead: number): string => {
+    const as_timestamp = (playhead: number): string => {
         const FPS = 29.97
-        let sec: string | number = (frames * playhead) / FPS
+        let sec: string | number = (timeline?.frames * playhead) / FPS
         const hour = Math.floor(sec / 60 / 60)
         const min = `${Math.floor(sec / 60) % 60}`.padStart(2, '0')
         sec = `${Math.floor(sec) % 60}`.padStart(2, '0')
         return `${hour}:${min}:${sec}`
     }
 
-    const as_timestamp_ = (frames: number, start: number, end: number) => {
+    const format_timestamp = (frames: number, { start, end }: Timestamp) => {
         return `${as_timestamp(frames, start)} - ${as_timestamp(frames, end)}`
     }
 
     const withinExpandedRegion = ({ start, end }: Timestamp) => 
-        start >= expandAt - (expandAmount / 2) && end <= expandAt + (expandAmount / 2)
+        start >= expandAt - (expandAmount) && end <= expandAt + (expandAmount)
                     
     const filtered = (): Cluster[] => 
         timeline.clusters
             .map(c => ({ ...c, timestamps: c.timestamps .filter(withinExpandedRegion) }))
             .filter(c => c.timestamps.length > 0)
 
-    const lineStyle = ({ start, end }: Timestamp, _) => {
+    const lineStyle = (i, { start, end }: Timestamp, _) => {
         return `
+            background: ${colors[i]};
             width: ${(end - start) * width}px;
             left: ${start * width}px;
         `
     }
     
-    const expandedLineStyle = ({ start, end }: Timestamp, _) => {
+    const expandedLineStyle = (i, { start, end }: Timestamp, _) => {
         return `
+            background: ${colors[i]};
             width: ${(end - start) * width * (1 / expandAmount)}px;
             left: ${(start - expandAt) * width * (1 / expandAmount) + (width / 2)}px;
         `
@@ -81,16 +84,25 @@
     <Tooltip 
         x={width / 2 + element.getBoundingClientRect().left} 
         y={element.getBoundingClientRect().top}
-    >
+    >        
         <div class='expanded-container' style={`width: ${width}px`}>
-            {#each expanded as { timestamps }}
+            <div class="timestamp-lines">
+                <div></div><div></div><div></div>
+            </div>
+            <div class="timestamps">
+                <p>{as_timestamp(expandAt - (expandAmount / 2))}</p>
+                <!-- <p>{as_timestamp(expandAt - (expandAmount / 4))}</p> -->
+                <p>{as_timestamp(expandAt)}</p>
+                <!-- <p>{as_timestamp(expandAt + (expandAmount / 4))}</p> -->
+                <p>{as_timestamp(expandAt + (expandAmount / 2))}</p>
+            </div>
+            {#each expanded as { id, timestamps }}
                 <Spacer />
                 <div class='row'>
-                    <!-- TODO Animate with delay -->
                     {#each timestamps as timestamp}
                         <div 
                             class='expanded-line' 
-                            style={expandedLineStyle(timestamp, width)}
+                            style={expandedLineStyle(id, timestamp, width)}
                         ></div>
                     {/each}
                 </div>
@@ -103,15 +115,14 @@
 <div class='container' bind:this={element} bind:clientWidth={width}>
     {#if timeline}
         <div class="chart">
-            {#each timeline.clusters as { timestamps }}    
+            {#each timeline.clusters as { id, timestamps }}    
                 <Spacer />
                 <div class='row'>
-                    <!-- TODO Animate with delay -->
                     {#each timestamps as timestamp}
                         <div 
                             class='line' 
                             class:highlighted={expanded ? withinExpandedRegion(timestamp) : true}
-                            style={lineStyle(timestamp, width)}
+                            style={lineStyle(id, timestamp, width)}
                         ></div>
                     {/each}
                 </div>        
@@ -132,42 +143,63 @@
 <style>
     .expanded-container {
         position: relative;
+        overflow-x: hidden;
+    }
+    .expanded-container .timestamps {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        font-family: monospace;
+    }
+    .expanded-container .timestamp-lines {
+        position: absolute;
+        top: 25%;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+    .expanded-container .timestamp-lines div {
+        width: 1px;
+        height: 100%;
+        border-left: 2px dashed var(--gray);
+        border-right: 2px dashed var(--gray);
     }
 
     .container {
         position: relative;
     }
-
+    
     .interaction-capturer {
         position: absolute;
         top: 0;
         left: 0;
+        bottom: 0;
         width: 100%;
         height: 100%;
         transition: border 250ms ease-in;
         border-radius: 2px;
     }
-    .interaction-capturer:hover {
-        border: var(--line);
-    }
 
     .row {
         position: relative;
+        height: 8px;
     }
 
     .expanded-line {
         position: absolute;
         height: 8px;
-        background: var(--orange);
+        border-radius: 4px;
     }
 
     .line {
         position: absolute;
-        height: 8px;
-        background: var(--orange);
         border-radius: 1px;
+        height: 100%;
     }
     .line:not(.highlighted) {
-        background: var(--gray);
+        background: var(--gray) !important;
     }
 </style>
