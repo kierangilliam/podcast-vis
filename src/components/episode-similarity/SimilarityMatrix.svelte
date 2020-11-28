@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { onMount } from 'svelte'
+    import { createEventDispatcher, onMount, tick } from 'svelte'
     import { COLORS } from '@lib/constants'
     import { height } from './similarity-state'
     import * as d3 from 'd3'
@@ -9,6 +9,7 @@
     export let data: [string, number][][]
     
     const PADDING = .15
+    const dispatch = createEventDispatcher()
 
     let mounted = false
     let size = 0
@@ -18,18 +19,12 @@
     let focusedClicked: [number, number] = null
 
     let containerHeight, containerWidth
-
-    $: {
-        if (containerHeight > $height) {
-            $height = containerHeight
-        }
-    }
     
     $: focused = getHoveringDetails(focusHovering)
     
     $: maxSimilarity = d3.max(data, d => d3.max(d, d => d[1]))
 
-    $: onHeightChange($height)
+    $: onHeightChange(containerHeight)
 
     $: rows = data.length
     $: color = d3.scaleLinear()
@@ -39,6 +34,7 @@
     const onHeightChange = (_) => {
         if (!mounted) return
 
+        $height = containerHeight
         size = d3.scaleBand()
             .range([0, containerWidth])
             .domain(d3.range(rows))
@@ -67,7 +63,12 @@
         }
     }
 
-    onMount(() => mounted = true)
+    onMount(async () => {
+        mounted = true
+        
+        await tick()
+        $height = containerHeight
+    })
 </script>
 
 <div class='container' bind:clientHeight={containerHeight} bind:clientWidth={containerWidth}>
@@ -100,24 +101,30 @@
     <Spacer s={8} />
 
     <div class='details'>
-        <div class='legend'>
-            <div class='scale-numbers'>
-                <p>0%</p>
-                <p>{Math.round(maxSimilarity * 100)}%</p>
+        <div>
+            <div class='legend'>
+                <div class='scale-numbers'>
+                    <p>0%</p>
+                    <p>{Math.round(maxSimilarity * 100)}%</p>
+                </div>
+                <div 
+                    class='scale'
+                    style={`background-image: linear-gradient(to right, ${COLORS.white}, ${COLORS.orange});`}
+                >
+                    {#if focused}
+                        <div 
+                            class='scale-indicator' 
+                            style={`left: ${focused.similarity / maxSimilarity * 100}%`}>
+                        </div>
+                    {/if}
+                </div>
             </div>
-            <div 
-                class='scale'
-                style={`background-image: linear-gradient(to right, ${COLORS.white}, ${COLORS.orange});`}
-            >
-                {#if focused}
-                    <div 
-                        class='scale-indicator' 
-                        style={`left: ${focused.similarity / maxSimilarity * 100}%`}>
-                    </div>
-                {/if}
-            </div>
+            <Spacer s={2} />
+            <label class='monospace'>Calculated using TF-IDF cosine similarity</label>
         </div>
-        <label class='monospace'>Calculated using TF-IDF cosine similarity</label>
+        <div>
+            <button on:click={() => dispatch('randomize')}>Randomize</button>
+        </div>
     </div>
 </div>
 
@@ -135,7 +142,6 @@
         align-items: center;
     }
 
-
     .row-title {
         display: flex;
         flex-direction: column;
@@ -148,10 +154,10 @@
         align-items: center;
     }
     .row-title.focused {
-        font-size: 1.1rem;
+        transform: scale(1.15) translate(-5%, -5%);
     }
     .row-title.not-focused {
-        font-size: .5rem;
+        transform: scale(.5);
     }    
 
     .cell {
@@ -163,6 +169,11 @@
         border: 4px solid var(--darkOrange);
         box-shadow: var(--level-2);
         cursor: pointer;
+    }
+
+    .details {
+        display: flex;
+        justify-content: space-between;
     }
 
     .legend {

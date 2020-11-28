@@ -4,9 +4,9 @@
     import SimilarityComparedAll from './SimilarityComparedAll.svelte'
     import SimilarityMatrix from './SimilarityMatrix.svelte'
     import { episode } from '@lib/utils'
-    import { EpisodeSims, IDs } from '@lib/proto/ep-sim'
+    import { EpisodeSims, IDs } from '@lib/proto/ep-sim'    
 
-    let data, idLookup, allData, comparedAllIdNum: number, comparedAllId: string
+    let matrixData, idLookup, allData, comparedAllIdNum: number, comparedAllId: string
     let reverseIdLookup = (_: string): number => {}
     
     $: comparedAllData = filterComparedAllData(allData, comparedAllIdNum)
@@ -16,23 +16,19 @@
         // Return default blank 5 row array for DOM sizing purposes
         if (!(allData && comparedAllIdNum)) return [[], [], [], [], []]
 
-        const items = allData
+        return allData
             .filter(({ idNum1, idNum2 }) => (idNum1 == comparedAllIdNum) || (idNum2 == comparedAllIdNum))
-            .map(fillInData)
-            .sort((a, b) => b.similarity - a.similairty)
-            .map(({ similarity, id1, id2, idNum1 }) => 
-                // [Other episode id, similarity, other episode high ranking tfidf words]
-                ([comparedAllIdNum == idNum1 ? id2 : id1, similarity, '__'])
-            )
+            .map(fillInIDs)
+            .sort((a, b) => b.similarity - a.similarity)
+            // [Other episode id, similarity]
+            .map(({ similarity, id1, id2, idNum1 }) => ([comparedAllIdNum == idNum1 ? id2 : id1, similarity]))
             // Filter non-main episodes
             // TODO should also filter in MMA?
             .filter(([id, _]) => episode(id).main)
             .slice(0, 100)
-        return items
     }
 
-    // Fill in the protobuf data (idNum1, idNum2, similarity) with more details
-    const fillInData = ({ idNum1, idNum2, similarity }) => ({
+    const fillInIDs = ({ idNum1, idNum2, similarity }) => ({
         idNum1, idNum2,
         id1: idLookup(idNum1),
         id2: idLookup(idNum2),
@@ -45,11 +41,30 @@
         let choice
         while (isNotMain) {
             choice = allData[Math.floor(Math.random() * allData.length)]
-            choice = fillInData(choice)
+            choice = fillInIDs(choice)
             if (episode(choice.id1).main) {
                 return choice.idNum1
             }
         }   
+    }
+
+    const randomizeMatrix = () => {
+        matrixData = [...Array(5)].map(_ => choice())
+
+        // 5 rows with 5 items each containing [id, similairty]
+        matrixData = matrixData.map(id => {
+                return matrixData.map(idInner => {
+                    if (id == idInner) {
+                        return [idLookup(id), 0.0]
+                    }
+
+                    const hit = allData.find(({ idNum1, idNum2 }) => 
+                        (idNum1 == id && idInner == idNum2) || (idNum2 == id && idInner == idNum1)
+                    )
+
+                    return [idLookup(idInner), hit.similarity]
+                })
+            })
     }
 
     onMount(async () => {
@@ -84,24 +99,9 @@
             return [lookup, reverseIdLookup]
         }
 
-        [allData, [idLookup, reverseIdLookup]] = await Promise.all([loadSims(), loadIDLookup()])
+        [allData, [idLookup, reverseIdLookup]] = await Promise.all([loadSims(), loadIDLookup()])   
 
-        data = [...Array(5)].map(_ => choice())
-
-        // 5 rows with 5 items each containing [id, similairty]
-        data = data.map(id => {
-                return data.map(idInner => {
-                    if (id == idInner) {
-                        return [idLookup(id), 0.0]
-                    }
-
-                    const hit = allData.find(({ idNum1, idNum2 }) => 
-                        (idNum1 == id && idInner == idNum2) || (idNum2 == id && idInner == idNum1)
-                    )
-
-                    return [idLookup(idInner), hit.similarity]
-                })
-            })
+        randomizeMatrix()
 
         comparedAllIdNum = choice()
         comparedAllId = idLookup(comparedAllIdNum)
@@ -112,9 +112,9 @@
 <H5>Compare topic contents between episodes.</H5>
 <Spacer />
 
-{#if data}
+{#if matrixData}
     <div class="container">
-        <SimilarityMatrix {data} />
+        <SimilarityMatrix data={matrixData} on:randomize={randomizeMatrix} />
         <Spacer />
         <SimilarityComparedAll bind:id={comparedAllId} data={comparedAllData} />
     </div>

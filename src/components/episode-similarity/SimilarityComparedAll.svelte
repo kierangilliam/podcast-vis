@@ -4,7 +4,8 @@
     import { height } from './similarity-state'
     import { episode } from '@lib/utils'
     import Search from '../Search.svelte'    
-    import { wordOccurrences } from '@lib/data'
+    import { topTFIDF } from '@lib/data'
+import ReverseStem from '../ReverseStem.svelte'
 
     export let id: string
     export let data: [string, number, string][]
@@ -18,7 +19,7 @@
         return totalWidth * sim 
     }
 
-    onMount(async () => {        
+    onMount(() => {        
         totalWidth = container.getBoundingClientRect().width
         mounted = true
     })
@@ -45,7 +46,7 @@
 
     {#if mounted}
         <div class="results">        
-            {#each data as [ID, sim, words]}
+            {#each data as [ID, sim]}
                 <div class='details'>
                     <div class='title' on:click={() => id = ID}>
                         <p class="number-chip">{episode(ID).number}</p>
@@ -54,8 +55,14 @@
                     <p>{Math.round(sim*100)}%</p>
                 </div>
                 <div class='bar' style='width: {barWidth(sim)}px'></div>
-                <!-- TODO -->
-                <label class='monospace words'>{words}</label>
+                
+                <div class="words">
+                    {#each $topTFIDF ? $topTFIDF[ID].slice(0, 5) : [] as stem}
+                        <ReverseStem {stem} />
+                        <span />
+                    {/each}
+                </div>
+
                 <Spacer s={6} />
             {/each}
         </div>  
@@ -69,6 +76,18 @@
         height: 100%;
         border: var(--line);
         padding: var(--s-3);
+    }
+
+    .words {
+        display: flex;
+        font-size: var(--smallText);
+        font-family: monospace;
+        overflow-x: hidden;
+        flex-wrap: wrap;
+        height: 20px;
+    }
+    .words > span {
+        margin-right: var(--s-2);
     }
 
     .description {
