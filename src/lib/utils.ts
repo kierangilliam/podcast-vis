@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
 import { writable } from 'svelte/store'
+import type { Episode } from './types'
 
 export const wait = async (ms: number) =>
     new Promise(res => setTimeout(() => res(), ms))
@@ -25,9 +26,12 @@ export let episodesLoaded = writable(false);
 export let episodes: Episode[] = [];
 (async () => {
     episodes = (await d3.csv('./episodes.csv'))
-        .map(({ published, number, main, ...rest }) => ({
+        .map(({ published, number, main, views, likes, dislikes, ...rest }) => ({
             published: new Date(published),
             number: +number,
+            likes: +likes,
+            dislikes: +dislikes,
+            views: +views,
             main: main === "True" ? true : false,
             ...rest,
         }))
@@ -46,6 +50,23 @@ export const getTitle = (id: string) => {
     }
 
     return guests ? guests : title
+}
+
+export const likeRatio = (id: string): number => {
+    const { likes, dislikes } = episode(id)
+    console.log(likes, dislikes, likes + dislikes)
+    console.log(likes, dislikes, likes / dislikes)
+    console.log(likes, dislikes, likes / likes)
+    console.log(typeof likes, typeof dislikes)
+    return likes / (likes + dislikes)
+}
+
+export const formatViews = (id: string): string => {
+    const { views } = episode(id)
+
+    if (views < 1_000) return `${views}`
+    if (views > 999 && views < 1_000_000) return (Math.abs(views) / 1_000).toFixed(1) + 'k'
+    return (Math.abs(views) / 1_000_000).toFixed(1) + 'm'
 }
 
 

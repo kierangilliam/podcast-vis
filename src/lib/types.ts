@@ -5,6 +5,9 @@ export interface Episode {
     number: number
     id: string
     main: boolean
+    likes: number
+    dislikes: number
+    views: number
 }
 
 export interface WordOccurrences {
