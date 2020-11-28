@@ -72,6 +72,7 @@
         bottom: 0;
         left: 0;
         right: 0;
+        z-index: 500;
     }
 
     .container {
@@ -102,8 +103,6 @@
         background-color: var(--background);
 		overflow: scroll;
 		max-width: 80vw;
-		/* max-height: 200px; */
-        /* display: ; */
 	}
 
 	.result {
