@@ -3,7 +3,7 @@
     import * as d3 from 'd3'
     import { onMount, tick } from 'svelte'
     import { makeDonutChart } from './donut-chart'
-    import { episode, getTitle } from '@lib/utils'
+    import { episode, formatViews, getTitle, likeRatio } from '@lib/utils'
     import { H5 } from '@ollopa/cedar'
     import { COLORS } from '@lib/constants';
 
@@ -14,7 +14,7 @@
     export let imageSize: number
 
     let element: SVGSVGElement, svg
-    let titleSize = width / 2 - 70
+    let titleSize = width / 2 - 10
     let images: { image: string, x: number, y: number }[] = []
 
     const donutChart = makeDonutChart({ 
@@ -79,15 +79,19 @@
     <div class='title' style={titleStyle()} in:fly={{ y: 150 }}>
         <H5>{getTitle(episodeID)}</H5> 
         <div class='number-chip'>{episode(episodeID).number}</div>
+        {formatViews(episodeID)} views
+        <div class="likes"><div class="ratio" style={`--ratio: ${likeRatio(episodeID)}`}></div></div>
     </div>
 
-    {#each images as { image, x, y }}
-        <img 
-            src={image} 
-            alt={`Screenshot from episode ${getTitle(episodeID)}`}
-            style={imageStyle({ x, y })} 
-        />
-    {/each}
+    <div class="images">
+        {#each images as { image, x, y }}
+            <img 
+                src={image} 
+                alt={`Screenshot from episode ${getTitle(episodeID)}`}
+                style={imageStyle({ x, y })} 
+            />
+        {/each}
+    </div>
 {/if}
 
 
@@ -99,7 +103,7 @@
         align-items: center;
         position: absolute;
     }
-    
+
     img {
         position: absolute;
         object-fit: cover;
@@ -107,9 +111,31 @@
         transition: all 175ms ease-in-out;
         box-shadow: var(--level-1);
     }
+    .images:hover img:not(:hover) {
+        transform: scale(.4);
+    }
     img:hover {
         width: initial;
         transform: scale(3);
         border-radius: 0;
+        z-index: 100;
+    }
+
+    .likes {
+        background: var(--red);
+        height: var(--s-2);
+        width: 70%;
+        border-radius: 999px;
+        position: relative;
+    }
+    .likes .ratio {
+        border-radius: 999px;
+        width: calc(var(--ratio) * 100%);
+        top: 0;
+        left: 0;
+        height: 100%;
+        position: absolute;
+        background: var(--green);
+        transition: width 500ms ease-out;
     }
 </style>
