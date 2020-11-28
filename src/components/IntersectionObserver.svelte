@@ -1,25 +1,28 @@
 <!-- https://svelte.dev/repl/c461dfe7dbf84998a03fdb30785c27f3?version=3.16.7 -->
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, setContext } from 'svelte'
+	import { writable } from 'svelte/store'
 
-	export let once = false;
-	export let top = 0;
-	export let bottom = 0;
-	export let left = 0;
-	export let right = 0;
-	export let threshold = 0.9;
-	export let center = false;
+	export let once = false
+	export let top = 0
+	export let bottom = 0
+	export let left = 0
+	export let right = 0
+	export let threshold = 0.9
+	export let center = false
 
-	let intersecting = false;
-	let container;
+	const intersecting = writable(false)
+	let container
+
+	setContext('intersectionObserver', { intersecting })
 
 	onMount(() => {
 		if (typeof IntersectionObserver !== 'undefined') {
 			const rootMargin = `${bottom}px ${left}px ${top}px ${right}px`;
 
 			const observer = new IntersectionObserver(entries => {
-				intersecting = entries[0].isIntersecting;
-				if (intersecting && once) {
+				$intersecting = entries[0].isIntersecting;
+				if ($intersecting && once) {
 					observer.unobserve(container);
 				}
 			}, { rootMargin, threshold })
@@ -30,14 +33,14 @@
 
 		function handler() {
 			const bcr = container.getBoundingClientRect();
-			intersecting = (
+			$intersecting = (
 				(bcr.bottom + bottom) > 0 &&
 				(bcr.right + right) > 0 &&
 				(bcr.top - top) < window.innerHeight &&
 				(bcr.left - left) < window.innerWidth
 			);
 
-			if (intersecting && once) {
+			if ($intersecting && once) {
 				window.removeEventListener('scroll', handler);
 			}
 		}
@@ -59,5 +62,5 @@
 </style>
 
 <div bind:this={container} class:center>
-	<slot {intersecting}></slot>
+	<slot intersecting={$intersecting}></slot>
 </div>

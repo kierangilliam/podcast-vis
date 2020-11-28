@@ -1,15 +1,17 @@
 <script lang='ts'>
     import { stemToWord } from '@lib/utils'
-    import { onDestroy } from 'svelte'
+    import { getContext, onDestroy } from 'svelte'
 
     export let stem: string
     
+    const { intersecting } = getContext('intersectionObserver')
+
     let reverseIndex = 0
     let indexInterval
 
-    $: reverseStem = getRestOfWord(stem, stemToWord, reverseIndex)
+    $: reverseStem = getRestOfWord(stem, stemToWord, reverseIndex, $intersecting)    
 
-    const getRestOfWord = (_, __, ___) => {
+    const getRestOfWord = (_, __, ___, ____) => {
         if (!stemToWord || !stem || !stemToWord[stem]) {
             clearInterval(indexInterval)
             return
@@ -24,10 +26,12 @@
             return
         }
         
-        if (!indexInterval) {
+        if (!indexInterval && $intersecting) {
             indexInterval = setInterval(() => 
                 reverseIndex += 1, 4500 + (Math.random() * 500)
             )
+        } else if (!$intersecting) {
+            clearInterval(indexInterval)
         }
 
         // Randomly show the stem by itself
