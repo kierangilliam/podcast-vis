@@ -4,18 +4,18 @@
     import { onMount, tick } from 'svelte'
     import { makeDonutChart } from './donut-chart'
     import { episode, formatViews, getTitle, likeRatio } from '@lib/utils'
-    import { H5 } from '@ollopa/cedar'
-    import { COLORS } from '@lib/constants';
+    import { H5 } from '@ollopa/cedar'    
 
     export let episodeID: string
     export let segments: { [key: number]: number }
     export let width: number
     export let height: number
     export let imageSize: number
+    export let colors
 
+    let images: { image: string, x: number, y: number, id: string }[] = []
     let element: SVGSVGElement, svg
     let titleSize = width / 2 - 10
-    let images: { image: string, x: number, y: number }[] = []
 
     const donutChart = makeDonutChart({ 
         animationDuration: 750,
@@ -24,19 +24,17 @@
     })
 
     $: updateData(svg, episodeID)
+    $: sum = segments && Object.values(segments).reduce((p, c) => p + c,0)
 
     const updateData = async (..._) => {
         if (!svg || !segments || !episodeID) return
 
-        const colors = [COLORS.orange, COLORS.blue, COLORS.green, COLORS.purple,
-                        COLORS.red, COLORS.black, COLORS.darkOrange]
-
         const dataset = Object.entries(segments)
-            .map(([cluster, value], i) => ({ 
+            .map(([cluster, value]) => ({ 
                 series: cluster, 
                 value,
                 image: `images/${episodeID}.cluster.${cluster}.jpg`,
-                color: colors[i],
+                color: colors[cluster],
             }))
 
         svg.call(donutChart.data(dataset))
@@ -53,9 +51,10 @@
         }
     }
 
-    const imageStyle = ({ x, y }) => {
-        const { cx, cy } = centerOfChart(imageSize / 2)
-        return `width: ${imageSize}px; height: ${imageSize}px; left: ${x + cx}px; top: ${y + cy}px;`
+    const imageStyle = ({ x, y }, isIcon=false) => {
+        const size = isIcon ? imageSize / 2 : imageSize
+        const { cx, cy } = centerOfChart(size / 2)
+        return `width: ${size}px; height: ${size}px; left: ${x + cx}px; top: ${y + cy}px;`
     }
     
     const titleStyle = () => {
@@ -84,12 +83,15 @@
     </div>
 
     <div class="images">
-        {#each images as { image, x, y }}
+        {#each images as { image, x, y, id }}
             <img 
                 src={image} 
                 alt={`Screenshot from episode ${getTitle(episodeID)}`}
                 style={imageStyle({ x, y })} 
             />
+            <div class="img-details" style={imageStyle({ x, y }, true)}>
+                {Math.floor(segments && segments[id] / sum * 100)}%
+            </div>
         {/each}
     </div>
 {/if}
@@ -104,16 +106,37 @@
         position: absolute;
     }
 
+    .images:hover img:not(:hover) {
+        transform: scale(.4);
+    }
+    .images:hover .img-details {
+        opacity: 1;
+    }
+    
+    .img-details {
+        display: flex;
+        width: 50px;
+        height: 50px;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        opacity: 0;
+        transition: opacity 250ms ease-out;
+        background: var(--lightGray);
+        border: var(--line);
+        border-radius: var(--s-8);
+        font-family: monospace;
+        font-weight: bolder;
+        padding: var(--s-2);
+    }
+
     img {
         position: absolute;
         object-fit: cover;
         border-radius: 50%;
         transition: all 175ms ease-in-out;
         box-shadow: var(--level-1);
-    }
-    .images:hover img:not(:hover) {
-        transform: scale(.4);
-    }
+    }    
     img:hover {
         width: initial;
         transform: scale(3);

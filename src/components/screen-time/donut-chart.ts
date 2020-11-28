@@ -1,4 +1,5 @@
-import * as d3 from 'd3'
+import { COLORS } from '@lib/constants';
+import * as d3 from 'd3';
 
 //https://bl.ocks.org/guilhermesimoes/49ba71346a956ed0a12e9bc515be5804
 export function makeDonutChart({ animationDuration = 750, innerRadius = 0, outerRadius = 100 }) {
@@ -37,6 +38,8 @@ export function makeDonutChart({ animationDuration = 750, innerRadius = 0, outer
             .each(function (d) { this._current = Object.assign({}, d, { startAngle: d.endAngle }); })
             .attr('class', 'slice')
             .style('fill', (d) => d.data.color)
+            .style('stroke', COLORS.white)
+            .style('stroke-width', 3)
 
         const t = d3.transition().duration(animationDuration)
 
@@ -64,7 +67,7 @@ export function makeDonutChart({ animationDuration = 750, innerRadius = 0, outer
         return arguments.length ? (data = _, pieChart) : data;
     }
 
-    pieChart.getImages = (context): { image: string, x: number, y: number }[] => {
+    pieChart.getImages = (context): { image: string, x: number, y: number, id: string }[] => {
         const images = []
 
         context
@@ -72,7 +75,7 @@ export function makeDonutChart({ animationDuration = 750, innerRadius = 0, outer
             .data(pie(data), joinKey)
             .each(d => {
                 const [x, y] = arc.centroid(d)
-                images.push({ image: d.data.image, x, y })
+                images.push({ image: d.data.image, x, y, id: d.data.series })
             })
 
         return images

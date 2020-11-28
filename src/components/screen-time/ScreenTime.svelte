@@ -4,28 +4,25 @@
 	import * as d3 from 'd3'
 	import { onMount } from 'svelte'
 	import DonutChart from './DonutChart.svelte'
-	import Timeline from './Timeline.svelte'
-	import { Timelines } from '@lib/proto/screen-time'
+	import Timeline from './Timeline.svelte'	
+	import { episode } from '@lib/utils'
 
 	let data
 	let segments: {}
 	// What search returns
 	let episodeID = null
 	let searchableEpisodes
-	let searchVisible = false
-	let timelines
+	let searchVisible = false	
 
 	$: episodeUpdate(episodeID)
 
-	// TODO set interval to change episode
-	// window.setInterval(() => {
-	//     if (toggle) {
-	//         svg.call(donutChart.data(dataset2))
-	//     } else {
-	//         svg.call(donutChart.data(dataset1))
-	//     }
-	//     toggle = !toggle;
-	// }, 3500)
+	// Basically build a color scheme for clusters that is monochromatic but in a random order
+	// So that similar colors aren't next to eachother
+	// const randUniqueRange = (len) => [...Array(len)].map((_, i) => i).sort(() => Math.random() - 0.5)
+	// const colorScale = d3.scaleLinear().range(['#ffad8a', '#a33202']).domain([0, 10])
+	// const colors = randUniqueRange(10).map(i => colorScale(i))
+	const colorScale = d3.schemePaired
+	const colors = [...Array(10)].map((_, i) => colorScale[i])
 
 	const episodeUpdate = (_) => {
 		if (!episodeID) return 
@@ -33,16 +30,17 @@
 		segments = data
 			.find(({ id }) => id === episodeID)
 			.segments
-	}
 
-	async function loadTimelines() {
-		const response = await fetch('./screen_time_timelines')
-		const bufferRes = await response.arrayBuffer();
-		// @ts-ignore
-		const pbf = new Pbf(new Uint8Array(bufferRes));
-		// @ts-ignore
-		const { timelines } = Timelines.read(pbf);
-		return timelines
+		console.log(episodeID)
+	}	
+
+	const navigate = () => {
+		const i = () => data.findIndex(({ id }) => id === episodeID) || 0
+
+		return {
+			forward: () => episodeID = data[Math.min(i() + 1, data.length - 1) % data.length].id,
+			back: () => episodeID = data[Math.max(i() - 1, 0) % data.length].id,
+		}
 	}
 
 	onMount(async () => {
@@ -65,17 +63,16 @@
             .map(({ id, data }) => ({
 				id, 
                 segments: formatData(data),
-			}))		
+			}))
+			.sort((a, b) => 
+				episode(a.id).published - episode(b.id).published
+			)
+			// If there is just 1 segment, the video averaging did not go as planned
+			.filter(({ segments }) => Object.keys(segments).length > 1)
 			
 		searchableEpisodes = data.map(({ id }) => id)
 
-		episodeID = data[0].id	
-
-		// TODO just make a folder with the timelines as protobufs
-		// do same for sim matrix
-		timelines = await loadTimelines()
-
-		console.log(timelines)
+		episodeID = "qxOeWuAHOiw" // Kanye Episode
 	})
 </script>
 
@@ -90,6 +87,7 @@
 				imageSize={75}
 				{episodeID}
 				{segments} 
+				{colors}
 			/>
 		</div>
 	{/if}
@@ -97,13 +95,20 @@
 	<div>
 		<H3>Screen time</H3>	
 		<p>Some explanatory text yada yada yada. Lorem ipsum yada yada yada.</p>	
-		<p class='inline-button' on:click={() => searchVisible=true}>
-			Search for a different episode
-		</p>
+		<div class="navigation">
+			<p class='inline-button' on:click={navigate().back}>Previous</p>
+			<p class='inline-button' on:click={() => searchVisible=true}>
+				Search for a different episode
+			</p>
+			<p class='inline-button' on:click={navigate().forward}>Next</p>
+		</div>
 	</div>
 </div>
 
-<Timeline />
+{#if episodeID}
+	<Spacer s={16} />
+	<Timeline {colors} {episodeID} />
+{/if}
 
 <style>
 	.container {
@@ -115,6 +120,11 @@
 
 	.chart {
 		width: 450px;
+	}
+
+	.navigation {
+		display: flex;
+		justify-content: space-between;
 	}
 	
     @media screen and (min-width: 750px) {
