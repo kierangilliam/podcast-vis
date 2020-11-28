@@ -67,6 +67,16 @@
     :global(h1) {
         margin: 0 !important;
     }
+    /* TODO move to ollopa */
+    :global(h1, h2, h3, h4, h5, h6) {
+        font-family: var(--headingFont);
+    }
+    :global(h1) { font-size: var(--h1); }
+    :global(h2) { font-size: var(--h2); }
+    :global(h3) { font-size: var(--h3); }
+    :global(h4) { font-size: var(--h4); }
+    :global(h5) { font-size: var(--h5); }
+    :global(h6) { font-size: var(--h6); }
     
 /*     
     :global(*) {
