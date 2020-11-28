@@ -3,14 +3,13 @@
     import { fade } from 'svelte/transition'
     import IntersectionObserver from './IntersectionObserver.svelte'
 
-    export let intro = false
     const GAP = 24
 </script>
 
 <Spacer s={GAP}/>
 
 <IntersectionObserver let:intersecting once center>
-    {#if intersecting || intro}
+    {#if intersecting}
         <div class='main' in:fade><slot /></div> 
     {:else}
         <div class="intersection-spacer"></div>

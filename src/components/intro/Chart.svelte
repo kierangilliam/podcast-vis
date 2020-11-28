@@ -76,6 +76,7 @@
     }
     
     onMount(async () => {
+        // Wait for container to render
         await tick()
 
         svg = d3.select(element)
@@ -180,7 +181,7 @@
 
 <div class='container' bind:clientWidth={containerWidth}>
     <div bind:this={element}></div>
-    <div class="cover"></div>
+    <div class='cover'></div>
 </div>
 
 <style>

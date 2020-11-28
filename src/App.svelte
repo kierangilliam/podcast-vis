@@ -19,9 +19,8 @@ TODO add to sections:
 		<H5>Here we analyze facets of the Joe Rogan Experience.</H5>
 		
 		{#if $episodesLoaded}
-			<Section intro>
-				<Intro />
-			</Section>
+			<Spacer s={16} />
+			<Intro />
 
 			<Section>
 				<ScreenTime />
