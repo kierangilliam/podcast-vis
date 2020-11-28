@@ -8,8 +8,10 @@ export const COLORS = {
     orange: '#EF8D63',
     darkOrange: '#70371F',
     // Secondaries
-    red: '#EC7A73',
-    green: '#C5F3C1',
-    purple: '#C665DE',
+    red: '#EF6363',
+    green: '#7BCE6D',
+    yellow: '#EFBF63',
+    pink: '#EF6395',
+    purple: '#7663EF',
     blue: '#558DE0',
 }

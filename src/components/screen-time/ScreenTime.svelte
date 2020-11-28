@@ -6,6 +6,7 @@
 	import DonutChart from './DonutChart.svelte'
 	import Timeline from './Timeline.svelte'	
 	import { episode } from '@lib/utils'
+import { COLORS } from '@lib/constants';
 
 	let data
 	let segments: {}
@@ -16,13 +17,10 @@
 
 	$: episodeUpdate(episodeID)
 
-	// Basically build a color scheme for clusters that is monochromatic but in a random order
-	// So that similar colors aren't next to eachother
-	// const randUniqueRange = (len) => [...Array(len)].map((_, i) => i).sort(() => Math.random() - 0.5)
-	// const colorScale = d3.scaleLinear().range(['#ffad8a', '#a33202']).domain([0, 10])
-	// const colors = randUniqueRange(10).map(i => colorScale(i))
-	const colorScale = d3.schemePaired
-	const colors = [...Array(10)].map((_, i) => colorScale[i])
+	const colors = [
+		COLORS.pink, COLORS.gray, COLORS.green, COLORS.yellow, COLORS.purple,
+		COLORS.orange, "#63ACEF", COLORS.red, '#CE6D6D', COLORS.black
+	]
 
 	const episodeUpdate = (_) => {
 		if (!episodeID) return 
@@ -30,8 +28,6 @@
 		segments = data
 			.find(({ id }) => id === episodeID)
 			.segments
-
-		console.log(episodeID)
 	}	
 
 	const navigate = () => {
