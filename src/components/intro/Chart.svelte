@@ -56,14 +56,15 @@
 
         updateDomains()
 
+        // TODO d3's transition is extrememly
         t(likeRatioLines).attr('d', likeRatioLine)
         t(viewsLines).attr('d', viewsLine)
         t(viewsPoints).attr('cx', (d) => x(d.published)).attr('cy', (d) => yViews(d.views))
         t(likesPoints).attr('cx', (d) => x(d.published)).attr('cy', (d) => yLikeRatio(likeRatio(d.id)))
     }
 
-    const makePoints = ({ name, color, y }) => {
-        return svg.selectAll(name)
+    const makePoints = ({ name, color, y }) =>
+        svg.selectAll(name)
             .data(episodes)
             .enter()
             .append('circle')
@@ -73,7 +74,6 @@
             .attr('cx', (d) => x(d.published))
             .attr('cy', y)
             .attr('r', strokeWidth * .75)
-    }
     
     onMount(async () => {
         // Wait for container to render
