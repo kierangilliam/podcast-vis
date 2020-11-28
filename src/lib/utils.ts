@@ -59,12 +59,21 @@ export const likeRatio = (id: string): number => {
 
 export const formatViews = (id: string): string => {
     const { views } = episode(id)
-
-    if (views < 1_000) return `${views}`
-    if (views > 999 && views < 1_000_000) return (Math.abs(views) / 1_000).toFixed(1) + 'k'
-    return (Math.abs(views) / 1_000_000).toFixed(1) + 'm'
+    return formatBigNumber(views)
 }
 
+export const formatDate = (x) => {
+    const d = new Date(x)
+    const month = d.toLocaleString('default', { month: 'short' });
+    return `${month}, ${d.getFullYear().toString().slice(-2)}'`
+}
+
+export const formatBigNumber = (n: number): string => {
+    if (n < 1_000) return `${n}`
+    if (n > 999 && n < 1_000_000) return (Math.abs(n) / 1_000).toFixed(1) + 'k'
+    if (Math.abs(n) / 1_000_000 % 5 == 0) return Math.round((Math.abs(n) / 1_000_000)) + 'm'
+    return (Math.abs(n) / 1_000_000).toFixed(1) + 'm'
+}
 
 export let stemToWord = null;
 (async () => {
