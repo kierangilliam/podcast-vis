@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { onMount, tick } from 'svelte'
     import * as d3 from 'd3'
-    import { episodes as allEpisodes, formatBigNumber, formatDate, likeRatio } from '@lib/utils'
+    import { episodes as allEpisodes, likeRatio } from '@lib/utils'
     import { COLORS } from '@lib/constants'
     import type { Episode } from '@lib/types'
     
