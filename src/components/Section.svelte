@@ -1,22 +1,35 @@
 <script>
     import { Spacer } from '@ollopa/cedar'
+    import { fly } from 'svelte/transition'
+    import IntersectionObserver from './IntersectionObserver.svelte'
 
     const GAP = 24
 </script>
 
 <Spacer s={GAP}/>
 
-<div><slot /></div> 
+<IntersectionObserver let:intersecting once center>
+    {#if intersecting}
+        <div class='main' in:fly={{ y: -100 }}><slot /></div> 
+    {:else}
+        <div class="intersection-spacer"></div>
+    {/if}
+</IntersectionObserver>
 
 <Spacer s={GAP}/>
 
 <style>
-    div {
+    .main {
         width: 90vw;
+    }
+    
+    .intersection-spacer {
+        width: 100%;
+        height: 90vh;
     }
 
     @media screen and (min-width: 1250px) {
-        div {
+        .main {
             width: 60vw;
         }
     }
