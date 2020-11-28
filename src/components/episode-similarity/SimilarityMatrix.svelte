@@ -76,7 +76,7 @@
         <div class='row'>        
             <div 
                 class='row-title' 
-                style={`width: ${size}px;`}                
+                style={`--size: ${size}px;`}
                 class:focused={focused && (focused.index[0] == i || focused.index[1] == i)}
                 class:not-focused={focused && focused.index[0] != i && focused.index[1] != i}
             >
@@ -145,16 +145,19 @@
     .row-title {
         display: flex;
         flex-direction: column;
-        align-items: flex-end;
-        text-align: right;
+        align-items: center;
+        justify-content: space-evenly;
+        text-align: center;
         transition: all 250ms;
+        width: var(--size);
+        height: var(--size);
     }
     .row-title:last-of-type {
         text-align: center;
         align-items: center;
     }
     .row-title.focused {
-        transform: scale(1.15) translate(-5%, -5%);
+        transform: scale(1.15);
     }
     .row-title.not-focused {
         transform: scale(.5);
@@ -177,7 +180,7 @@
     }
 
     .legend {
-        max-width: 50%;
+        width: 100%;
     }
     .scale-numbers {
         display: flex;
