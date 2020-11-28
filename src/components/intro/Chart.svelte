@@ -9,6 +9,8 @@
     // 120 days
     const DATE_WINDOW = 120 * (24 * 60 * 60 * 1000)
     const episodes = allEpisodes.filter(({ main }) => main)
+    const highlightedEpisodes = episodes.filter((_, i) => i % 10 == 0)
+
     const [minDate, maxDate] = d3.extent(episodes, d => d.published)
     const margin = {top: 10, right: 30, bottom: 30, left: 60},
         height = 400 - margin.top - margin.bottom
@@ -16,9 +18,10 @@
     let containerWidth: number
     let element: HTMLElement
     let svg
-    let x, yLikeRatio, yViews, xAxis, yAxisViews
-    let viewsLine, viewsPoints, likeRatioLine
-    let strokeWidth = 2.5
+    let x, yLikeRatio, yViews //, xAxis, yAxisViews
+    let viewsLine, viewsPoints, viewsLines
+    let likesPoints, likeRatioLine, likeRatioLines
+    let strokeWidth = 3
     let interval
 
     let start: Date = new Date('1-1-2018')
@@ -46,19 +49,30 @@
     }
 
     // Transititon and transition linear helper functions
-    const t = (e) => e.transition().duration(TRANSITION_DURATION)
-    const tl = e => t(e).ease(d3.easeLinear)
+    const t = (e) => e.transition().duration(TRANSITION_DURATION).ease(d3.easeLinear)
 
     const handleChartUpdate = (_, __) => {
         if (!svg) return
 
         updateDomains()
 
-        t(yAxisViews).call(d3.axisLeft(yViews).ticks(10).tickFormat(formatBigNumber))
-        tl(xAxis).call(d3.axisBottom(x).ticks(8).tickFormat(formatDate))
-        tl(likeRatioLine).attr('d', d3.line().x((d) => x(d.published)).y((d) => yLikeRatio(likeRatio(d.id))))
-        tl(viewsLine).attr('d', d3.line().x(d => x(d.published)).y(d => yViews(d.views)))
-        tl(viewsPoints).attr('cx', (d) => x(d.published)).attr('cy', (d) => yViews(d.views))
+        t(likeRatioLines).attr('d', likeRatioLine)
+        t(viewsLines).attr('d', viewsLine)
+        t(viewsPoints).attr('cx', (d) => x(d.published)).attr('cy', (d) => yViews(d.views))
+        t(likesPoints).attr('cx', (d) => x(d.published)).attr('cy', (d) => yLikeRatio(likeRatio(d.id)))
+    }
+
+    const makePoints = ({ name, color, y }) => {
+        return svg.selectAll(name)
+            .data(episodes)
+            .enter()
+            .append('circle')
+            .attr('fill', color)
+            .attr('opacity', .9)
+            .attr('stroke', 'none')
+            .attr('cx', (d) => x(d.published))
+            .attr('cy', y)
+            .attr('r', strokeWidth * .75)
     }
     
     onMount(async () => {
@@ -79,38 +93,44 @@
 
         updateDomains()
 
-        xAxis = svg.append('g')
-            .attr("font-family", "times-new-roman")
-            .attr('transform', 'translate(0,' + height + ')')
-            .call(d3.axisBottom(x).ticks(8).tickFormat(formatDate))                
+        // Horizontal lines for axis
+        const axisLineWidth = 1
+        svg.selectAll('axis-lines')
+            .data([...Array(4)].map((_, i) => (i + 1) * 2))
+            .enter()
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', i => yLikeRatio(i / 10) - axisLineWidth / 2)
+            .attr('width', width)
+            .attr('height', axisLineWidth)
+            .attr('fill', COLORS.gray)
+            .attr('opacity', .7)
 
-        yAxisViews = svg.append('g')
-            .attr("font-family", "times-new-roman")
-            .call(d3.axisLeft(yViews).ticks(10).tickFormat(formatBigNumber))
-        
-        svg.append('g')
-            .attr('transform', 'translate( ' + width + ', 0 )')
-            .attr("font-family", "times-new-roman")
-            .call(d3.axisRight(yLikeRatio).ticks(10).tickFormat(x => `${x*100}%`))
-        
         // View count
-        viewsLine = svg.append('path')
+        viewsLine = d3.line()
+            .x(d => x(d.published))
+            .y(d => yViews(d.views))
+            .curve(d3.curveCardinal.tension(0.5))
+
+        viewsLines = svg.append('path')
             .datum(episodes)
             .attr('fill', 'none')
-            .attr('stroke-opacity', .5)
+            .attr('stroke-opacity', .7)
             .attr('stroke', COLORS.orange)
             .attr('stroke-width', strokeWidth)
-            .attr('d', d3.line().x(d => x(d.published)).y(d => yViews(d.views)))
+            .attr('d', viewsLine)
         
-        viewsPoints = svg.selectAll('views-points')
-            .data(episodes)
-            .enter()
-            .append('circle')
-            .attr('fill', COLORS.orange)
-            .attr('stroke', 'none')
-            .attr('cx', (d) => x(d.published))
-            .attr('cy', (d) => yViews(d.views))
-            .attr('r', strokeWidth)
+        viewsPoints = makePoints({ 
+            name: 'views-points', 
+            color: COLORS.orange,
+            y: (d) => yViews(d.views),
+        })
+        
+        likesPoints = makePoints({ 
+            name: 'likes-points', 
+            color: COLORS.green,
+            y: d => yLikeRatio(likeRatio(d.id)),
+        })
         
         // Like ratio gradient
         svg.append('linearGradient')
@@ -128,12 +148,18 @@
             .attr('stop-color', (d) => d.color)
 
         // Like ratio
-        likeRatioLine = svg.append('path')
+        likeRatioLine = d3.line()                
+            .x((d) => x(d.published))
+            .y((d) => yLikeRatio(likeRatio(d.id)))
+            .curve(d3.curveCardinal.tension(0.5))
+
+        likeRatioLines = svg.append('path')
             .datum(episodes)
             .attr('fill', 'none')
             .attr('stroke', 'url(#like-gradient)')
             .attr('stroke-width', strokeWidth)
-            .attr('d', d3.line().x((d) => x(d.published)).y((d) => yLikeRatio(likeRatio(d.id))))    
+            .attr('stroke-opacity', .7)
+            .attr('d', likeRatioLine)    
 
 
         // Clear interval when we leave view of chart
@@ -154,10 +180,24 @@
 
 <div class='container' bind:clientWidth={containerWidth}>
     <div bind:this={element}></div>
+    <div class="cover"></div>
 </div>
 
 <style>
     .container {
         width: 100%;
+        position: relative;
+    }
+
+    .cover {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: linear-gradient(to right, 
+            rgba(255,255,255,1) 0%, rgba(255,255,255,0) 10%, 
+            rgba(255,255,255,0) 90%, rgba(255,255,255,1) 100%
+        );
     }
 </style>
