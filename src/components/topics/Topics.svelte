@@ -7,6 +7,7 @@
     import TopicsBins from './TopicsBins.svelte'
     import { wordOccurrences } from '@lib/data'
     import type { Bin } from './topics'
+    import { onMount, tick } from 'svelte'
 
     type ChartDataPoint = Episode & { termFrequency: number }
 
@@ -15,6 +16,7 @@
     let pinnedWord = 'mask'
     let width: number
     let height: number
+    let mounted = false
 
     $: bins = bin($wordOccurrences)    
     $: chartData = getChartData(bins, pinnedWord)
@@ -90,22 +92,27 @@
             .filter(({ start }) => start != 0)
             .reverse()
     }
+
+    onMount(async () => {
+        await tick()
+        mounted = true
+    })
 </script>
 
 <H3>Topics over time</H3>
 
 <div class='container' bind:clientWidth={width} bind:clientHeight={height}>
-    {#if bins && width}
+    {#if bins}
         <TopicsBins {bins} bind:pinnedWord bind:highlighted />           
 
-        {#if chartData && height}
+        {#if chartData && mounted}
             <div class='chart'>
                 <Chart 
                     {pinnedWord} 
                     data={chartData} 
                     {highlighted} 
-                    width={width-50} 
-                    height={isMobile ? width : height} 
+                    width={isMobile ? width - 50 : 400} 
+                    height={400} 
                 />
             </div>
         {/if}
@@ -123,7 +130,7 @@
             display: flex;
         }    
         .chart {
-            margin-top: 0;
+            margin-top: -12px;
         }    
     }
 </style>
