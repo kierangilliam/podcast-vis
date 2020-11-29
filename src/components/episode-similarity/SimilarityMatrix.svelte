@@ -3,12 +3,12 @@
     import { COLORS } from '@lib/constants'
     import { height } from './similarity-state'
     import * as d3 from 'd3'
-    import { episode, getTitle } from '@lib/utils'    
+    import { episode, getTitle, isMobile } from '@lib/utils'    
     import { Spacer } from '@ollopa/cedar'
 
     export let data: [string, number][][]
     
-    const PADDING = .15
+    const PADDING = isMobile ? .05 : .15
     const dispatch = createEventDispatcher()
 
     let mounted = false
@@ -17,11 +17,9 @@
     // Row Col
     let focusHovering: [number, number] = null
     let focusedClicked: [number, number] = null
+    let containerHeight: number, containerWidth: number
+    let container: HTMLElement
 
-    let containerHeight, containerWidth
-
-    $: console.log(containerHeight)
-    
     $: focused = getHoveringDetails(focusHovering)
     
     $: maxSimilarity = d3.max(data, d => d3.max(d, d => d[1]))
@@ -36,7 +34,8 @@
     const onHeightChange = (_) => {
         if (!mounted) return
 
-        $height = containerHeight
+        // Using the bound `containerHeight` does not work for some reason
+        $height = container.getBoundingClientRect().height
         size = d3.scaleBand()
             .range([0, containerWidth])
             .domain(d3.range(rows))
@@ -48,6 +47,7 @@
             background: ${color(similarity)};
             height: ${size}px !important; 
             width: ${size}px !important;
+            margin: ${PADDING * size / 2}px;
         `
 
     // Get details of element being hovered over
@@ -67,14 +67,15 @@
 
     onMount(async () => {
         mounted = true
-        
+        // I have no clue what is causing this bug, but containerHeight, though being bound,
+        // will not update itself unless we force a height change
+        container.setAttribute('height', `${container.getBoundingClientRect().height + 1}px`)
         await tick()
         $height = containerHeight
-        console.log($height, 'here')
     })
 </script>
 
-<div class='container' bind:clientHeight={containerHeight} bind:clientWidth={containerWidth}>
+<div bind:this={container} class='container' bind:clientHeight={containerHeight} bind:clientWidth={containerWidth}>
     {#each data as column, i}
         <div class='row'>        
             <div 
@@ -126,7 +127,7 @@
             <label class='monospace'>Calculated using TF-IDF cosine similarity</label>
         </div>
         <div>
-            <button on:click={() => dispatch('randomize')}>Randomize</button>
+            <button class="inline-button" on:click={() => dispatch('randomize')}>Randomize</button>
         </div>
     </div>
 </div>
@@ -154,7 +155,7 @@
         transition: all 250ms;
         width: var(--size);
         height: var(--size);
-    }
+    }    
     .row-title:last-of-type {
         text-align: center;
         align-items: center;
@@ -167,7 +168,6 @@
     }    
 
     .cell {
-        margin: var(--s-2);
         border: none;
         transition: all 250ms ease-in-out;
     }
@@ -200,6 +200,19 @@
         height: 100%;
         position: relative;
         background: var(--darkOrange);
+    }
+
+    /* Small screens */
+    @media screen and (max-width: 750px) {
+        .row-title {
+            font-size: var(--textSmall);
+        }
+        .row-title:first-of-type {
+            margin-left: -5%;
+        }
+        .details {
+            flex-direction: column;
+        }
     }
 </style>
 

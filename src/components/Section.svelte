@@ -3,14 +3,16 @@
     import { fade } from 'svelte/transition'
     import IntersectionObserver from './IntersectionObserver.svelte'
 
+    export let spanMobile = false
+
     const GAP = 24
 </script>
 
 <Spacer s={GAP}/>
 
-<IntersectionObserver let:intersecting once center threshold={.8}>
+<IntersectionObserver let:intersecting once center threshold={.6}>
     {#if intersecting}
-        <div class='main' in:fade><slot /></div> 
+        <div class='main' class:spanMobile in:fade><slot /></div> 
     {:else}
         <div class="intersection-spacer"></div>
     {/if}
@@ -22,14 +24,17 @@
     .main {
         width: 90vw;
     }
+    .main.spanMobile {
+        width: 99vw;
+    }
     
     .intersection-spacer {
         width: 100%;
         height: 90vh;
     }
 
-    @media screen and (min-width: 1250px) {
-        .main {
+    @media screen and (min-width: 750px) {
+        .main, .main.spanMobile {
             width: 60vw;
         }
     }

@@ -113,7 +113,7 @@
 <Spacer />
 
 {#if matrixData}
-    <div class="container">
+    <div class='container'>
         <SimilarityMatrix data={matrixData} on:randomize={randomizeMatrix} />
         <Spacer />
         <SimilarityComparedAll bind:id={comparedAllId} data={comparedAllData} />

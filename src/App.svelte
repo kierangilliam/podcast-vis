@@ -31,7 +31,7 @@ TODO add to sections:
 				<Topics />
 			</Section>
 
-			<Section>
+			<Section spanMobile>
 				<Similarity />
 			</Section>
 

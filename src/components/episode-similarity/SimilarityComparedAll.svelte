@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { H4, H5, Spacer } from '@ollopa/cedar'
+    import { H5, Spacer } from '@ollopa/cedar'
     import { onMount } from 'svelte'
     import { height } from './similarity-state'
     import { episode } from '@lib/utils'
@@ -33,7 +33,7 @@
     <p class='description'>Most similar podcasts</p>
     
     <div class='title'>
-        <H4>{episode(id).guests}</H4>
+        <h4>{episode(id).guests}</h4>
         <div class='flex between'>
             <H5>{episode(id).number}</H5>
             <p class='inline-button' on:click={() => searchVisible=true}>
@@ -110,6 +110,9 @@
         transition: all 250ms ease-in;
         display: flex;
     }
+    .details .title h4 {
+        text-decoration: underline;
+    }
     .details .title .number-chip {
         margin-right: var(--s-2);
     }
@@ -121,5 +124,12 @@
         background: var(--orange);
         height: 25px;
         transition: all 250ms ease-in-out;
+    }
+
+    /* Small screens */
+    @media screen and (max-width: 750px) {
+        .container {
+            height: 80vh !important;
+        }
     }
 </style>
