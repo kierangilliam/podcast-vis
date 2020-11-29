@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { H3 } from '@ollopa/cedar'
 	import * as d3 from 'd3'
-    import { chunk, episode } from '@lib/utils'
+    import { chunk, episode, isMobile } from '@lib/utils'
     import Chart from './TopicsChart.svelte'
     import type { Episode } from '@lib/types'
     import TopicsBins from './TopicsBins.svelte'
@@ -13,6 +13,8 @@
     // Episode ids that are emphasized on the chart
     let highlighted: string[]
     let pinnedWord = 'mask'
+    let width: number
+    let height: number
 
     $: bins = bin($wordOccurrences)    
     $: chartData = getChartData(bins, pinnedWord)
@@ -92,20 +94,36 @@
 
 <H3>Topics over time</H3>
 
-{#if bins}
-    <div class='container'>
+<div class='container' bind:clientWidth={width} bind:clientHeight={height}>
+    {#if bins && width}
         <TopicsBins {bins} bind:pinnedWord bind:highlighted />           
 
-        {#if chartData}
+        {#if chartData && height}
             <div class='chart'>
-                <Chart {pinnedWord} data={chartData} {highlighted} />
+                <Chart 
+                    {pinnedWord} 
+                    data={chartData} 
+                    {highlighted} 
+                    width={width-50} 
+                    height={isMobile ? width : height} 
+                />
             </div>
         {/if}
-    </div>
-{/if}
+    {/if}
+</div>
 
 <style>
-    .container {
-        display: flex;
+    .chart {
+        margin-top: var(--s-8);
     }    
+
+    /* Big screens */
+    @media screen and (min-width: 750px) {
+        .container {
+            display: flex;
+        }    
+        .chart {
+            margin-top: 0;
+        }    
+    }
 </style>

@@ -15,6 +15,8 @@
     export let pinnedWord: string
     export let data: DataPoint[]
     export let highlighted: string[]
+    export let width: number
+    export let height: number
 
     const DOT_SIZE = 4.5
 
@@ -27,9 +29,7 @@
     $: updateData(data, mounted)
     $: updateHighlighted(highlighted)
 
-    const margin = { top: 10, right: 30, bottom: 30, left: 60 },
-        width = 460 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom
+    const margin = { top: 10, right: 25, bottom: 30, left: 25 }
 
     const dotOpacity = (d: DataPoint, defaultValue='1') => 
         d.termFrequency == 0 ? '0' : defaultValue
@@ -107,10 +107,10 @@
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
         x = d3.scaleLinear()            
-            .range([ 0, width ])
+            .range([0, width])
 
         y = d3.scaleLinear()
-            .range([ height, 0 ])
+            .range([height, 0])
 
         svg.append('g')
             .attr('class', 'x axis')

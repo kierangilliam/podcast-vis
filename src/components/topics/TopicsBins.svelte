@@ -1,8 +1,9 @@
 <script lang='ts'>
-    import { H5 } from '@ollopa/cedar'
+    import { H5, Spacer } from '@ollopa/cedar'
     import Slider from './Slider.svelte'
     import ReverseStem from '../ReverseStem.svelte'
     import type { Bin } from './topics'
+import { isMobile } from '@lib/utils';
 
     export let bins: Bin[]
     export let highlighted: string[]
@@ -19,13 +20,15 @@
 </script>
 
 <div class='bins'>
-    <div 
-        class='slider'
-        on:mousemove={() => highlighted = visibleBins.flatMap(b => b.episodeIDs)}
-        on:mouseout={() => highlighted = null}
-    >
-        <Slider bind:value={binsStart} min={0} max={bins.length - VISIBLE_BIN_COUNT} />
-    </div>
+    {#if !isMobile}
+        <div 
+            class='slider'
+            on:mousemove={() => highlighted = visibleBins.flatMap(b => b.episodeIDs)}
+            on:mouseleave={() => highlighted = null}
+        >
+            <Slider bind:value={binsStart} min={0} max={bins.length - VISIBLE_BIN_COUNT} />
+        </div>
+    {/if}
 
     {#each visibleBins as item}
         <div 
@@ -33,9 +36,7 @@
             on:mouseover={() => highlighted = item.episodeIDs}
             on:mouseout={() => highlighted = null}
         >
-            <div class='bin-title'>
-                <H5>{item.start} - {item.end}</H5>
-            </div>
+            <h5 class='bin-title'>{item.start} - {item.end}</h5>
             
             <div class='bin-inner'>
                 {#each item.tfidf.slice(0, VISIBLE_WORDS_COUNT) as [word, _]}
@@ -51,8 +52,19 @@
                 {/each}
             </div>
         </div>
-    {/each}
+    {/each}    
 </div> 
+
+{#if isMobile}
+    <div 
+        class='slider'
+        on:touchmove={() => highlighted = visibleBins.flatMap(b => b.episodeIDs)}
+        on:touchend={() => highlighted = null}
+    >
+        <Spacer />
+        <Slider bind:value={binsStart} min={0} max={bins.length - VISIBLE_BIN_COUNT} />
+    </div>
+{/if}
 
 <style>
     .bins {
@@ -68,10 +80,7 @@
         transition: all 250ms ease-in;
         width: 100%;
         margin: 0 var(--s-2);
-    }
-    .bin:first-of-type {
-        margin-left: var(--s-8);
-    }
+    }    
 
     .bin-inner {
         padding: var(--s-2) var(--s-3);
@@ -86,12 +95,8 @@
     .slider {
         --sliderHeight: 425px;
         --sliderXOffset: 15px;
-        position: absolute;
-        width: var(--sliderHeight);
-        left: calc(var(--sliderHeight) / -2 - var(--sliderXOffset));
-        top: calc(var(--sliderHeight) / 2);
-        transform: rotate(270deg);
-    }
+        width: 100%;
+    }    
 
     .selected {
         border-radius: var(--s-3);
@@ -101,5 +106,28 @@
         opacity: .75;
         border-radius: var(--s-3);
         background: var(--peach);
+    }
+
+    /* Small screens */
+    @media screen and (max-width: 750px) {
+        .bins, .bin-title {
+            font-size: var(--textSmall);
+            overflow-x: scroll;            
+        }
+    }
+
+    /* Big screens */
+    @media screen and (min-width: 750px) {
+        /* Vertical slider */
+        .slider {
+            position: absolute;
+            width: var(--sliderHeight);
+            left: calc(var(--sliderHeight) / -2 - var(--sliderXOffset));
+            top: calc(var(--sliderHeight) / 2);
+            transform: rotate(270deg);
+        }
+        .bin:first-of-type {
+            margin-left: var(--s-8);
+        }
     }
 </style>

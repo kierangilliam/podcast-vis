@@ -17,7 +17,7 @@
     input {
         --thumbHeight: var(--s-2);
         --thumbWidth: var(--s-4);
-        --thumbColor: var(--darkGray);
+        --thumbColor: var(--blue);
         --lineColor: var(--gray);
 
         border: var(--line);
