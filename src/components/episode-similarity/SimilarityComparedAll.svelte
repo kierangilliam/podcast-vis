@@ -4,8 +4,7 @@
     import { height } from './similarity-state'
     import { episode } from '@lib/utils'
     import Search from '../Search.svelte'    
-    import { topTFIDF } from '@lib/data'
-    import ReverseStem from '../ReverseStem.svelte'
+    import TfidfWords from '../TFIDFWords.svelte'
 
     export let id: string
     export let data: [string, number, string][]
@@ -56,12 +55,7 @@
                 </div>
                 <div class='bar' style='width: {barWidth(sim)}px'></div>
                 
-                <div class="words">
-                    {#each $topTFIDF ? $topTFIDF[ID].slice(0, 5) : [] as stem}
-                        <ReverseStem {stem} />
-                        <span />
-                    {/each}
-                </div>
+                <TfidfWords id={ID} />
 
                 <Spacer s={6} />
             {/each}
