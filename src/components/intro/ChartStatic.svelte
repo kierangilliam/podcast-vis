@@ -6,9 +6,7 @@
     import type { Episode } from '@lib/types'
     import { tweened } from 'svelte/motion'
     import type { Readable } from 'svelte/store'
-    import Tooltip from '../Tooltip.svelte'
-    import { Spacer } from '@ollopa/cedar'
-    import TfidfWords from '../TFIDFWords.svelte'
+    import EpisodeTooltip from '../EpisodeTooltip.svelte'
 
     export let previousStart: Date, previousEnd: Date
     export let currentStart: Date, currentEnd: Date
@@ -107,7 +105,7 @@
                 d3.select(this)
                     .transition()
                     .duration(100)
-                    .attr('r', dotSize * 1.5)
+                    .attr('r', dotSize * 4)
                     .style('fill', color)
             })
             .on('mouseleave', function(e, d) {
@@ -212,27 +210,13 @@
     })
 </script>
 
-<Tooltip x={tooltip?.x} y={tooltip?.y} yOffset={25}>
-    <div class='flex between'>
-        <p class='tooltip-title'>{getTitle(tooltip?.id)}</p>
-        <p class='number-chip'>{tooltip?.number}</p>
-    </div>
-
-    <Spacer s={2} />
-
-    <div class='flex between'>
-        {#if tooltip?.likeRatio}
-            <div>{Math.floor(likeRatio(tooltip?.id) * 100)}% liked</div>
-        {:else if tooltip?.views}
-            <div>{formatViews(tooltip?.id)} views</div>
-        {/if}
-        <p class='published'>{tooltip?.published.toDateString()}</p>
-    </div>
-
-    <Spacer s={2} />
-
-    <TfidfWords id={tooltip?.id} />
-</Tooltip>
+<EpisodeTooltip id={tooltip?.id} x={tooltip?.x} y={tooltip?.y} words>
+    {#if tooltip?.likeRatio}
+        <div>{Math.floor(likeRatio(tooltip?.id) * 100)}% liked</div>
+    {:else if tooltip?.views}
+        <div>{formatViews(tooltip?.id)} views</div>
+    {/if}
+</EpisodeTooltip>
 
 <div class='container' bind:clientWidth={containerWidth}>
     <div bind:this={element}></div>
@@ -243,11 +227,5 @@
     .container {
         width: 100%;
         position: relative;
-    }
-
-    .published {
-        font-size: var(--textSmall);
-        /* TODO really need a light-black / darker gray. same thing in description of compared all */
-        opacity: .75;
     }
 </style>

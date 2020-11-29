@@ -4,10 +4,14 @@
 
     export let id
     export let show = 5
+
+    $: words = $topTFIDF && id && $topTFIDF[id] 
+        ? $topTFIDF[id].slice(0, show) 
+        : []
 </script>
 
 <div class="words">
-    {#each $topTFIDF && id ? $topTFIDF[id].slice(0, show) : [] as stem}
+    {#each words as stem}
         <ReverseStem {stem} />
         <span />
     {/each}

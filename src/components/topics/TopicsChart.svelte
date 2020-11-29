@@ -1,12 +1,12 @@
 <script lang='ts'>
     import { onMount } from 'svelte'
     import * as d3 from 'd3'
-    import { H5, Spacer } from '@ollopa/cedar'
+    import { H5 } from '@ollopa/cedar'
     import { COLORS } from '@lib/constants'
-    import { formatDate, getTitle } from '@lib/utils'
+    import { formatDate } from '@lib/utils'
     import type { Episode } from '@lib/types'
-    import Tooltip from '../Tooltip.svelte'
     import ReverseStem from '../ReverseStem.svelte'
+    import EpisodeTooltip from '../EpisodeTooltip.svelte'
 
     interface DataPoint extends Episode {
         termFrequency: number
@@ -149,19 +149,9 @@
     })    
 </script>
 
-<Tooltip x={tooltip?.x} y={tooltip?.y} yOffset={25}>
-    <div class='flex between'>
-        <p class='tooltip-title'>{getTitle(tooltip.id)}</p>
-        <p class='number-chip'>{tooltip.number}</p>
-    </div>
-    <Spacer s={2} />
-    <div class='flex between'>
-        <div>
-            {tooltip.termFrequency} {tooltip.termFrequency > 1 ? 'occurrences' : 'occurrence'} of {pinnedWord}
-        </div>
-        <p class='published'>{tooltip.published.toDateString()}</p>
-    </div>
-</Tooltip>
+<EpisodeTooltip id={tooltip?.id} x={tooltip?.x} y={tooltip?.y}>
+    {tooltip.termFrequency} {tooltip.termFrequency > 1 ? 'occurrences' : 'occurrence'} of {pinnedWord}
+</EpisodeTooltip>
 
 <div class='container'>
     <H5>
@@ -174,18 +164,5 @@
 <style>
     .container {
         text-align: center;
-    }    
-
-    .tooltip-title {
-        margin-right: var(--s-6);
-    }
-    .published {
-        margin-left: var(--s-12);
-    }
-
-    .published {
-        font-size: var(--textSmall);
-        /* TODO really need a light-black / darker gray. same thing in description of compared all */
-        opacity: .75;
-    }
+    }        
 </style>
