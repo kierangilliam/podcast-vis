@@ -1,7 +1,7 @@
 <script lang='ts'>
-    import { onMount, tick } from 'svelte'
+    import { getContext, onMount, tick } from 'svelte'
     import * as d3 from 'd3'
-    import { formatViews, getTitle, likeRatio } from '@lib/utils'
+    import { formatViews, likeRatio } from '@lib/utils'
     import { COLORS } from '@lib/constants'
     import type { Episode } from '@lib/types'
     import { tweened } from 'svelte/motion'
@@ -12,6 +12,8 @@
     export let currentStart: Date, currentEnd: Date
     export let episodes: Episode[]
     export let transitionDuration: number
+
+    const { likeColorGradient, viewsColor, likeRatioColor } = getContext('settings')
 
     const [minDate, maxDate] = d3.extent(episodes, d => d.published)
 
@@ -60,13 +62,13 @@
 
         if (tooltip?.views === true) {
             viewsLines.attr('stroke-opacity', 1)
-            viewsPoints.style('fill', d => d.id === tooltip.id ? COLORS.orange : 'none')
+            viewsPoints.style('fill', d => d.id === tooltip.id ? viewsColor : 'none')
             return
         } else if (viewsLines.attr('stroke-opacity') == 1) {
             viewsLines.attr('stroke-opacity', 0)
         } else if (tooltip?.likeRatio === true) {
             likeRatioLines.attr('stroke-opacity', 1)            
-            likesPoints.style('fill', d => d.id === tooltip.id ? COLORS.black : 'none')
+            likesPoints.style('fill', d => d.id === tooltip.id ? COLORS.gray : 'none')
             return
         } else if (likeRatioLines.attr('stroke-opacity') == 1) {
             likeRatioLines.attr('stroke-opacity', 0)
@@ -79,10 +81,10 @@
         // TODO d3's transition is extrememly slow
         // t(likeRatioLines).attr('d', likeRatioLine)
         viewsPoints
-            .style('fill', d => withinDateExtent(d) ? COLORS.orange : COLORS.gray)
+            .style('fill', d => withinDateExtent(d) ? viewsColor : COLORS.gray)
 
         likesPoints
-            .style('fill', d => withinDateExtent(d) ? COLORS.green : COLORS.gray)
+            .style('fill', d => withinDateExtent(d) ? likeRatioColor : COLORS.gray)
 
         // TODO vertical line at start and v line at end
     }
@@ -162,25 +164,12 @@
         viewsLines = svg.append('path')
             .datum(episodes)
             .attr('fill', 'none')
-            .attr('stroke', COLORS.orange)
+            .attr('stroke', likeRatioColor)
             .attr('stroke-width', strokeWidth)
             .attr('d', viewsLine)
             .attr('stroke-opacity', 0)
 
-        // Like ratio gradient
-        svg.append('linearGradient')
-            .attr('id', 'like-gradient')
-            .attr('gradientUnits', 'userSpaceOnUse')
-            .attr('x1', 0)
-            .attr('y1', yLikeRatio(d3.min(episodes, d => likeRatio(d.id))))
-            .attr('x2', 0)
-            .attr('y2', yLikeRatio(1))
-            .selectAll('stop')
-            .data([{ offset: '25%', color: COLORS.red }, { offset: '100%', color: COLORS.green }])
-            .enter()
-            .append('stop')
-            .attr('offset', (d) => d.offset)
-            .attr('stop-color', (d) => d.color)        
+        likeColorGradient(svg, yLikeRatio)
 
         // Like ratio
         likeRatioLine = d3.line()                
@@ -198,24 +187,23 @@
 
         viewsPoints = makePoints({ 
             name: 'views', 
-            color: d => withinDateExtent(d) ? COLORS.orange : COLORS.gray,
+            color: d => withinDateExtent(d) ? viewsColor : COLORS.gray,
             y: (d) => yViews(d.views),
         })
         
         likesPoints = makePoints({ 
             name: 'likeRatio', 
-            color: d => withinDateExtent(d) ? COLORS.green : COLORS.gray,
+            color: d => withinDateExtent(d) ? likeRatioColor : COLORS.gray,
             y: d => yLikeRatio(likeRatio(d.id)),
         })
     })
 </script>
 
 <EpisodeTooltip id={tooltip?.id} x={tooltip?.x} y={tooltip?.y} words>
-    {#if tooltip?.likeRatio}
-        <div>{Math.floor(likeRatio(tooltip?.id) * 100)}% liked</div>
-    {:else if tooltip?.views}
+    <div>
         <div>{formatViews(tooltip?.id)} views</div>
-    {/if}
+        <div class='likes'><div class='ratio' style={`--ratio: ${likeRatio(tooltip.id)}`}></div></div>
+    </div>
 </EpisodeTooltip>
 
 <div class='container' bind:clientWidth={containerWidth}>
@@ -227,5 +215,23 @@
     .container {
         width: 100%;
         position: relative;
+    }
+
+    .likes {
+        background: var(--red);
+        height: var(--s-2);
+        width: 100%;
+        border-radius: 999px;
+        position: relative;
+    }
+    .likes .ratio {
+        border-radius: 999px;
+        width: calc(var(--ratio) * 100%);
+        top: 0;
+        left: 0;
+        height: 100%;
+        position: absolute;
+        background: var(--green);
+        transition: width 500ms ease-out;
     }
 </style>

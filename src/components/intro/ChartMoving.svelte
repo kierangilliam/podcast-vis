@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { onMount, tick } from 'svelte'
+    import { getContext, onMount, tick } from 'svelte'
     import * as d3 from 'd3'
     import { likeRatio } from '@lib/utils'
     import { COLORS } from '@lib/constants'
@@ -8,7 +8,8 @@
     export let start: Date, end: Date
     export let episodes: Episode[]
     export let transitionDuration: number
-
+    
+    const { likeColorGradient, viewsColor, likeRatioColor } = getContext('settings')
     const margin = { top: 10, right: 30, bottom: 30, left: 60 },
         height = 350 - margin.top - margin.bottom
 
@@ -41,10 +42,8 @@
         updateDomains()
 
         // TODO d3's transition is extrememly slow
-        t(likeRatioLines).attr('d', likeRatioLine)
-        t(viewsLines).attr('d', viewsLine)
-        // t(viewsPoints).attr('cx', (d) => x(d.published)).attr('cy', (d) => yViews(d.views))
-        // t(likesPoints).attr('cx', (d) => x(d.published)).attr('cy', (d) => yLikeRatio(likeRatio(d.id)))
+        // t(likeRatioLines).attr('d', likeRatioLine)
+        // t(viewsLines).attr('d', viewsLine)
     }
     
     onMount(async () => {
@@ -64,36 +63,9 @@
             .domain([0, 1])
             .range([height, 0])
 
-        updateDomains()
-
-        // View count
-        viewsLine = d3.line()
-            .x(d => x(d.published))
-            .y(d => yViews(d.views))
-            .curve(d3.curveCardinal.tension(0.5))
-
-        viewsLines = svg.append('path')
-            .datum(episodes)
-            .attr('fill', 'none')
-            // .attr('stroke-opacity', .7)
-            .attr('stroke', COLORS.orange)
-            .attr('stroke-width', strokeWidth)
-            .attr('d', viewsLine)
+        updateDomains()        
         
-        // Like ratio gradient
-        svg.append('linearGradient')
-            .attr('id', 'like-gradient')
-            .attr('gradientUnits', 'userSpaceOnUse')
-            .attr('x1', 0)
-            .attr('y1', yLikeRatio(d3.min(episodes, d => likeRatio(d.id))))
-            .attr('x2', 0)
-            .attr('y2', yLikeRatio(1))
-            .selectAll('stop')
-            .data([{ offset: '25%', color: COLORS.red }, { offset: '100%', color: COLORS.green }])
-            .enter()
-            .append('stop')
-            .attr('offset', (d) => d.offset)
-            .attr('stop-color', (d) => d.color)
+        likeColorGradient(svg, yLikeRatio)
 
         // Like ratio
         likeRatioLine = d3.line()                
@@ -106,8 +78,20 @@
             .attr('fill', 'none')
             .attr('stroke', 'url(#like-gradient)')
             .attr('stroke-width', strokeWidth)
-            // .attr('stroke-opacity', .7)
             .attr('d', likeRatioLine)    
+
+        // View count
+        viewsLine = d3.line()
+            .x(d => x(d.published))
+            .y(d => yViews(d.views))
+            .curve(d3.curveCardinal.tension(0.5))
+
+        viewsLines = svg.append('path')
+            .datum(episodes)
+            .attr('fill', 'none')
+            .attr('stroke', viewsColor)
+            .attr('stroke-width', strokeWidth)
+            .attr('d', viewsLine)
     })
 </script>
 

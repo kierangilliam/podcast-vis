@@ -5,11 +5,12 @@ export const COLORS = {
     lightGray: '#F1F0F2',
     darkGray: '#9089A5',
     // Primary
+    lightOrange: '#FFBEA4',
     orange: '#EF8D63',
     darkOrange: '#70371F',
     // Secondaries
-    red: '#EF6363',
-    green: '#7BCE6D',
+    red: '#DE7272',
+    green: '#91D89C',
     yellow: '#EFBF63',
     pink: '#EF6395',
     purple: '#7663EF',
