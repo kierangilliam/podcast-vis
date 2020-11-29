@@ -39,8 +39,8 @@
 
         const T = svg.transition()
 
-        x.domain(d3.extent(data, (d: DataPoint) => d.published))
-        y.domain(d3.extent(data, (d: DataPoint) => d.termFrequency))
+        x.domain(d3.extent(data, (d: DataPoint) => d.published)).range([0, width])
+        y.domain(d3.extent(data, (d: DataPoint) => d.termFrequency)).range([height, 0])
         
         const bottomAxis = T.select('.x.axis')
             .duration(750)
