@@ -98,7 +98,6 @@
         PIE
             ON PIE INTRO SHOW NUMBERS
             *WHAT DOES PREVIOUS MEAN
-            *DATE EP AIRED
         TOPICS OVER TIME EXPLANATION
             *CHART SHOULD BE ON THE RIGHT
             **SEARCH FOR A KEYWORD
@@ -107,11 +106,10 @@
             *REVERSE STEM STOPS BOUNCING 
             **number - number show ep titles
             **slider - show ep start and end
-        COS SIM
-            *COMPARED ALL NEEDS TO BE TALLER
-            *COMPARED ALL NEEDS TO BE TALLER -->
-        <p>TODO GET ACCURATE STATEMENT</p>
-        <i><h5>1500 episodes, 1,000,000 words, and 675gb analyzed.</h5></i>
+        COS SIM MATRIX
+            *interaction
+         -->
+        <i><h5>2462 videos, 8,626,908 words, and 675gb of data analyzed.</h5></i>
     </div>
     <div class='static'>
         <ChartStatic 
