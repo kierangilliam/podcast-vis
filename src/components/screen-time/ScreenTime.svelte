@@ -16,6 +16,34 @@
 	let searchVisible = false
 	let containerWidth: number	
 
+	const blacklist = [
+		1520, 
+		1521, 
+		1529, // whitney cummings & annie
+		1547, // Colin Quinn
+		1549, // Tom Papa
+		1498, // jon stewart
+		1567,
+	]
+
+	const maybeBlacklist = [
+		1497, // joe schilling
+		1487, // Janet Zuccarini & Evan Funke
+		1481, // adam eget
+		1466, // Jessimae Peluso
+		1463, // Tom Green
+		1459, // Tom ONell
+		1446, // Bert Kreischer
+		1440, // Fortune Feimster
+		1433, // Michael Yo
+		1421, // Jim Norton
+		1420, // Mark Normand
+		1405, // Sober October 3 Recap
+		1400, // Tony Hinchcliffe
+	]
+
+	const BLACKLIST = [...blacklist, ...maybeBlacklist]
+
 	$: episodeUpdate(episodeID)
 
 	const colors = [
@@ -67,17 +95,20 @@
 			.sort((a, b) => 
 				// @ts-ignore
 				episode(a.id).published - episode(b.id).published
-			)
-			// 1521, 1520
-			.filter(({ segments }) => {
+			)			
+			.filter(({ segments, id }) => {
 				const keys = Object.keys(segments)
 				// If there is just 1 segment, the video averaging did not go as planned
 				if (keys.length == 1) return false
+				// If there are two segments but one of the segments makes up for 95%
+				// of the time, there was probably an error
 				if (keys.length == 2) {
 					const ratio = Math.min(segments[keys[0]], segments[keys[1]]) / 
 						Math.max(segments[keys[0]], segments[keys[1]])
 					return ratio > .05
 				}
+
+				return !BLACKLIST.includes(episode(id).number)
 			})
 			
 		searchableEpisodes = data.map(({ id }) => id)
@@ -91,7 +122,20 @@
 <div class='container' bind:clientWidth={containerWidth}>
 	<div class='details'>
 		<H3>Screen time</H3>	
-		<div class='explanation'>Hover over a picture to see it more clearly. Tap on the below timeline to get a closer look. </div>	
+		<Spacer />
+		<div class='explanation'>
+			Hover over a picture to see it more clearly. 
+			Tap on the below timeline to get a closer look. 
+			<Spacer s={2} />
+			<p>
+				<i>
+					Note: The automated method of determining screen time works very well in calm episodes. 
+					However, in the minority of episodes with a lot of variance (people coming in and out of the studio, changing seats, etc), the accuracy drops. 
+					See the below “methodology” section for more details.
+				</i>
+			</p>
+		</div>	
+		<Spacer />
 		<div class='navigation'>
 			<p class='inline-button' on:click={navigate().back}>Previous</p>
 			<p class='inline-button' on:click={() => searchVisible=true}>
@@ -132,6 +176,11 @@
 		--size: var(--s-16);
 		width: var(--size);
 		height: var(--size);
+	}
+
+	.explanation p {
+		font-size: .95rem;
+		color: var(--darkGray);
 	}
 
 	.navigation {
