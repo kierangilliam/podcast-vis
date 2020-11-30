@@ -1,5 +1,6 @@
 importScripts("https://unpkg.com/comlink/dist/umd/comlink.js");
 
+// CSV Parsing code taken from D3
 var EOL = {},
     EOF = {},
     QUOTE = 34,
