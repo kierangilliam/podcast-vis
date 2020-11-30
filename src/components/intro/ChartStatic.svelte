@@ -17,7 +17,7 @@
 
     const [minDate, maxDate] = d3.extent(episodes, d => d.published)
 
-    const margin = { top: 10, right: 30, bottom: 30, left: 60 },
+    const margin = { top: 10, right: 20, bottom: 10, left: 20 },
         height = 350 - margin.top - margin.bottom
 
     const dotSize = 3

@@ -28,7 +28,7 @@ TODO add to sections:
 				<ScreenTime />
 			</Section>
 
-			<Section>
+			<Section stretchExtra>
 				<Topics />
 			</Section>
 

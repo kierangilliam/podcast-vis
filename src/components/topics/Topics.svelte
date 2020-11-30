@@ -101,11 +101,13 @@
     })
 </script>
 
-<H3>Topics over time</H3>
-<div class='explanation'>
-    How does the conversation change from month to month, year to year?
-    Click on a term in the bins to update the 'term frequency' chart. 
-    Use the scrollbar to go back / forward in time.
+<div class="title">
+    <H3>Topics over time</H3>
+    <div class='explanation'>
+        How does the conversation change from month to month, year to year?
+        Click on a term in the bins to update the 'term frequency' chart. 
+        Use the scrollbar to go back / forward in time.
+    </div>
 </div>
 
 <div class='container' bind:clientWidth={width} bind:clientHeight={height}>
@@ -131,16 +133,17 @@
         margin-top: var(--s-8);
     }    
 
+    .title {
+        padding: 0 var(--s-4);
+        max-width: 600px;
+    }
+
     .explanation {
         margin-bottom: var(--s-6);
     }
 
     /* Big screens */
     @media screen and (min-width: 1150px) {
-        .explanation {
-            width: 65%;
-        }
-
         .container {
             display: flex;
         }    

@@ -140,7 +140,7 @@
 	}
 	
 	/* Big screens */
-    @media screen and (min-width: 750px) {
+    @media screen and (min-width: 915px) {
         .container {
             flex-direction: row-reverse;
         }

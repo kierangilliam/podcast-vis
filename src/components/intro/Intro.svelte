@@ -116,7 +116,7 @@
          -->
          Above shows the like ratio (in green) and view count (in purple) for the episodes around 
          {formatDateForExplanation(start, end)}.
-         <Spacer s={2} />
+         <Spacer />
          This window is highlighted in the following chart.
          Mouse over a datapoint below to see more details.
     </div>
