@@ -12,12 +12,6 @@
     $: reverseStem = getRestOfWord(stem, stemToWord, reverseIndex, $intersecting)    
 
     const getRestOfWord = (_, __, ___, ____) => {
-        if(stem === 'extinct') {
-            console.log(stem)
-            console.log($intersecting)
-            console.log(indexInterval)
-        }
-
         if (!stemToWord || !stem || !stemToWord[stem]) {
             clearInterval(indexInterval)
             return
