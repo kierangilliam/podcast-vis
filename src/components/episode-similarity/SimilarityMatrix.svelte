@@ -1,7 +1,6 @@
 <script lang='ts'>
-    import { createEventDispatcher, onMount, tick } from 'svelte'
+    import { createEventDispatcher, onMount } from 'svelte'
     import { COLORS } from '@lib/constants'
-    import { height } from './similarity-state'
     import * as d3 from 'd3'
     import { episode, getTitle, isMobile } from '@lib/utils'    
     import { Spacer } from '@ollopa/cedar'
@@ -34,8 +33,6 @@
     const onHeightChange = (_) => {
         if (!mounted) return
 
-        // Using the bound `containerHeight` does not work for some reason
-        $height = container.getBoundingClientRect().height
         size = d3.scaleBand()
             .range([0, containerWidth])
             .domain(d3.range(rows))
@@ -66,11 +63,6 @@
 
     onMount(async () => {
         mounted = true
-        // I have no clue what is causing this bug, but containerHeight, though being bound,
-        // will not update itself unless we force a height change
-        container.setAttribute('height', `${container.getBoundingClientRect().height + 1}px`)
-        await tick()
-        $height = containerHeight
     })
 </script>
 
@@ -95,7 +87,9 @@
                         on:click={() => focusedClicked = [i, j]}
                         on:mouseenter={() => focusHovering = [i, j]}
                         on:mouseleave={() => focusHovering = null}
-                    ></div>
+                    >
+                        <p>{Math.round(sim * 100)}%</p>
+                    </div>
                 {/if}
             {/each}
         </div>
@@ -170,11 +164,22 @@
         border: none;
         transition: all 250ms ease-in-out;
         margin: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .cell p {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 2.2rem;
+        opacity: 0;
     }
     .cell:hover {
         border: 4px solid var(--darkOrange);
         box-shadow: var(--level-2);
         cursor: pointer;
+    }
+    .cell:hover p {
+        opacity: 1;
     }
 
     .details {

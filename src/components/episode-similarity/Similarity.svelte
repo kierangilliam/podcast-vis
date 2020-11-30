@@ -80,7 +80,7 @@
 <H5>Compare topic contents between episodes.</H5>
 <Spacer />
 
-{#if matrixData}
+{#if $epSims && comparedAllData}
     <div class='container'>
         <SimilarityMatrix data={matrixData} on:randomize={randomizeMatrix} />
         <Spacer />

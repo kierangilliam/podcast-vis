@@ -1,7 +1,6 @@
 <script lang='ts'>
     import { H5, Spacer } from '@ollopa/cedar'
     import { onMount } from 'svelte'
-    import { height } from './similarity-state'
     import { episode } from '@lib/utils'
     import Search from '../Search.svelte'    
     import TfidfWords from '../TFIDFWords.svelte'
@@ -32,7 +31,7 @@
 <!-- {searchableEpisodes} -->
 <Search bind:episodeID={id} bind:visible={searchVisible}  />
 
-<div bind:this={container} class='container' style='height: {$height}px;'>
+<div bind:this={container} class='container'>
     <p class='description'>Most similar podcasts</p>
     
     <div class='title'>
@@ -72,10 +71,11 @@
     .container {
         flex: 1;
         width: 100%;
-        min-height: 70vh;
+        min-height: 40vh;
+        max-height: 70vmin;
         border: var(--line);
         padding: var(--s-3);
-        border: var(--line);
+        border: none;
         position: relative;
     }
     .cover {
@@ -91,18 +91,6 @@
             rgba(255,255,255,.9) 90%,
             rgba(255,255,255,1) 100%
         );
-    }
-
-    .words {
-        display: flex;
-        font-size: var(--smallText);
-        font-family: monospace;
-        overflow-x: hidden;
-        flex-wrap: wrap;
-        height: 20px;
-    }
-    .words > span {
-        margin-right: var(--s-2);
     }
 
     .description {
