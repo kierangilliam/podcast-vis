@@ -135,8 +135,8 @@
 
     .title {
         padding: 0 var(--s-4);
-        max-width: 600px;
-    }
+        max-width: 700px;
+    }    
 
     .explanation {
         margin-bottom: var(--s-6);
