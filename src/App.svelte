@@ -22,7 +22,8 @@ TODO add to sections:
 		{#if $episodesLoaded}
 			<Spacer s={24} />
 			<Intro />
-
+			<Spacer s={24} />
+			
 			<Section>
 				<ScreenTime />
 			</Section>

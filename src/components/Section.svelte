@@ -5,7 +5,7 @@
 
     export let stretch = false
 
-    const GAP = 24
+    const GAP = 32
 </script>
 
 <Spacer s={GAP}/>
