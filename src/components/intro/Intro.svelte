@@ -5,7 +5,7 @@
     import * as d3 from 'd3'
     import { episodes as allEpisodes, likeRatio } from '@lib/utils'
     import { writable } from 'svelte/store'
-import { COLORS } from '@lib/constants';
+    import { COLORS } from '@lib/constants'
 
     const episodes = allEpisodes.filter(({ main }) => main)
     // 90 days
@@ -17,7 +17,7 @@ import { COLORS } from '@lib/constants';
 	setContext('settings', { 
         likeColorGradient, 
         likeRatioColor: COLORS.green,
-        viewsColor: '#FF9C40',
+        viewsColor: '#9486F2',
     })    
 
     let element: HTMLElement
@@ -26,6 +26,7 @@ import { COLORS } from '@lib/constants';
     let end = new Date(start.getTime() + DATE_WINDOW)
     let previousStart = start
     let previousEnd = end
+    let firstLoad = true
 
     function likeColorGradient (svg, y) {
         svg.append('linearGradient')
@@ -66,6 +67,15 @@ import { COLORS } from '@lib/constants';
         const observer = new IntersectionObserver(e => {
             $intersecting = e[0].isIntersecting
             if (e[0].isIntersecting) {
+                if (firstLoad) {
+                    setTimeout(() => {
+                        incrementDates()
+                        interval = setInterval(incrementDates, transitionDuration)
+                    }, firstLoad ? 2500 : 0)
+                    firstLoad = false
+                    return
+                }
+
                 incrementDates()
                 interval = setInterval(incrementDates, transitionDuration)
             } else {
@@ -79,15 +89,31 @@ import { COLORS } from '@lib/constants';
     })
 </script>
 
-<div bind:this={element}>
-    <div class='container'>
+<div bind:this={element} class='container'>
+    <div class='moving'>
         <ChartMoving {start} {end} {episodes} {transitionDuration} />
     </div>
     <div class='text'>
+        <!--
+        PIE
+            ON PIE INTRO SHOW NUMBERS
+            *WHAT DOES PREVIOUS MEAN
+            *DATE EP AIRED
+        TOPICS OVER TIME EXPLANATION
+            *CHART SHOULD BE ON THE RIGHT
+            **SEARCH FOR A KEYWORD
+            *TOPICS CHART -> REVERSE STEM HOVER
+            WHAT ARE THE GRAYED OUT THIGNS
+            *REVERSE STEM STOPS BOUNCING 
+            **number - number show ep titles
+            **slider - show ep start and end
+        COS SIM
+            *COMPARED ALL NEEDS TO BE TALLER
+            *COMPARED ALL NEEDS TO BE TALLER -->
         <p>TODO GET ACCURATE STATEMENT</p>
         <i><h5>1500 episodes, 1,000,000 words, and 675gb analyzed.</h5></i>
     </div>
-    <div class='container'>
+    <div class='static'>
         <ChartStatic 
             {previousStart} 
             {previousEnd} 
@@ -100,13 +126,19 @@ import { COLORS } from '@lib/constants';
 </div>
 
 <style>
-    .container {
-        width: 90vw;
-        height: 40vh;
+    .static, .moving {
+        width: 90vw;        
+    }
+
+    .static {
+        height: 350px;
+    }
+
+    .moving {
+        height: 250px;
     }
 
     .text {
-        /* font-family: 'Times New Roman', Times, serif; */
         display: flex;
         justify-content: center;
         margin-bottom: var(--s-4);

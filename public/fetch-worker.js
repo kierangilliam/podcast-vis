@@ -172,7 +172,12 @@ function Fetch() {
     async function get(endpoint = '') {
         const response = await fetch(baseUrl + endpoint)
         const data = await response.text();
-        // const data = await response.json();
+        return data;
+    }
+
+    async function getBuffer(endpoint = '') {
+        const response = await fetch(baseUrl + endpoint)
+        const data = await response.arrayBuffer();
         return data;
     }
 
@@ -195,7 +200,7 @@ function Fetch() {
     }
 
     return {
-        get, wordOccurrences, topTfidf
+        get, wordOccurrences, topTfidf, getBuffer
     }
 }
 
