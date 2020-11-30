@@ -22,7 +22,7 @@
 
     let element: HTMLElement
     let interval    
-    let start = new Date('1-1-2018')
+    let start = new Date(2018, 1, 1)
     let end = new Date(start.getTime() + DATE_WINDOW)
     let previousStart = start
     let previousEnd = end
@@ -124,6 +124,10 @@
 </div>
 
 <style>
+    .container {
+
+    }
+
     .static, .moving {
         width: 90vw;        
     }
