@@ -77,11 +77,11 @@
 </script>
 
 <H3>Episode Similarity</H3>
-<H5>
+<div class='explanation'>
     Compare topic contents between episodes. Click episode titles on the "Most similar podcasts to" 
     section to pin that episode.
     See the methodology section below on how these scores were calculated.
-</H5>
+</div>
 <Spacer />
 
 {#if $epSims && comparedAllData}
@@ -93,7 +93,16 @@
 {/if}
 
 <style>
+    .explanation {
+        margin-bottom: var(--s-4);
+    }
+
+    /* Big screens */
     @media screen and (min-width: 1150px) {
+        .explanation {
+            width: 65%;
+        }
+
         .container {
             display: flex;
         }

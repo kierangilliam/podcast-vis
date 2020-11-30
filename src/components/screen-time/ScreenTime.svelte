@@ -91,7 +91,7 @@
 <div class='container' bind:clientWidth={containerWidth}>
 	<div class='details'>
 		<H3>Screen time</H3>	
-		<p>Hover over a picture to see it more clearly. Tap on the below timeline to get a closer look. </p>	
+		<div class='explanation'>Hover over a picture to see it more clearly. Tap on the below timeline to get a closer look. </div>	
 		<div class='navigation'>
 			<p class='inline-button' on:click={navigate().back}>Previous</p>
 			<p class='inline-button' on:click={() => searchVisible=true}>

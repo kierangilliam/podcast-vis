@@ -102,11 +102,11 @@
 </script>
 
 <H3>Topics over time</H3>
-<p>
+<div class='explanation'>
     How does the conversation change from month to month, year to year?
     Click on a term in the bins to update the 'term frequency' chart. 
     Use the scrollbar to go back / forward in time.
-</p>
+</div>
 
 <div class='container' bind:clientWidth={width} bind:clientHeight={height}>
     {#if bins}
@@ -131,11 +131,20 @@
         margin-top: var(--s-8);
     }    
 
+    .explanation {
+        margin-bottom: var(--s-6);
+    }
+
     /* Big screens */
     @media screen and (min-width: 1150px) {
+        .explanation {
+            width: 65%;
+        }
+
         .container {
             display: flex;
         }    
+
         .chart {
             margin-top: -12px;
         }    

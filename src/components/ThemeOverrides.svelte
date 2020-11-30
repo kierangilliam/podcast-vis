@@ -146,6 +146,11 @@
         width: fit-content;
     }
 
+    :global(.explanation) {
+        font-size: 1.1rem;
+        font-family: var(--headingFont);
+    }
+
     @media screen and (max-width: 1000px) {
         :global(body) {
             overflow-x: hidden !important;
