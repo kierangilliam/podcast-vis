@@ -18,6 +18,8 @@
 
     $: visibleBins = bins && bins.slice(binsStart, binsStart + VISIBLE_BIN_COUNT)
 
+    const isHighlighted = (item, highlighted) => highlighted && item.episodeIDs.every(id => highlighted.includes(id))
+
     const formatDate = (d: Date) => {
         const month = d.toLocaleString('default', { month: 'short' });
         return `${month} ${d.getDate()} ${d.getFullYear().toString().slice(-2)}'`
@@ -39,10 +41,11 @@
         <div class='bin'>
             <h5 
                 class='bin-title'
+                class:highlighted={isHighlighted(item, highlighted)}
                 on:mouseover={() => highlighted = item.episodeIDs}
                 on:mouseout={() => highlighted = null}
             >
-                {#if highlighted == item.episodeIDs}
+                {#if isHighlighted(item, highlighted)}
                     {formatDate(item.startDate)} - {formatDate(item.endDate)}
                 {:else}
                     {item.start} - {item.end}
@@ -93,9 +96,12 @@
         margin: 0 var(--s-2);
     }    
 
+    .bin-title.highlighted {
+        font-size: var(--textSmall);
+    }
+
     .bin-title:hover {
         cursor: none;
-        font-size: var(--textSmall);
     }
 
     .bin-inner {
@@ -146,7 +152,7 @@
             margin-left: var(--s-8);
         }
 
-        .bin-title:hover {
+        .bin-title.highlighted {
             margin-top: var(--s-1);
             margin-bottom: var(--s-2);
         }
