@@ -169,9 +169,10 @@
         align-items: center;
     }
     .cell p {
-        font-family: 'Times New Roman', Times, serif;
-        font-size: 2.2rem;
+        font-family: var(--headingFont);
+        font-size: 1.7rem;
         opacity: 0;
+        color: var(--darkOrange);
     }
     .cell:hover {
         border: 4px solid var(--darkOrange);
@@ -201,7 +202,7 @@
         box-shadow: var(--level-1);
     }
     .scale-indicator {
-        width: var(--s-1);
+        width: 2px;
         height: 100%;
         position: relative;
         background: var(--darkOrange);

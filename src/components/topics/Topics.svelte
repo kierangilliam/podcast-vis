@@ -102,6 +102,11 @@
 </script>
 
 <H3>Topics over time</H3>
+<p>
+    How does the conversation change from month to month, year to year?
+    Click on a term in the bins to update the 'term frequency' chart. 
+    Use the scrollbar to go back / forward in time.
+</p>
 
 <div class='container' bind:clientWidth={width} bind:clientHeight={height}>
     {#if bins}

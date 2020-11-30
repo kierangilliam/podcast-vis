@@ -32,7 +32,7 @@
 <Search bind:episodeID={id} bind:visible={searchVisible}  />
 
 <div bind:this={container} class='container'>
-    <p class='description'>Most similar podcasts</p>
+    <p class='description'>Most similar podcasts to...</p>
     
     <div class='title'>
         <h4>{episode(id).guests}</h4>
