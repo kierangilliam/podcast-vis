@@ -59,6 +59,8 @@
                         cfd,
                         start: d3.min(bin, d => d.number),
                         end: d3.max(bin, d => d.number),    
+                        startDate: d3.min(bin, d => d.published),
+                        endDate: d3.max(bin, d => d.published),    
                         episodeIDs: bin.map(({ id }) => id)                    
                     }
                 })

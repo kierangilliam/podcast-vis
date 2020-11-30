@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { onMount } from 'svelte'
+    import { onMount, tick } from 'svelte'
     import * as d3 from 'd3'
     import { H5 } from '@ollopa/cedar'
     import { COLORS } from '@lib/constants'
@@ -34,12 +34,14 @@
     const dotOpacity = (d: DataPoint, defaultValue='1') => 
         d.termFrequency == 0 ? '0' : defaultValue
     
-    const updateData = (data: DataPoint[], mounted: boolean) => {
+    const updateData = async (data: DataPoint[], mounted: boolean) => {
         if (!mounted) return
+
+        await tick()
 
         const T = svg.transition()
 
-        console.log('update')
+        console.log('update', width, height)
 
         x.domain(d3.extent(data, (d: DataPoint) => d.published)).range([0, width])
         y.domain(d3.extent(data, (d: DataPoint) => d.termFrequency)).range([height, 0])
@@ -69,6 +71,7 @@
         svg.selectAll('circle')
             .data(data)      
             .transition()      
+            .delay(150)      
             .duration(750)
             .attr('opacity', dotOpacity)
             .attr('cx', (d: DataPoint) => x(d.published))
@@ -152,7 +155,8 @@
 </script>
 
 <EpisodeTooltip id={tooltip?.id} x={tooltip?.x} y={tooltip?.y}>
-    {tooltip.termFrequency} {tooltip.termFrequency > 1 ? 'occurrences' : 'occurrence'} of {pinnedWord}
+    {tooltip.termFrequency} {tooltip.termFrequency > 1 ? 'occurrences' : 'occurrence'} of <span>&nbsp;</span>
+    <ReverseStem stem={pinnedWord} />
 </EpisodeTooltip>
 
 <div class='container'>
