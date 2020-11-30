@@ -6,19 +6,22 @@
     import { episodes as allEpisodes, likeRatio } from '@lib/utils'
     import { writable } from 'svelte/store'
     import { COLORS } from '@lib/constants'
+    import { Spacer } from '@ollopa/cedar'
 
     const episodes = allEpisodes.filter(({ main }) => main)
     // 90 days
     const DATE_WINDOW = 90 * (24 * 60 * 60 * 1000)
     const transitionDuration = 5000
     const intersecting = writable(false)
-
-	setContext('intersectionObserver', { intersecting })    
-	setContext('settings', { 
+    const [minDate, maxDate] = d3.extent(episodes, d => d.published)
+    const settings = { 
         likeColorGradient, 
         likeRatioColor: COLORS.green,
         viewsColor: '#9486F2',
-    })    
+    }
+
+	setContext('intersectionObserver', { intersecting })    
+	setContext('settings', settings)    
 
     let element: HTMLElement
     let interval    
@@ -46,9 +49,7 @@
             .append('stop')
             .attr('offset', (d) => d.offset)
             .attr('stop-color', (d) => d.color)
-    }
-
-    const [minDate, maxDate] = d3.extent(episodes, d => d.published)
+    }    
 
     const incrementDates = () => {
         previousStart = start
@@ -60,7 +61,13 @@
             start = minDate
             end = new Date(start.getTime() + DATE_WINDOW)
         }
-    }        
+    }      
+
+    const formatDateForExplanation = (..._) => {
+        const d = new Date(start.getTime() + (DATE_WINDOW / 2))
+        const month = d.toLocaleString('default', { month: 'long' });
+        return `${month} ${d.getDate()}, ${d.getFullYear()}`
+    }
 
     onMount(() => {
         // Clear interval when we leave view of chart
@@ -93,10 +100,9 @@
     <div class='moving'>
         <ChartMoving {start} {end} {episodes} {transitionDuration} />
     </div>
-    <div class='text'>
+    <div class='explanation'>
         <!--
         PIE
-            ON PIE INTRO SHOW NUMBERS
             *WHAT DOES PREVIOUS MEAN
         TOPICS OVER TIME EXPLANATION
             *CHART SHOULD BE ON THE RIGHT
@@ -105,11 +111,14 @@
             WHAT ARE THE GRAYED OUT THIGNS
             *REVERSE STEM STOPS BOUNCING 
             **number - number show ep titles
-            **slider - show ep start and end
         COS SIM MATRIX
             *interaction
          -->
-        <i><h5>2462 videos, 8,626,908 words, and 675gb of data analyzed.</h5></i>
+         Above shows the like ratio (in green) and view count (in purple) for the episodes around 
+         {formatDateForExplanation(start, end)}.
+         <Spacer s={2} />
+         This window is highlighted in the following chart.
+         Mouse over a datapoint below to see more details.
     </div>
     <div class='static'>
         <ChartStatic 
@@ -125,7 +134,10 @@
 
 <style>
     .container {
-
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
     }
 
     .static, .moving {
@@ -140,9 +152,9 @@
         height: 250px;
     }
 
-    .text {
-        display: flex;
-        justify-content: center;
-        margin-bottom: var(--s-4);
+    .explanation {
+        text-align: center;
+        width: 80%;
+        margin-bottom: var(--s-12);
     }
 </style>

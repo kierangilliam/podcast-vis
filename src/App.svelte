@@ -16,8 +16,8 @@ TODO add to sections:
 <Theme>
 	<Flex column>
 		<Spacer s={8} />
-		<h1 class="title">Average Joe.</h1>
-		<h5 class='subtitle'>Here we analyze facets of the Joe Rogan Experience.</h5>
+		<h1 class='title'>Average Joe.</h1>
+		<i><h5>2462 videos, 8,626,908 words, and 675gb of data analyzed.</h5></i>
 		
 		{#if $episodesLoaded}
 			<Spacer s={24} />
