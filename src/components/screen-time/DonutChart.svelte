@@ -3,7 +3,8 @@
     import * as d3 from 'd3'
     import { onMount, tick } from 'svelte'
     import { makeDonutChart } from './donut-chart'
-    import { episode, formatViews, getTitle, likeRatio } from '@lib/utils'
+    import { episode, formatViews, getTitle, likeRatio, clickOutside } from '@lib/utils'
+    import { Spacer } from '@ollopa/cedar'
 
     export let episodeID: string
     export let segments: { [key: number]: number }
@@ -14,6 +15,7 @@
     let images: { image: string, x: number, y: number, id: string }[] = []
     let element: SVGSVGElement, svg
     let titleSize = chartSize / 2 - 10
+    let highlighted
 
     const donutChart = makeDonutChart({ 
         animationDuration: 750,
@@ -49,10 +51,10 @@
         }
     }
 
-    const imageStyle = ({ x, y }, isIcon=false) => {
+    const imageStyle = ({ x, y }, isIcon=false, highlighted=false) => {
         const size = isIcon ? imageSize / 1.5 : imageSize
         const { cx, cy } = centerOfChart(size / 2)
-        return `--size: ${size}px; transform: translate(${x + cx}px, ${y + cy}px);`
+        return `--size: ${size}px; transform: translate(${x + cx}px, ${y + cy}px) ${highlighted ? 'scale(3)' : ''};`
     }
     
     const titleStyle = () => {
@@ -73,20 +75,30 @@
 <div class="container">
     {#if element}
         <div class='title' style={titleStyle()} in:fly={{ y: 150 }}>
+            <h4>{getTitle(episodeID)}</h4>        
+            <Spacer s={3} />
             <span>
-                <h5>{getTitle(episodeID)}</h5>        
+                <div>{episode(episodeID).published.toDateString()}</div>
+                <Spacer s={2} />
                 <span class='number-chip'>{episode(episodeID).number}</span>
             </span>
-            {formatViews(episodeID)} views
+            <Spacer s={3} />
             <div class="likes"><div class="ratio" style={`--ratio: ${likeRatio(episodeID)}`}></div></div>
+            <Spacer s={3} />
+            <div>{formatViews(episodeID)} views</div>            
+            
         </div>
     
         <div class="images">
             {#each images as { image, x, y, id }}
                 <img 
                     src={image} 
+                    on:mouseover={() => { highlighted = id }}
+                    on:click={() => { highlighted = id }}
+                    on:mouseleave={() => { highlighted = null }}
+                    use:clickOutside={() => { highlighted = null }}
                     alt={`Screenshot from episode ${getTitle(episodeID)}`}
-                    style={imageStyle({ x, y })} 
+                    style={imageStyle({ x, y }, false, highlighted === id)} 
                 />
                 <div class="img-details" style={imageStyle({ x, y }, true)}>
                     {Math.floor(segments && segments[id] / sum * 100)}<span>%</span>
@@ -119,13 +131,12 @@
     .title span {
         display: flex;
         align-items: center;
+        justify-content: space-between;
     }
-    .title span h5 {
+    .title h4 {
         font-family: 'Times New Roman', Times, serif;
         font-style: italic;
         font-weight: bold;
-        font-size: var(--h5);
-        margin-right: var(--s-2);
     }
 
     .images:hover img:not(:hover) {
@@ -165,7 +176,6 @@
     }    
     img:hover {
         width: initial;
-        transform: scale(3);
         border-radius: 0;
         z-index: 100;
     }

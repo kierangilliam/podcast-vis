@@ -2,7 +2,6 @@
     import { getContext, onMount, tick } from 'svelte'
     import * as d3 from 'd3'
     import { likeRatio } from '@lib/utils'
-    import { COLORS } from '@lib/constants'
     import type { Episode } from '@lib/types'
 
     export let start: Date, end: Date
@@ -11,14 +10,14 @@
     
     const { likeColorGradient, viewsColor, likeRatioColor } = getContext('settings')
     const margin = { top: 10, right: 30, bottom: 30, left: 60 },
-        height = 350 - margin.top - margin.bottom
+        height = 200 - margin.top - margin.bottom
 
     let containerWidth: number
     let element: HTMLElement
     let svg
     let x, yLikeRatio, yViews
-    let viewsLine, viewsPoints, viewsLines
-    let likesPoints, likeRatioLine, likeRatioLines
+    let viewsLine, viewsLines
+    let likeRatioLine, likeRatioLines
     let strokeWidth = 4
 
     $: width = containerWidth - margin.left - margin.right

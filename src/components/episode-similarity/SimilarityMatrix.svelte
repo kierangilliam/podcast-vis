@@ -47,7 +47,6 @@
             background: ${color(similarity)};
             height: ${size}px !important; 
             width: ${size}px !important;
-            margin: ${PADDING * size / 2}px;
         `
 
     // Get details of element being hovered over
@@ -134,7 +133,7 @@
 
 <style>
     .container {
-        flex: 1.5;
+        flex: 1.25;
         width: 100%;
         border: var(--line);
         padding: var(--s-3);
@@ -170,6 +169,7 @@
     .cell {
         border: none;
         transition: all 250ms ease-in-out;
+        margin: 8px;
     }
     .cell:hover {
         border: 4px solid var(--darkOrange);
@@ -212,6 +212,9 @@
         }
         .details {
             flex-direction: column;
+        }
+        .cell {
+            margin: 2px;
         }
     }
 </style>

@@ -1,22 +1,30 @@
 <script lang='ts'>
     import { H3, H5, Spacer } from '@ollopa/cedar'
-    import { onMount } from 'svelte'
     import SimilarityComparedAll from './SimilarityComparedAll.svelte'
     import SimilarityMatrix from './SimilarityMatrix.svelte'
     import { episode } from '@lib/utils'
-    import { EpisodeSims, IDs } from '@lib/proto/ep-sim'    
+    import { epSimIdLookup, epSimReverseIdLookup, epSims } from '@lib/data';
 
-    let matrixData, idLookup, allData, comparedAllIdNum: number, comparedAllId: string
-    let reverseIdLookup = (_: string): number => {}
-    
-    $: comparedAllData = filterComparedAllData(allData, comparedAllIdNum)
-    $: comparedAllIdNum = reverseIdLookup(comparedAllId)
+    let matrixData, comparedAllIdNum: number, comparedAllId: string
+
+    $: dataReady($epSims)
+    $: comparedAllData = filterComparedAllData($epSims, comparedAllIdNum)
+    $: comparedAllIdNum = $epSimReverseIdLookup && $epSimReverseIdLookup(comparedAllId)
+
+    function dataReady(_) {
+        if (!$epSims) return
+
+        randomizeMatrix()
+
+        comparedAllIdNum = choice()
+        comparedAllId = $epSimIdLookup(comparedAllIdNum)
+    }
 
     const filterComparedAllData = (_, __) => {
         // Return default blank 5 row array for DOM sizing purposes
-        if (!(allData && comparedAllIdNum)) return [[], [], [], [], []]
+        if (!($epSims && comparedAllIdNum)) return [[], [], [], [], []]
 
-        return allData
+        return $epSims
             .filter(({ idNum1, idNum2 }) => (idNum1 == comparedAllIdNum) || (idNum2 == comparedAllIdNum))
             .map(fillInIDs)
             .sort((a, b) => b.similarity - a.similarity)
@@ -30,8 +38,8 @@
 
     const fillInIDs = ({ idNum1, idNum2, similarity }) => ({
         idNum1, idNum2,
-        id1: idLookup(idNum1),
-        id2: idLookup(idNum2),
+        id1: $epSimIdLookup(idNum1),
+        id2: $epSimIdLookup(idNum2),
         similarity,
     })
 
@@ -40,7 +48,7 @@
         const isNotMain = true
         let choice
         while (isNotMain) {
-            choice = allData[Math.floor(Math.random() * allData.length)]
+            choice = $epSims[Math.floor(Math.random() * $epSims.length)]
             choice = fillInIDs(choice)
             if (episode(choice.id1).main) {
                 return choice.idNum1
@@ -55,57 +63,17 @@
         matrixData = matrixData.map(id => {
                 return matrixData.map(idInner => {
                     if (id == idInner) {
-                        return [idLookup(id), 0.0]
+                        return [$epSimIdLookup(id), 0.0]
                     }
 
-                    const hit = allData.find(({ idNum1, idNum2 }) => 
+                    const hit = $epSims.find(({ idNum1, idNum2 }) => 
                         (idNum1 == id && idInner == idNum2) || (idNum2 == id && idInner == idNum1)
                     )
 
-                    return [idLookup(idInner), hit.similarity]
+                    return [$epSimIdLookup(idInner), hit.similarity]
                 })
             })
     }
-
-    onMount(async () => {
-        async function loadSims() {
-            const response = await fetch('./ep_sim')
-            const bufferRes = await response.arrayBuffer();
-            // @ts-ignore
-            const pbf = new Pbf(new Uint8Array(bufferRes));
-            // @ts-ignore
-            const { rows } = EpisodeSims.read(pbf);
-            return rows
-        }
-
-        // Returns a function that maps from an idNum to an id
-        async function loadIDLookup() {
-            const response = await fetch('./ep_sim_id_lookup')
-            const bufferRes = await response.arrayBuffer();
-            // @ts-ignore
-            const pbf = new Pbf(new Uint8Array(bufferRes));
-            // @ts-ignore
-            const { rows } = IDs.read(pbf);
-
-            function lookup(idNum: number): string {
-                return rows.find(item => item.idNum === idNum).id
-            }
-            
-            function reverseIdLookup (id: string): number {
-                if (!id) return
-                return rows.find(item => item.id === id).idNum
-            }
-
-            return [lookup, reverseIdLookup]
-        }
-
-        [allData, [idLookup, reverseIdLookup]] = await Promise.all([loadSims(), loadIDLookup()])   
-
-        randomizeMatrix()
-
-        comparedAllIdNum = choice()
-        comparedAllId = idLookup(comparedAllIdNum)
-    })
 </script>
 
 <H3>Episode Similarity</H3>

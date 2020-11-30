@@ -68,8 +68,17 @@
 				// @ts-ignore
 				episode(a.id).published - episode(b.id).published
 			)
-			// If there is just 1 segment, the video averaging did not go as planned
-			.filter(({ segments }) => Object.keys(segments).length > 1)
+			// 1521, 1520
+			.filter(({ segments }) => {
+				const keys = Object.keys(segments)
+				// If there is just 1 segment, the video averaging did not go as planned
+				if (keys.length == 1) return false
+				if (keys.length == 2) {
+					const ratio = Math.min(segments[keys[0]], segments[keys[1]]) / 
+						Math.max(segments[keys[0]], segments[keys[1]])
+					return ratio > .05
+				}
+			})
 			
 		searchableEpisodes = data.map(({ id }) => id)
 

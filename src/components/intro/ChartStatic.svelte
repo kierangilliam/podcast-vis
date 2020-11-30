@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { getContext, onMount, tick } from 'svelte'
     import * as d3 from 'd3'
-    import { formatViews, likeRatio } from '@lib/utils'
+    import { formatBigNumber, formatViews, likeRatio } from '@lib/utils'
     import { COLORS } from '@lib/constants'
     import type { Episode } from '@lib/types'
     import { tweened } from 'svelte/motion'
@@ -74,12 +74,9 @@
             likeRatioLines.attr('stroke-opacity', 0)
         }
 
-        // console.log($start.getDate(), $start.getMonth(), $end.getDate(), $end.getMonth())
-
         updateDomains()
 
         // TODO d3's transition is extrememly slow
-        // t(likeRatioLines).attr('d', likeRatioLine)
         viewsPoints
             .style('fill', d => withinDateExtent(d) ? viewsColor : COLORS.gray)
 
@@ -164,10 +161,21 @@
         axisLines
             .append('text')
             .attr('font-size', 10)
-            .attr('x', width - 20)
+            .attr('x', 0)
             .attr('y', i => yLikeRatio(i / 10) - axisLineWidth / 2 - 4)
-            .text(i => `${Math.round(yLikeRatio.invert(yLikeRatio(i / 10) - axisLineWidth / 2) * 100)}%`)
-            .attr('fill', COLORS.gray)            
+            .text(i => `${formatBigNumber(yViews.invert(yLikeRatio(i / 10) - axisLineWidth / 2))} views`)
+            .attr('fill', COLORS.darkGray)            
+            .attr('opacity', .75)
+
+        // LIKE RATIO
+        axisLines
+            .append('text')
+            .attr('font-size', 10)
+            .attr('x', width - 40)
+            .attr('y', i => yLikeRatio(i / 10) - axisLineWidth / 2 - 4)
+            .text(i => `${Math.round(yLikeRatio.invert(yLikeRatio(i / 10) - axisLineWidth / 2) * 100)}% liked`)
+            .attr('fill', COLORS.darkGray)            
+            .attr('opacity', .75)
 
         // View count
         viewsLine = d3.line()
