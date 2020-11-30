@@ -12,6 +12,12 @@
     $: reverseStem = getRestOfWord(stem, stemToWord, reverseIndex, $intersecting)    
 
     const getRestOfWord = (_, __, ___, ____) => {
+        if(stem === 'extinct') {
+            console.log(stem)
+            console.log($intersecting)
+            console.log(indexInterval)
+        }
+
         if (!stemToWord || !stem || !stemToWord[stem]) {
             clearInterval(indexInterval)
             return
@@ -35,11 +41,16 @@
         }
 
         // Randomly show the stem by itself
-        if (Math.random() > .8) {
+        if (Math.random() > .3) {
             return 
         }
         
-        return stemToWord[stem][reverseIndex % stemToWord[stem].length]
+        const reversed = stemToWord[stem][reverseIndex % stemToWord[stem].length]
+        const [l1, l2] = [reversed.length, stem.length]
+        // industri -> industry, industrial
+        return l1 === l2 && stem.substring(0, l1 - 1) === reversed.substring(0, l1 - 1)
+            ? ''
+            : reversed
     }
 
     onDestroy(() => clearInterval(indexInterval))
