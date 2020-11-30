@@ -81,7 +81,11 @@ import { COLORS } from '@lib/constants';
 
 <div bind:this={element}>
     <div class='container'>
-        <ChartMoving {start} {end} {episodes} {transitionDuration} {likeColorGradient} />
+        <ChartMoving {start} {end} {episodes} {transitionDuration} />
+    </div>
+    <div class='text'>
+        <p>TODO GET ACCURATE STATEMENT</p>
+        <i><h5>675gb of video, 1,000,000 words, and 1500 episodes analyzed.</h5></i>
     </div>
     <div class='container'>
         <ChartStatic 
@@ -91,7 +95,6 @@ import { COLORS } from '@lib/constants';
             currentEnd={end} 
             {transitionDuration}
             {episodes} 
-            {likeColorGradient} 
         />
     </div>
 </div>
@@ -100,5 +103,12 @@ import { COLORS } from '@lib/constants';
     .container {
         width: 90vw;
         height: 40vh;
+    }
+
+    .text {
+        /* font-family: 'Times New Roman', Times, serif; */
+        display: flex;
+        justify-content: center;
+        margin-bottom: var(--s-4);
     }
 </style>

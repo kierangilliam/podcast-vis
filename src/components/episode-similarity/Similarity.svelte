@@ -121,7 +121,7 @@
 {/if}
 
 <style>
-    @media screen and (min-width: 750px) {
+    @media screen and (min-width: 1150px) {
         .container {
             display: flex;
         }

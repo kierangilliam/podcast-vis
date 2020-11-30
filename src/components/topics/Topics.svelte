@@ -125,7 +125,7 @@
     }    
 
     /* Big screens */
-    @media screen and (min-width: 750px) {
+    @media screen and (min-width: 11550px) {
         .container {
             display: flex;
         }    

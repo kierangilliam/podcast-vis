@@ -3,7 +3,7 @@
     import { fade } from 'svelte/transition'
     import IntersectionObserver from './IntersectionObserver.svelte'
 
-    export let spanMobile = false
+    export let stretch = false
 
     const GAP = 24
 </script>
@@ -12,7 +12,7 @@
 
 <IntersectionObserver let:intersecting once center threshold={.6}>
     {#if intersecting}
-        <div class='main' class:spanMobile in:fade><slot /></div> 
+        <div class='main' class:stretch in:fade><slot /></div> 
     {:else}
         <div class="intersection-spacer"></div>
     {/if}
@@ -24,7 +24,7 @@
     .main {
         width: 90vw;
     }
-    .main.spanMobile {
+    .main.stretch {
         width: 99vw;
     }
     
@@ -33,8 +33,14 @@
         height: 90vh;
     }
 
-    @media screen and (min-width: 750px) {
-        .main, .main.spanMobile {
+    @media screen and (min-width: 550px) {
+        .main, .main.stretch {
+            width: 80vw;
+        }
+    }
+
+    @media screen and (min-width: 1350px) {
+        .main, .main.stretch {
             width: 60vw;
         }
     }

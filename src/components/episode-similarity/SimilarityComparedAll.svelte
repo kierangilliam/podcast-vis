@@ -10,9 +10,13 @@
     export let data: [string, number, string][]
     
     let container: HTMLElement
+    let resultsElement: HTMLElement
     let totalWidth = 0
     let mounted = false
     let searchVisible: boolean
+
+    //  Reset scroll on ep change
+    $: data && resultsElement && resultsElement.scrollTo(0, 0)
 
     const barWidth = (sim) => {
         return totalWidth * sim 
@@ -44,7 +48,7 @@
     <Spacer s={12} />
 
     {#if mounted}
-        <div class="results">        
+        <div class="results" bind:this={resultsElement}>        
             {#each data as [ID, sim]}
                 <div class='details'>
                     <div class='title' on:click={() => id = ID}>
@@ -61,15 +65,32 @@
             {/each}
         </div>  
     {/if}
+    <div class="cover"></div>
 </div>
 
 <style>
     .container {
         flex: 1;
         width: 100%;
-        height: 100%;
+        min-height: 70vh;
         border: var(--line);
         padding: var(--s-3);
+        border: var(--line);
+        position: relative;
+    }
+    .cover {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        pointer-events: none;
+        touch-action: none;
+        background: linear-gradient(to bottom, 
+            rgba(255,255,255,0) 75%,
+            rgba(255,255,255,.9) 90%,
+            rgba(255,255,255,1) 100%
+        );
     }
 
     .words {
@@ -121,9 +142,9 @@
     }
 
     /* Small screens */
-    @media screen and (max-width: 750px) {
+    @media screen and (max-width: 1150px) {
         .container {
-            height: 80vh !important;
+            height: 85vh !important;
         }
     }
 </style>

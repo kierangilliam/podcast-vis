@@ -22,7 +22,7 @@
         display: flex;
         font-size: var(--smallText);
         font-family: monospace;
-        overflow-x: hidden;
+        overflow: hidden;
         flex-wrap: wrap;
         height: 20px;
     }

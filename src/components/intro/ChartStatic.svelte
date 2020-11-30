@@ -86,7 +86,11 @@
         likesPoints
             .style('fill', d => withinDateExtent(d) ? likeRatioColor : COLORS.gray)
 
-        // TODO vertical line at start and v line at end
+        svg.selectAll('axis-lines')
+            .attr('opacity', tooltip ? 1 : .7)
+        
+        svg.selectAll('axis-labels')
+            .attr('opacity', tooltip ? 1 : 0)
     }
 
     const makePoints = ({ name, color, y }) =>
@@ -144,16 +148,26 @@
 
         // Horizontal lines for axis
         const axisLineWidth = 1
-        svg.selectAll('axis-lines')
+        const axisLines = svg.selectAll('axis-lines')
             .data([...Array(4)].map((_, i) => (i + 1) * 2))
             .enter()
+
+        axisLines
             .append('rect')
             .attr('x', 0)
             .attr('y', i => yLikeRatio(i / 10) - axisLineWidth / 2)
             .attr('width', width)
             .attr('height', axisLineWidth)
             .attr('fill', COLORS.gray)
-            .attr('opacity', .7)
+            .attr('opacity', .75)
+            
+        axisLines
+            .append('text')
+            .attr('font-size', 10)
+            .attr('x', width - 20)
+            .attr('y', i => yLikeRatio(i / 10) - axisLineWidth / 2 - 4)
+            .text(i => `${Math.round(yLikeRatio.invert(yLikeRatio(i / 10) - axisLineWidth / 2) * 100)}%`)
+            .attr('fill', COLORS.gray)            
 
         // View count
         viewsLine = d3.line()

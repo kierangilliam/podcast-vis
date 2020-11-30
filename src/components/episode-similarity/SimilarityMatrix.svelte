@@ -127,7 +127,7 @@
             <label class='monospace'>Calculated using TF-IDF cosine similarity</label>
         </div>
         <div>
-            <button class="inline-button" on:click={() => dispatch('randomize')}>Randomize</button>
+            <p class="inline-button" on:click={() => dispatch('randomize')}>Randomize</p>
         </div>
     </div>
 </div>
