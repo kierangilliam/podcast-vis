@@ -42,7 +42,7 @@ import ReverseStem from "./ReverseStem.svelte";
 <h4>Screen Time</h4>
 
 <p>
-	The real question I wanted to ask was, 'is the conversation dominated by one person, 
+	In this section, I wanted to ask was, 'is the conversation dominated by one person, 
 	or does it have equal representation from all parties?' 
 	The process of speaker segmentation from audio is called diarization.
 	This led me to trying several diarization techniques. 
@@ -64,7 +64,7 @@ import ReverseStem from "./ReverseStem.svelte";
 	As you can see, clusters form nicely out these averages. 
 	The next step was to use a 1D clustering algorithm. I chose KDE.
 	This ended up proxying diarization pretty well, so I dropped my attempts at a DL 
-	solution inplace for this naive method.
+	solution in place for this naive method.
 </p>
 
 <h5>Limitations</h5>
@@ -157,7 +157,7 @@ import ReverseStem from "./ReverseStem.svelte";
 </p>
 
 <p>
-	This is how I show the user that exinct, extinction, and extinctions all mean the same thing in this context.
+	This is how I show the user that extinct, extinction, and extinctions all mean the same thing in this context.
 </p>
 
 <h4>Like Ratio / Views Line Chart</h4>
