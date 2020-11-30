@@ -85,7 +85,7 @@ import { COLORS } from '@lib/constants';
     </div>
     <div class='text'>
         <p>TODO GET ACCURATE STATEMENT</p>
-        <i><h5>675gb of video, 1,000,000 words, and 1500 episodes analyzed.</h5></i>
+        <i><h5>1500 episodes, 1,000,000 words, and 675gb analyzed.</h5></i>
     </div>
     <div class='container'>
         <ChartStatic 

@@ -42,8 +42,8 @@
         updateDomains()
 
         // TODO d3's transition is extrememly slow
-        // t(likeRatioLines).attr('d', likeRatioLine)
-        // t(viewsLines).attr('d', viewsLine)
+        t(likeRatioLines).attr('d', likeRatioLine)
+        t(viewsLines).attr('d', viewsLine)
     }
     
     onMount(async () => {
