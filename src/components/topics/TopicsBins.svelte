@@ -1,9 +1,9 @@
 <script lang='ts'>
-    import { H5, Spacer } from '@ollopa/cedar'
+    import { Spacer } from '@ollopa/cedar'
     import Slider from './Slider.svelte'
     import ReverseStem from '../ReverseStem.svelte'
     import type { Bin } from './topics'
-import { isMobile } from '@lib/utils';
+    import { isMobile } from '@lib/utils'
 
     export let bins: Bin[]
     export let highlighted: string[]
@@ -17,6 +17,11 @@ import { isMobile } from '@lib/utils';
     let hoverWord = null
 
     $: visibleBins = bins && bins.slice(binsStart, binsStart + VISIBLE_BIN_COUNT)
+
+    const formatDate = (d: Date) => {
+        const month = d.toLocaleString('default', { month: 'short' });
+        return `${month} ${d.getDate()} ${d.getFullYear().toString().slice(-2)}'`
+    }
 </script>
 
 <div class='bins'>
@@ -31,12 +36,18 @@ import { isMobile } from '@lib/utils';
     {/if}
 
     {#each visibleBins as item}
-        <div 
-            class='bin' 
-            on:mouseover={() => highlighted = item.episodeIDs}
-            on:mouseout={() => highlighted = null}
-        >
-            <h5 class='bin-title'>{item.start} - {item.end}</h5>
+        <div class='bin'>
+            <h5 
+                class='bin-title'
+                on:mouseover={() => highlighted = item.episodeIDs}
+                on:mouseout={() => highlighted = null}
+            >
+                {#if highlighted == item.episodeIDs}
+                    {formatDate(item.startDate)} - {formatDate(item.endDate)}
+                {:else}
+                    {item.start} - {item.end}
+                {/if}
+        </h5>
             
             <div class='bin-inner'>
                 {#each item.tfidf.slice(0, VISIBLE_WORDS_COUNT) as [word, _]}
@@ -81,6 +92,11 @@ import { isMobile } from '@lib/utils';
         width: 100%;
         margin: 0 var(--s-2);
     }    
+
+    .bin-title:hover {
+        cursor: none;
+        font-size: var(--textSmall);
+    }
 
     .bin-inner {
         padding: var(--s-2) var(--s-3);
@@ -128,6 +144,11 @@ import { isMobile } from '@lib/utils';
         }
         .bin:first-of-type {
             margin-left: var(--s-8);
+        }
+
+        .bin-title:hover {
+            margin-top: var(--s-1);
+            margin-bottom: var(--s-2);
         }
     }
 </style>
