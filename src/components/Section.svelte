@@ -4,7 +4,6 @@
     import IntersectionObserver from './IntersectionObserver.svelte'
 
     export let stretch = false
-    export let stretchExtra = false
 
     const GAP = 32
 </script>
@@ -13,7 +12,7 @@
 
 <IntersectionObserver let:intersecting once center threshold={.6}>
     {#if intersecting}
-        <div class='main' class:stretch class:stretch-extra={stretchExtra} in:fade><slot /></div> 
+        <div class='main' class:stretch in:fade><slot /></div> 
     {:else}
         <div class="intersection-spacer"></div>
     {/if}
@@ -26,7 +25,7 @@
         width: 90vw;
     }
     
-    .stretch, .stretch-extra {
+    .stretch {
         width: 99vw;
     }
     
@@ -36,19 +35,19 @@
     }
 
     @media screen and (min-width: 550px) {
-        .main, .stretch {
+        .main {
             width: 80vw;
         }
-        .stretch-extra {
+        .stretch {
             width: 95vw;
         }
     }
 
     @media screen and (min-width: 1350px) {
-        .main, .main.stretch {
+        .main {
             width: 60vw;
         }
-        .stretch-extra {
+        .stretch {
             width: 85vw;
         }
     }

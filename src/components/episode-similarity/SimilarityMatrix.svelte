@@ -67,6 +67,35 @@
 </script>
 
 <div bind:this={container} class='container' bind:clientHeight={containerHeight} bind:clientWidth={containerWidth}>
+    <div class='details'>
+        <div>
+            <p class="inline-button" on:click={() => dispatch('randomize')}>Randomize</p>
+        </div>
+        <div>
+            <div class='legend'>
+                <div class='scale-numbers'>
+                    <p>0%</p>
+                    <p>{Math.round(maxSimilarity * 100)}%</p>
+                </div>
+                <div 
+                    class='scale'
+                    style={`background-image: linear-gradient(to right, ${COLORS.white}, ${COLORS.orange});`}
+                >
+                    {#if focused}
+                        <div 
+                            class='scale-indicator' 
+                            style={`left: ${focused.similarity / maxSimilarity * 100}%`}>
+                        </div>
+                    {/if}
+                </div>
+            </div>
+            <label class='monospace'>Calculated using TF-IDF cosine similarity</label>
+            <Spacer s={2} />
+        </div>        
+    </div>
+
+    <Spacer s={8} />   
+
     {#each data as column, i}
         <div class='row'>        
             <div 
@@ -93,36 +122,7 @@
                 {/if}
             {/each}
         </div>
-    {/each}
-
-    <Spacer s={8} />
-
-    <div class='details'>
-        <div>
-            <div class='legend'>
-                <div class='scale-numbers'>
-                    <p>0%</p>
-                    <p>{Math.round(maxSimilarity * 100)}%</p>
-                </div>
-                <div 
-                    class='scale'
-                    style={`background-image: linear-gradient(to right, ${COLORS.white}, ${COLORS.orange});`}
-                >
-                    {#if focused}
-                        <div 
-                            class='scale-indicator' 
-                            style={`left: ${focused.similarity / maxSimilarity * 100}%`}>
-                        </div>
-                    {/if}
-                </div>
-            </div>
-            <Spacer s={2} />
-            <label class='monospace'>Calculated using TF-IDF cosine similarity</label>
-        </div>
-        <div>
-            <p class="inline-button" on:click={() => dispatch('randomize')}>Randomize</p>
-        </div>
-    </div>
+    {/each} 
 </div>
 
 <style>
@@ -217,7 +217,7 @@
             margin-left: -5%;
         }
         .details {
-            flex-direction: column;
+            flex-direction: column-reverse;
         }
         .cell {
             margin: 2px;

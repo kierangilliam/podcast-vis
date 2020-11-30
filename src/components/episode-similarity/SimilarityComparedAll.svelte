@@ -35,23 +35,23 @@
     <p class='description'>Most similar podcasts to...</p>
     
     <div class='title'>
-        <h4>{episode(id).guests}</h4>
         <div class='flex between'>
-            <H5>{episode(id).number}</H5>
-            <p class='inline-button' on:click={() => searchVisible=true}>
-                Search for a different episode
-            </p>
+            <h5>{episode(id).guests}</h5>
+            <p class="number-chip">{episode(id).number}</p>
         </div>
+        <p class='inline-button' on:click={() => searchVisible=true}>
+            Search for a different episode
+        </p>
     </div>
 
     <Spacer s={12} />
 
     {#if mounted}
-        <div class="results" bind:this={resultsElement}>        
+        <div class='results' bind:this={resultsElement}>        
             {#each data as [ID, sim]}
                 <div class='details'>
                     <div class='title' on:click={() => id = ID}>
-                        <p class="number-chip">{episode(ID).number}</p>
+                        <p class='number-chip'>{episode(ID).number}</p>
                         {episode(ID).guests}
                     </div>
                     <p>{Math.round(sim*100)}%</p>
@@ -64,7 +64,7 @@
             {/each}
         </div>  
     {/if}
-    <div class="cover"></div>
+    <div class='cover'></div>
 </div>
 
 <style>
@@ -72,7 +72,7 @@
         flex: 1;
         width: 100%;
         min-height: 40vh;
-        max-height: 70vmin;
+        max-height: 70vh;
         border: var(--line);
         padding: var(--s-3);
         border: none;
@@ -133,6 +133,7 @@
     @media screen and (max-width: 1150px) {
         .container {
             height: 85vh !important;
+            max-height: 85vh !important;
         }
     }
 </style>
