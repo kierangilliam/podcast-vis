@@ -186,7 +186,7 @@
         viewsLines = svg.append('path')
             .datum(episodes)
             .attr('fill', 'none')
-            .attr('stroke', likeRatioColor)
+            .attr('stroke', viewsColor)
             .attr('stroke-width', strokeWidth)
             .attr('d', viewsLine)
             .attr('stroke-opacity', 0)
