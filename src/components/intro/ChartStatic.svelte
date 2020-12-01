@@ -17,7 +17,7 @@
 
     const [minDate, maxDate] = d3.extent(episodes, d => d.published)
 
-    const margin = { top: 10, right: 20, bottom: 10, left: 20 },
+    const margin = { top: 10, right: 10, bottom: 10, left: 10 },
         height = 350 - margin.top - margin.bottom
 
     const dotSize = 3
@@ -35,9 +35,6 @@
     $: width = containerWidth - margin.left - margin.right
     $: highlighted = ($start, $end) && episodes.filter(withinDateExtent)
     $: handleChartUpdate(highlighted)    
-
-    // Transititon and transition linear helper functions
-    const t = (e, d) => e.transition().duration(d)
 
     const withinDateExtent = (ep: Episode) => 
         ep.published >= $start && ep.published <= $end

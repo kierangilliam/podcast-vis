@@ -16,8 +16,10 @@ TODO add to sections:
 <Theme>
 	<Flex column>
 		<Spacer s={8} />
-		<h1 class='title'>Average Joe.</h1>
-		<i><h5>2462 videos, 8,626,908 words, and 699gb of data analyzed.</h5></i>
+		<h1 class='title'>Average Joe</h1>
+		<div class="subtitle">
+			<i><h5>2462 videos, 8,626,908 words, and 699gb of data analyzed.</h5></i>
+		</div>
 		
 		{#if $episodesLoaded}
 			<Spacer s={24} />
@@ -58,5 +60,6 @@ TODO add to sections:
 
 	.subtitle {
 		text-align: center;
+		padding: 0 var(--s-4);
 	}
 </style>
