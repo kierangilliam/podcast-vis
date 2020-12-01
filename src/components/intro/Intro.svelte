@@ -3,7 +3,7 @@
     import ChartMoving from './ChartMoving.svelte'
     import ChartStatic from './ChartStatic.svelte'
     import * as d3 from 'd3'
-    import { episodes as allEpisodes, likeRatio } from '@lib/utils'
+    import { episodes as allEpisodes, likeRatio, setCSSVar } from '@lib/utils'
     import { writable } from 'svelte/store'
     import { COLORS } from '@lib/constants'
     import { Spacer } from '@ollopa/cedar'
@@ -20,6 +20,7 @@
         viewsColor: '#9486F2',
     }
 
+    setCSSVar(['introChartTransitionDuration', `${transitionDuration}ms`])
 	setContext('intersectionObserver', { intersecting })    
 	setContext('settings', settings)    
 
@@ -156,5 +157,12 @@
         text-align: center;
         width: 80%;
         margin-bottom: var(--s-12);
+    }
+
+    /* Small screens */
+    @media screen and (max-width: 450px) {
+        .moving, .static {
+            width: 100vw;
+        }
     }
 </style>

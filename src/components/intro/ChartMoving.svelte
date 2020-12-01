@@ -32,17 +32,13 @@
         yViews.domain([0, d3.max(episodes.filter(withinDateExtent), (d) => d.views)])
     }
 
-    // Transititon and transition linear helper functions
-    const t = (e) => e.transition().duration(transitionDuration).ease(d3.easeLinear)
-
     const handleChartUpdate = (_, __) => {
         if (!svg) return
 
         updateDomains()
 
-        // TODO d3's transition is extrememly slow
-        t(likeRatioLines).attr('d', likeRatioLine)
-        t(viewsLines).attr('d', viewsLine)
+        likeRatioLines.attr('d', likeRatioLine)
+        viewsLines.attr('d', viewsLine)
     }
     
     onMount(async () => {
@@ -74,6 +70,7 @@
 
         likeRatioLines = svg.append('path')
             .datum(episodes)
+            .attr('class', 'moving-lines')
             .attr('fill', 'none')
             .attr('stroke', 'url(#like-gradient)')
             .attr('stroke-width', strokeWidth)
@@ -87,6 +84,7 @@
 
         viewsLines = svg.append('path')
             .datum(episodes)
+            .attr('class', 'moving-lines')
             .attr('fill', 'none')
             .attr('stroke', viewsColor)
             .attr('stroke-width', strokeWidth)
@@ -100,6 +98,10 @@
 </div>
 
 <style>
+    :global(.moving-lines) {
+        transition: all var(--introChartTransitionDuration) linear;
+    }
+
     .container {
         width: 100%;
         position: relative;
