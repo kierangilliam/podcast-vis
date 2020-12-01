@@ -6,7 +6,6 @@
 
     export let start: Date, end: Date
     export let episodes: Episode[]
-    export let transitionDuration: number
     
     const { likeColorGradient, viewsColor, likeRatioColor } = getContext('settings')
     const margin = { top: 10, right: 30, bottom: 30, left: 60 },
@@ -98,6 +97,7 @@
 </div>
 
 <style>
+    /* TODO Does not work on webkit */
     :global(.moving-lines) {
         transition: all var(--introChartTransitionDuration) linear;
     }
