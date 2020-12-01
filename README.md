@@ -80,9 +80,7 @@ The Intersection Observer API allows you to subscribe to an element's visibility
 
 ##### Web Workers
 
-Web Workers allow you to execute javascript off of the main thread. This is handy when you, for example, have some computationally heavy work that you need to do client-side but don't want the webpage to render clunkily. I used webworkers to download and parse* my data.
-
-* Right now I'm parsing protobuf data on the main thread. I'm not too upset about this due to the fact the parser I'm using, pbf, has a throughput of ~60Mbs per second.
+Web Workers allow you to execute javascript off of the main thread. This is handy when you, for example, have some computationally heavy work that you need to do client-side but don't want the webpage to render clunkily. I used webworkers to download and parse my data.
 
 ##### Like Ratio / Views Line Chart
 

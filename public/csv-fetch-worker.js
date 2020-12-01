@@ -170,20 +170,14 @@ function Fetch() {
     const baseUrl = ""
     const csv = dsv(",")
 
-    async function get(endpoint = '') {
+    async function getText(endpoint = '') {
         const response = await fetch(baseUrl + endpoint)
         const data = await response.text();
         return data;
     }
 
-    async function getBuffer(endpoint = '') {
-        const response = await fetch(baseUrl + endpoint)
-        const data = await response.arrayBuffer();
-        return data;
-    }
-
     async function wordOccurrences() {
-        const data = await get('./word_occurrences.csv')
+        const data = await getText('./word_occurrences.csv')
         const d = {}
         csv.parse(data).forEach(({ id, top_words }) => {
             d[id] = (0, eval)('(' + top_words + ')')
@@ -192,7 +186,7 @@ function Fetch() {
     }
 
     async function topTfidf() {
-        const data = await get('./top_tfidf.csv')
+        const data = await getText('./top_tfidf.csv')
         const d = {}
         csv.parse(data).forEach(({ id, top_words }) => {
             d[id] = (0, eval)('(' + top_words + ')')
@@ -200,9 +194,7 @@ function Fetch() {
         return d
     }
 
-    return {
-        get, wordOccurrences, topTfidf, getBuffer
-    }
+    return { wordOccurrences, topTfidf }
 }
 
 Comlink.expose(Fetch());
