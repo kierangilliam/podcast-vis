@@ -17,3 +17,7 @@ export interface WordOccurrences {
 export interface TopTFIDF {
     [id: string]: string[]
 }
+
+export interface Timestamp { start: number, end: number }
+export interface TimelineCluster { id: string, timestamps: Timestamp[] }
+export interface Timeline { id: string, clusters: TimelineCluster[], frames: number }

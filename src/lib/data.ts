@@ -1,12 +1,12 @@
-import { EpisodeSims, IDs } from '@lib/proto/ep-sim'
-import * as Comlink from 'comlink'
-import { writable } from 'svelte/store'
-import type { TopTFIDF, WordOccurrences } from './types'
+import { EpisodeSims, IDs } from '@lib/proto/ep-sim';
+import { Timelines } from '@lib/proto/screen-time';
+import * as Comlink from 'comlink';
+import { writable } from 'svelte/store';
+import type { Timeline, TopTFIDF, WordOccurrences } from './types';
 
-async function getData() {
+export const remoteFetchWorker = () => {
     const worker = new Worker('./fetch-worker.js')
-    const remoteFetch = Comlink.wrap(worker)
-    return remoteFetch
+    return Comlink.wrap(worker)
 }
 
 export const wordOccurrences = writable<WordOccurrences>(null);
@@ -17,7 +17,7 @@ export const wordOccurrences = writable<WordOccurrences>(null);
     //     })
 
     // @ts-ignore
-    const wc = await (await getData()).wordOccurrences()
+    const wc = await (await remoteFetchWorker()).wordOccurrences()
 
     wordOccurrences.set(wc)
 })()
@@ -29,7 +29,7 @@ export const topTFIDF = writable<TopTFIDF>(null);
     //         (0, eval)('(' + top_words + ')')
     //     })
 
-    const d = await (await getData()).topTfidf()
+    const d = await remoteFetchWorker().topTfidf()
     topTFIDF.set(d)
 })()
 
@@ -66,7 +66,7 @@ export const epSimReverseIdLookup = writable<any>(null);
 
     // TODO Hacky
     console.log('start ep sim loading')
-    const fetcher = await getData()
+    const fetcher = remoteFetchWorker()
     const [epSimBuffer, idLookupBuffer] = await Promise.all(
         // @ts-ignore
         [fetcher.getBuffer('./ep_sim'), fetcher.getBuffer('./ep_sim_id_lookup')]
@@ -80,3 +80,13 @@ export const epSimReverseIdLookup = writable<any>(null);
     epSimReverseIdLookup.set(reverseIdLookup)
     epSimIdLookup.set(idLookup)
 })()
+
+export async function getTimelineData(): Promise<Timeline[]> {
+    // @ts-ignore
+    const buffer = await remoteFetchWorker().getBuffer('./screen_time_timelines')
+    // @ts-ignore
+    const pbf = new Pbf(new Uint8Array(buffer));
+    // @ts-ignore
+    const { timelines } = Timelines.read(pbf);
+    return timelines
+}

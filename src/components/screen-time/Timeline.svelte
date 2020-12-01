@@ -3,14 +3,11 @@
     import { clickOutside } from '@lib/utils'
     import Tooltip from '../Tooltip.svelte'
     import { onMount } from 'svelte'
-    import { Timelines } from '@lib/proto/screen-time'
+    import { getTimelineData } from '@lib/data'
+    import type { Timeline, TimelineCluster, Timestamp } from '@lib/types'
     
     export let episodeID: string
-    export let colors: string[]
-
-    interface Timestamp { start: number, end: number }
-    interface Cluster { id: string, timestamps: Timestamp[] }
-    interface Timeline { id: string, clusters: Cluster[], frames: number }
+    export let colors: string[]    
 
     const expandAmount = .05
     let expandAt: number
@@ -18,7 +15,7 @@
     let width: number
 
     let timelines: Timeline[]
-    let timeline: Timeline, expanded: Cluster[]
+    let timeline: Timeline, expanded: TimelineCluster[]
     
     $: timeline = timelines && timelines.find(t => t.id === episodeID)
     $: expanded = timeline && expandAt && filtered()
@@ -32,14 +29,10 @@
         return `${hour}:${min}:${sec}`
     }
 
-    const format_timestamp = (frames: number, { start, end }: Timestamp) => {
-        return `${as_timestamp(frames, start)} - ${as_timestamp(frames, end)}`
-    }
-
     const withinExpandedRegion = ({ start, end }: Timestamp) => 
         start >= expandAt - (expandAmount) && end <= expandAt + (expandAmount)
                     
-    const filtered = (): Cluster[] => 
+    const filtered = (): TimelineCluster[] => 
         timeline.clusters
             .map(c => ({ ...c, timestamps: c.timestamps .filter(withinExpandedRegion) }))
             .filter(c => c.timestamps.length > 0)
@@ -61,22 +54,11 @@
     }
 
     const hideExpanded = () => { expandAt = null }
+
     const setExpanded = ({ offsetX }) => { expandAt = offsetX / width }
 
-    async function loadTimelines(): Promise<Timeline[]> {
-		const response = await fetch('./screen_time_timelines')
-		const bufferRes = await response.arrayBuffer();
-		// @ts-ignore
-		const pbf = new Pbf(new Uint8Array(bufferRes));
-		// @ts-ignore
-		const { timelines } = Timelines.read(pbf);
-		return timelines
-	}
-
     onMount(async () => {
-        // TODO just make a folder with the timelines as protobufs
-		// do same for sim matrix
-        timelines = await loadTimelines()
+        timelines = await getTimelineData()
     })
 </script>
 
@@ -91,9 +73,7 @@
             </div>
             <div class="timestamps">
                 <p>{as_timestamp(expandAt - (expandAmount / 2))}</p>
-                <!-- <p>{as_timestamp(expandAt - (expandAmount / 4))}</p> -->
                 <p>{as_timestamp(expandAt)}</p>
-                <!-- <p>{as_timestamp(expandAt + (expandAmount / 4))}</p> -->
                 <p>{as_timestamp(expandAt + (expandAmount / 2))}</p>
             </div>
             {#each expanded as { id, timestamps }}
@@ -132,8 +112,10 @@
         <div 
             class="interaction-capturer" 
             on:mousemove={setExpanded}
+            on:dragover={setExpanded}
             on:click={setExpanded}
             on:mouseleave={hideExpanded}
+            on:dragend={hideExpanded}
             use:clickOutside={hideExpanded}
         ></div>
     {/if}
