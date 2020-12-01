@@ -1,7 +1,6 @@
 <script lang='ts'>
-import ReverseStem from "../ReverseStem.svelte";
-import Link from "./Link.svelte";
-
+	import ReverseStem from '../ReverseStem.svelte'
+	import A from './Link.svelte'
 </script>
 
 <h1>Methodology</h1>
@@ -14,7 +13,7 @@ import Link from "./Link.svelte";
 <h3>Data Collection</h3>
 
 <p>
-	<Link href='jre-data-wrangling'>Github</Link>
+	<A href='jre-data-wrangling'>Github</A>
 </p>
 
 <p>
@@ -29,7 +28,7 @@ import Link from "./Link.svelte";
 <p>
 	YouTube captions are pretty good but definitely are nowhere near human-level transcription.
 	I played around with some open source speech-to-text libraries like 
-	<Link href="deepspeech2">deepspeech</Link>, but didn't have the compute power, at the end of the day, 
+	<A href='deepspeech2'>deepspeech</A>, but didn't have the compute power, at the end of the day, 
 	to process all 1500+ episodes. I am therefore at the mercy of father Google.
 </p>
 
@@ -50,7 +49,7 @@ import Link from "./Link.svelte";
 	The process of speaker segmentation from audio is called diarization.
 	This led me to trying several diarization techniques. 
 	I tried approaches from my own (terrible) home-brewed spectrogram CNN to libraries such as 
-	<Link href="pyannote">pyannote</Link>.
+	<A href='pyannote'>pyannote</A>.
 	However, nothing I tried was 1. quick enough for 3600+ hours of audio or 2. anywhere near accurate. 
 </p>
 
@@ -65,7 +64,7 @@ import Link from "./Link.svelte";
 	When visualized over time, this is what they look like. 
 </p>
 
-<div class="image"><img src="./methodology/frame-averages.png" alt=""></div>
+<div class='image'><img src='./methodology/frame-averages.png' alt=''></div>
 
 <p>
 	As you can see, clusters form nicely out these averages. 
@@ -81,13 +80,13 @@ import Link from "./Link.svelte";
 	It fails terribly when there is a lot of movement in the podcast.
 </p>
 
-<div class="image"><img src="./methodology/clusters-bad.png" alt=""></div>
+<div class='image'><img src='./methodology/clusters-bad.png' alt=''></div>
 
 <p>
 	If I were to spend more time on this project, I would create some way to automatically prune episodes with 
 	a large frame-average spread. 
 	If you notice a chart in the screentime section that inaccurately represents that episode,
-	please <Link href="kierangilliam/jre-vis">submit an issue</Link>.
+	please <A href='kierangilliam/jre-vis'>submit an issue</A>.
 </p>
 
 <h4>Topics</h4>
@@ -128,7 +127,7 @@ import Link from "./Link.svelte";
 	This method relied heavily on the TF-IDF scores addressed above.
 	We can treat the TF-IDF scores as vectors and use the cosine angle between two vectors 
 	to score their similarity. 
-	If that made sense, great, if not, <Link href='tfidf'>this article</Link>
+	If that made sense, great, if not, <A href='tfidf'>this article</A>
 	does a good job at explaining this concept.	
 </p>
 
@@ -142,7 +141,7 @@ import Link from "./Link.svelte";
 <h4>Topics Over Time</h4>
 
 <p>
-	This was heavily inspired by <Link href="bitstream">this</Link> paper's visualization:
+	This was heavily inspired by <A href='bitstream'>this</A> paper's visualization:
 </p>
 
 <div class='image'>
@@ -193,7 +192,7 @@ import Link from "./Link.svelte";
 <h5>Intersection Observers</h5>
 
 <p>
-	The <Link href="Intersection_Observer">Intersection Observer API</Link>
+	The <A href='Intersection_Observer'>Intersection Observer API</A>
 	allows you to subscribe to an element's visibility status. 
 	The use case here was obvious and simple: don't render animating content when the 
 	user could not see that section of the page.
@@ -202,17 +201,17 @@ import Link from "./Link.svelte";
 <h5>Web Workers</h5>
 
 <p>
-	<Link href="Web_Workers">Web Workers</Link>
+	<A href='Web_Workers'>Web Workers</A>
 	allow you to execute javascript off of the main thread. 
 	This is handy when you, for example, have some computationally heavy work that you 
 	need to do client-side but don't want the webpage to render clunkily.
 	I used webworkers to download and parse* my data.
 </p>
 
-<p class="note">
+<p class='note'>
 	* Right now I'm parsing protobuf data on the main thread. 
 	I'm not too upset about this due to the fact the parser I'm using,
-	<Link href="pbf">pbf</Link>, has a throughput of ~60Mbs per second.
+	<A href='pbf'>pbf</A>, has a throughput of ~60Mbs per second.
 </p>
 
 <h5>Like Ratio / Views Line Chart</h5>
@@ -220,7 +219,7 @@ import Link from "./Link.svelte";
 <p>
 	I added this chart last minute because I needed something relatively eye-grabbing 
 	that would make a user pause for a second before scrolling. 
-	This chart uses a (proportionally) small 300kb "episodes" csv file that every visualization depends on.
+	This chart uses a (proportionally) small 300kb 'episodes' csv file that every visualization depends on.
 	As the user parses the somewhat opaque visualization, I load and parse all of the data 
 	in the background that is used for the other visualizations.
 </p>
