@@ -5,7 +5,7 @@
     import { COLORS } from '@lib/constants'
     import type { Episode } from '@lib/types'
     import { tweened } from 'svelte/motion'
-    import type { Readable } from 'svelte/store'
+    import type { Writable } from 'svelte/store'
     import EpisodeTooltip from '../EpisodeTooltip.svelte'
 
     export let previousStart: Date, previousEnd: Date
@@ -28,12 +28,13 @@
     let svg
     let x, yLikeRatio, yViews
     let viewsLine, viewsPoints, viewsLines
-    let likesPoints, likeRatioLine, likeRatioLines    
-    let start: Readable<Date> , end: Readable<Date>
+    let likesPoints, likeRatioLine, likeRatioLines
+    let start: Writable<Date> = tweened(previousStart, { duration: transitionDuration })
+    let end: Writable<Date> = tweened(previousEnd, { duration: transitionDuration })
     
-    $: [start, end] = handleDateUpdate(currentStart, currentEnd)
     $: width = containerWidth - margin.left - margin.right
     $: highlighted = ($start, $end) && episodes.filter(withinDateExtent)
+    $: handleDateUpdate(currentStart, currentEnd)
     $: handleChartUpdate(highlighted)    
 
     const withinDateExtent = (ep: Episode) => 
@@ -44,14 +45,13 @@
         x.domain([minDate, maxDate])
     }
     
-    // start and end only update every 5 seconds
-    const handleDateUpdate = (_, __) => {
-        const start = tweened(previousStart, { duration: transitionDuration })
-        const end = tweened(previousEnd, { duration: transitionDuration })
+    // currentStart and currentEnd only update every 5 seconds, tween the values
+    const handleDateUpdate = async (_, __) => {        
+        start.set(previousStart)
+        end.set(previousEnd)
+        await tick()
         start.set(currentStart)
         end.set(currentEnd)
-
-        return [start, end]
     }
 
     const handleChartUpdate = (_) => {
