@@ -41,8 +41,6 @@
 
         const T = svg.transition()
 
-        console.log('update', width, height)
-
         x.domain(d3.extent(data, (d: DataPoint) => d.published)).range([0, width])
         y.domain(d3.extent(data, (d: DataPoint) => d.termFrequency)).range([height, 0])
         

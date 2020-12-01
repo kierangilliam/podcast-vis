@@ -1,7 +1,7 @@
 <script lang='ts'>
     import { H3 } from '@ollopa/cedar'
-	import * as d3 from 'd3'
-    import { chunk, episode, isMobile } from '@lib/utils'
+	import * as Comlink from 'comlink'
+    import { episode, isMobile } from '@lib/utils'
     import Chart from './TopicsChart.svelte'
     import type { Episode } from '@lib/types'
     import TopicsBins from './TopicsBins.svelte'
@@ -15,84 +15,38 @@
     let highlighted: string[]
     let pinnedWord = 'mask'
     let width: number
-    let height: number
     let mounted = false
+    let bins: Bin[] = null
 
-    $: bins = bin($wordOccurrences)    
-    $: chartData = getChartData(bins, pinnedWord)
+    $: bin($wordOccurrences)    
+    $: chartData = getChartData($wordOccurrences, pinnedWord)
     
-    const getChartData = (bins: Bin[], word: string) => {
-        if (!bins || !word) return
+    const getChartData = (_, __) => {
+        if (!$wordOccurrences || !pinnedWord) return
 
         return Object.entries($wordOccurrences)
             .map<ChartDataPoint>(([id, topWords]) => ({
                 ...episode(id),
-                termFrequency: topWords[word] || 0,
+                termFrequency: topWords[pinnedWord] || 0,
             }))
             .filter(({ number }) => number != 0)
     }
 
     /**
-     * Bin episode CFDs into
+     * Turn the word occurrences for episode into bins of {binLength} episodes
+     * Then calculate TF-IDF scores, treating bins as 'documents'
     */
-    const bin = (_): Bin[] => {
+    const bin = async (_) => {
         if (!$wordOccurrences) return
-
-        const binLength = 10              
         
-        let data = Object.entries($wordOccurrences).map(([id, topWords]) => 
+        const binLength = 10  
+        const worker = new Worker('./tfidf-worker.js')
+        const remoteTFIDFFunction = Comlink.wrap(worker)
+        const data = Object.entries($wordOccurrences).map(([id, topWords]) =>
             ({ ...episode(id), topWords })
         )
-
-        const bins: Omit<Bin, 'tfidf'>[] = chunk(data, binLength)
-            .map((bin: (Episode & { topWords: object })[]) => {
-                    // Sum items in bin
-                    const cfd = bin.reduce((prev, curr) => {
-                            Object.entries(curr.topWords).forEach(([key, value]) => {
-                                prev[key] = (prev[key] || 0) + value
-                            })
-
-                            return prev
-                    }, ({}))
-
-                    return {
-                        cfd,
-                        start: d3.min(bin, d => d.number),
-                        end: d3.max(bin, d => d.number),    
-                        startDate: d3.min(bin, d => d.published),
-                        endDate: d3.max(bin, d => d.published),    
-                        episodeIDs: bin.map(({ id }) => id)                    
-                    }
-                })
-
-        const allWords = bins.reduce((prev, curr) => 
-            Array.from(new Set(prev.concat(Object.keys(curr.cfd))))
-        , [])
-
-        // Document frequency of a word
-        let binFrequency = {}
-        allWords.forEach(word => {
-            bins.forEach(bin => {
-                if (word in bin.cfd) {
-                    binFrequency[word] = (binFrequency[word] || 0) + 1
-                }
-            })
-        })
-
-        return bins.map(bin => {
-                const tfidf = {}
-                Object.entries(bin.cfd).forEach(([word, tf]) => {
-                    const idf = bins.length / (binFrequency[word] + 1)
-                    tfidf[word] = tf * Math.log(idf)                
-                })
-                return { 
-                    ...bin, 
-                    tfidf: Object.entries<number>(tfidf)
-                        .sort((a, b) => b[1] - a[1]) 
-                }
-            })
-            .filter(({ start }) => start != 0)
-            .reverse()
+        // @ts-ignore
+        bins = await remoteTFIDFFunction(binLength, data)
     }
 
     onMount(async () => {
@@ -110,7 +64,7 @@
     </div>
 </div>
 
-<div class='container' bind:clientWidth={width} bind:clientHeight={height}>
+<div class='container' bind:clientWidth={width}>
     {#if bins}
         <TopicsBins {bins} bind:pinnedWord bind:highlighted />           
 

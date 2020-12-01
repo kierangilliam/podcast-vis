@@ -14,14 +14,6 @@ export const getCSSVar = (name: string) =>
 export const getCSSVarPx = (name: string) =>
     parseInt(getCSSVar(name).split('px')[0])
 
-export const chunk = (arr, chunkSize) => {
-    if (chunkSize <= 0) throw "Invalid chunk size";
-    var R = [];
-    for (var i = 0, len = arr.length; i < len; i += chunkSize)
-        R.push(arr.slice(i, i + chunkSize));
-    return R;
-}
-
 export let episodesLoaded = writable(false);
 export let episodes: Episode[] = [];
 (async () => {
