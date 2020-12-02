@@ -22,7 +22,7 @@
 
     let element: HTMLElement
     // d3 x y scales and main svg
-    let x, y, svg
+    let xDate, yTermFrequency, svg
     let mounted = false
     let tooltip
 
@@ -41,12 +41,12 @@
 
         const T = svg.transition()
 
-        x.domain(d3.extent(data, (d: DataPoint) => d.published)).range([0, width])
-        y.domain(d3.extent(data, (d: DataPoint) => d.termFrequency)).range([height, 0])
+        xDate.domain(d3.extent(data, (d: DataPoint) => d.published)).range([0, width])
+        yTermFrequency.domain(d3.extent(data, (d: DataPoint) => d.termFrequency)).range([height, 0])
         
         const bottomAxis = T.select('.x.axis')
             .duration(750)
-            .call(d3.axisBottom(x)
+            .call(d3.axisBottom(xDate)
                 .tickSize(4)
                 .tickFormat((x, i) => i % 2 == 0 ? formatDate(x) : '')
             )        
@@ -64,7 +64,7 @@
 
         T.select('.y.axis')
             .duration(750)
-            .call(d3.axisLeft(y))
+            .call(d3.axisLeft(yTermFrequency))
         
         svg.selectAll('circle')
             .data(data)      
@@ -72,8 +72,8 @@
             .delay(150)      
             .duration(750)
             .attr('opacity', dotOpacity)
-            .attr('cx', (d: DataPoint) => x(d.published))
-            .attr('cy', (d: DataPoint) => y(d.termFrequency))
+            .attr('cx', (d: DataPoint) => xDate(d.published))
+            .attr('cy', (d: DataPoint) => yTermFrequency(d.termFrequency))
             .attr('r', DOT_SIZE)            
     }    
 
@@ -101,6 +101,53 @@
             })
     }
 
+    const findPointFrom = (x: number, y: number) => {
+        const dateWindow = (24 * 60 * 60 * 1000) * 120
+        const dateLeft = new Date(xDate.invert(x) - dateWindow)
+        const dateRight = new Date(xDate.invert(x) + dateWindow)
+        
+        return data
+            .filter(({ published }) => published > dateLeft && published < dateRight)
+            .map(ep => ({
+                ...ep,
+                distX: Math.abs(xDate(ep.published) - x),
+                distY: Math.abs(yTermFrequency(ep.termFrequency) - y),
+            }))
+    }
+
+    const handleMouseMove = (e) => {
+        const { layerY, clientY, clientX, layerX } = e
+
+        // Clear last selected
+        if (tooltip) handleMouseLeave()
+
+        const x = layerX - margin.left
+        const y = layerY - margin.top
+        const eps = findPointFrom(x, y)
+        const ep = eps[d3.minIndex(eps, e => e.distY)]
+        
+        if (eps.length == 0 || ep.distY > 25 || ep.termFrequency == 0) return
+        
+        tooltip = { ...ep, x: clientX, y: clientY }
+
+        svg.select(`#topics-chart-${ep.id}`)
+            .transition()
+            .duration(100)
+            .attr('r', DOT_SIZE * 1.5)
+            .style('fill', COLORS.darkOrange)
+    }
+
+    const handleMouseLeave = () => {            
+        if (tooltip) {
+            svg.select(`#topics-chart-${tooltip.id}`)
+                .transition()
+                .duration(100)
+                .attr('r', DOT_SIZE)
+                .style('fill', COLORS.orange)
+            tooltip = null
+        }
+    }
+
     onMount(() => {
         svg = d3.select(element)
             .append('svg')
@@ -109,10 +156,10 @@
             .append('g')
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-        x = d3.scaleLinear()            
+        xDate = d3.scaleLinear()            
             .range([0, width])
 
-        y = d3.scaleLinear()
+        yTermFrequency = d3.scaleLinear()
             .range([height, 0])
 
         svg.append('g')
@@ -126,27 +173,11 @@
             .data(data)
             .enter()
             .append('circle')
+            .attr('id', ep => `topics-chart-${ep.id}`)
             .attr('fill', COLORS.orange)
-            .attr('cx', (d: DataPoint) => x(d.number))
-            .attr('cy', (d: DataPoint) => y(d.termFrequency))
+            .attr('cx', (d: DataPoint) => xDate(d.number))
+            .attr('cy', (d: DataPoint) => yTermFrequency(d.termFrequency))
             .attr('r', DOT_SIZE)
-            .on('mouseover', function({ clientX, clientY }, dataPoint) {
-                if (dataPoint.termFrequency == 0) return
-                tooltip = { x: clientX, y: clientY, ...dataPoint }
-                d3.select(this)
-                    .transition()
-                    .duration(100)
-                    .attr('r', DOT_SIZE * 1.5)
-                    .style('fill', COLORS.darkOrange)
-            })
-            .on('mouseleave', function(e, d) {
-                tooltip = null
-                d3.select(this)
-                    .transition()
-                    .duration(100)
-                    .attr('r', DOT_SIZE)
-                    .style('fill', COLORS.orange)
-            })
 
         mounted = true
     })    
@@ -162,7 +193,13 @@
         <strong style="font-family: times-new-roman"><i><ReverseStem stem={pinnedWord} /></i></strong> 
         term frequency over time
     </H5>
-    <div bind:this={element}></div>
+    <div 
+        bind:this={element}
+        on:mousemove={handleMouseMove}
+        on:drag={handleMouseMove}
+        on:mouseleave={handleMouseLeave}
+        on:mouseleave={handleMouseLeave}
+    ></div>
 </div>
 
 <style>
