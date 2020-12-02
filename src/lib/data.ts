@@ -6,20 +6,20 @@ function arrayBufferToStr(buffer: ArrayBuffer) {
     // Use chunks to not go over call stack
     // chunks of 1024 bytes * 64
     const chunkSize = 1024 * 64
+    // To right before the last chunk so the last `String.fromCharCode`
+    // can skip passing a byteLength argument 
+    const endCondition = buffer.byteLength - (chunkSize * 2)
     let str = ""
+    let start = 0
 
-    for (let start = 0; start < buffer.byteLength; start += chunkSize * 2) {
-        if (buffer.byteLength - start > (chunkSize * 2)) {
-            const ab = new Uint16Array(buffer, start, chunkSize)
-            str += String.fromCharCode.apply(null, ab)
-        } else {
-            const ab = new Uint16Array(buffer, start)
-            str += String.fromCharCode.apply(null, ab)
-            break
-        }
+    for (start = 0; start < endCondition; start += chunkSize * 2) {
+        str += String.fromCharCode.apply(null, new Uint16Array(buffer, start, chunkSize))
     }
 
+    const view = new Uint16Array(buffer, start)
     buffer = null
+    str += String.fromCharCode.apply(null, view)
+
 
     return str
 }
@@ -33,11 +33,13 @@ console.time('ep sim --')
 
 w.addEventListener('message', function (event) {
     // w.postMessage()
-    console.log('event', event)
-    if (event.data instanceof ArrayBuffer) {
+    console.log('event', event, typeof event.data)
+    if (event.data instanceof Uint8Array) {
+
         console.time('to str')
-        const ab = arrayBufferToStr(event.data)
+        const ab = (new TextDecoder("utf-8")).decode(event.data)
         console.timeEnd('to str')
+
         console.time('parse')
         const parsed = JSON.parse(ab)
         console.timeEnd('parse')

@@ -50,20 +50,29 @@ function str2ab(str) {
     for (var i = 0, strLen = str.length; i < strLen; i++) {
         bufView[i] = str.charCodeAt(i);
     }
+
     return buf;
 }
 
 
 self.onmessage = async (message) => {
+    const enc = new TextEncoder(); // always utf-8
+
     if (message.data === 'Timelines') {
         const timelines = await getTimelineData()
-        const ab = str2ab(JSON.stringify({ timelines }))
+        const ab = enc.encode(JSON.stringify({ timelines }))
         self.postMessage(ab, [ab])
         return
-    } else if (message.data === 'EpisodeSimilarity') {
+    }
+
+    else if (message.data === 'EpisodeSimilarity') {
         const [episodeSimilarityTable, idLookupTable] = await getEpisodeSimilarityData()
-        const ab = str2ab(JSON.stringify({ episodeSimilarityTable, idLookupTable }))
-        self.postMessage(ab, [ab])
+
+        console.time('str2ab - epsim')
+        const ab = enc.encode(JSON.stringify({ episodeSimilarityTable, idLookupTable }))
+        console.timeEnd('str2ab - epsim')
+
+        self.postMessage(ab, [ab.buffer])
         return
     }
 
