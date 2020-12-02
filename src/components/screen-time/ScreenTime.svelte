@@ -27,6 +27,7 @@
 	]
 
 	const maybeBlacklist = [
+		1555, // alex jones and tim dillon
 		1497, // joe schilling
 		1487, // Janet Zuccarini & Evan Funke
 		1481, // adam eget
