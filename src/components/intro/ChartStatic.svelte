@@ -92,6 +92,7 @@
             .enter()
             .append('circle')
             .attr('class', d => `moving-chart-${d.id}`)
+            .attr('pointer-events', 'none')
             .attr('fill', color)
             .attr('opacity', .9)
             .attr('stroke', 'none')
@@ -123,7 +124,7 @@
     }
 
     const handleMouseMove = (e) => {
-        const { layerY, clientY, clientX, layerX } = e
+        const { offsetY, clientY, clientX, offsetX } = e
 
         // Clear last selected
         if (tooltip) {
@@ -133,8 +134,8 @@
             tooltip = null
         }
 
-        const x = layerX - margin.left
-        const y = layerY - margin.top
+        const x = offsetX - margin.left
+        const y = offsetY - margin.top
         const eps = findPointFrom(
             xDate.invert(x), yViews.invert(y), yLikeRatio.invert(y)
         )

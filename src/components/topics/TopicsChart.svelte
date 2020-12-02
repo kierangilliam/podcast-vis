@@ -107,6 +107,7 @@
         const dateRight = new Date(xDate.invert(x) + dateWindow)
         
         return data
+            .filter(({ termFrequency }) => termFrequency !== 0)
             .filter(({ published }) => published > dateLeft && published < dateRight)
             .map(ep => ({
                 ...ep,
@@ -116,17 +117,17 @@
     }
 
     const handleMouseMove = (e) => {
-        const { layerY, clientY, clientX, layerX } = e
+        const { offsetX, offsetY, clientX, clientY } = e
 
         // Clear last selected
         if (tooltip) handleMouseLeave()
 
-        const x = layerX - margin.left
-        const y = layerY - margin.top
+        const x = offsetX - margin.left
+        const y = offsetY - margin.top
         const eps = findPointFrom(x, y)
         const ep = eps[d3.minIndex(eps, e => e.distY)]
         
-        if (eps.length == 0 || ep.distY > 25 || ep.termFrequency == 0) return
+        if (eps.length == 0 || ep.distY > 25) return
         
         tooltip = { ...ep, x: clientX, y: clientY }
 
@@ -174,6 +175,7 @@
             .enter()
             .append('circle')
             .attr('id', ep => `topics-chart-${ep.id}`)
+            .attr('pointer-events', 'none')
             .attr('fill', COLORS.orange)
             .attr('cx', (d: DataPoint) => xDate(d.number))
             .attr('cy', (d: DataPoint) => yTermFrequency(d.termFrequency))
