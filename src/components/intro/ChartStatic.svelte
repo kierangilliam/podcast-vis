@@ -26,7 +26,7 @@
     let containerWidth: number
     let element: HTMLElement
     let svg
-    let x, yLikeRatio, yViews
+    let xDate, yLikeRatio, yViews
     let viewsLine, viewsPoints, viewsLines
     let likesPoints, likeRatioLine, likeRatioLines
     let start: Writable<Date> = tweened(previousStart, { duration: transitionDuration })
@@ -42,7 +42,7 @@
 
     const updateDomains = () => {
         yViews.domain([0, d3.max(episodes, (d) => d.views)])
-        x.domain([minDate, maxDate])
+        xDate.domain([minDate, maxDate])
     }
     
     // currentStart and currentEnd only update every 5 seconds, tween the values
@@ -57,34 +57,33 @@
     const handleChartUpdate = (_) => {
         if (!svg) return
 
-        if (tooltip?.views === true) {
+        if (tooltip?.showViews) {
             viewsLines.attr('stroke-opacity', 1)
-            viewsPoints.style('fill', d => d.id === tooltip.id ? viewsColor : 'none')
+            viewsPoints.style('fill', d => d.id === tooltip.id ? COLORS.pink : 'none')
+            svg.selectAll('.views-labels').attr('fill', COLORS.darkGray)
             return
         } else if (viewsLines.attr('stroke-opacity') == 1) {
+            svg.selectAll('.views-labels').attr('fill', COLORS.gray)
             viewsLines.attr('stroke-opacity', 0)
-        } else if (tooltip?.likeRatio === true) {
+        } 
+        
+        else if (tooltip?.showLikeRatio) {
             likeRatioLines.attr('stroke-opacity', 1)            
-            likesPoints.style('fill', d => d.id === tooltip.id ? COLORS.gray : 'none')
+            likesPoints.style('fill', d => d.id === tooltip.id ? COLORS.pink : 'none')
+            svg.selectAll('.like-ratio-labels').attr('fill', COLORS.darkGray)
             return
         } else if (likeRatioLines.attr('stroke-opacity') == 1) {
             likeRatioLines.attr('stroke-opacity', 0)
+            svg.selectAll('.like-ratio-labels').attr('fill', COLORS.gray)
         }
 
         updateDomains()
 
-        // TODO d3's transition is extrememly slow
-        viewsPoints
-            .style('fill', d => withinDateExtent(d) ? viewsColor : COLORS.gray)
+        viewsPoints.style('fill', d => withinDateExtent(d) ? viewsColor : COLORS.gray)
 
-        likesPoints
-            .style('fill', d => withinDateExtent(d) ? likeRatioColor : COLORS.gray)
+        likesPoints.style('fill', d => withinDateExtent(d) ? likeRatioColor : COLORS.gray)
 
-        svg.selectAll('axis-lines')
-            .attr('opacity', tooltip ? 1 : .7)
-        
-        svg.selectAll('axis-labels')
-            .attr('opacity', tooltip ? 1 : 0)
+        // svg.selectAll('axis-lines').attr('opacity', tooltip ? 1 : .7)
     }
 
     const makePoints = ({ name, color, y }) =>
@@ -92,43 +91,79 @@
             .data(episodes)
             .enter()
             .append('circle')
+            .attr('class', d => `moving-chart-${d.id}`)
             .attr('fill', color)
             .attr('opacity', .9)
             .attr('stroke', 'none')
-            .attr('cx', (d) => x(d.published))
+            .attr('cx', (d) => xDate(d.published))
             .attr('cy', y)
-            .attr('r', dotSize)
-            .on('mouseover', function({ clientX, clientY }, dataPoint) {
-                if (dataPoint.termFrequency == 0) return
-                tooltip = { x: clientX, y: clientY, ...dataPoint }
-                tooltip[name] = true
-                d3.select(this)
-                    .transition()
-                    .duration(100)
-                    .attr('r', dotSize * 4)
-                    .style('fill', color)
-            })
-            .on('mouseleave', function(e, d) {
-                tooltip = null
-                d3.select(this)
-                    .transition()
-                    .duration(100)
-                    .attr('r', dotSize)
-                    .style('fill', color)
-            })
+            .attr('r', dotSize)            
     
+
+    const findPointFrom = (date: Date, views, likeratio) => {
+        const thirtyDays = (24 * 60 * 60 * 1000) * 30
+        const dateLeft = new Date(date.getTime() - thirtyDays)
+        const dateRight = new Date(date.getTime() + thirtyDays)
+        
+        return episodes
+            .filter(({ published }) => published > dateLeft && published < dateRight)
+            .map(ep => ({
+                ...ep,
+                distX: Math.abs(xDate(ep.published) - xDate(date)),
+                distViews: Math.abs(yViews(ep.views) - yViews(views)),
+                distLikeRatio: Math.abs(yLikeRatio(likeRatio(ep.id)) - yLikeRatio(likeratio)),
+            }))
+            .map(ep => ({
+                ...ep,
+                distY: ep.distLikeRatio < ep.distViews ? ep.distLikeRatio : ep.distViews,
+                // Used downstream in chart update
+                showLikeRatio: ep.distLikeRatio < ep.distViews,
+                showViews: ep.distLikeRatio > ep.distViews,
+            }))
+    }
+
+    const handleMouseMove = (e) => {
+        const { layerY, clientY, clientX, layerX } = e
+
+        // Clear last selected
+        if (tooltip) {
+            svg.selectAll(`.moving-chart-${tooltip.id}`)
+                .attr('r', dotSize)
+                .style('fill', COLORS.gray)
+            tooltip = null
+        }
+
+        const x = layerX - margin.left
+        const y = layerY - margin.top
+        const eps = findPointFrom(
+            xDate.invert(x), yViews.invert(y), yLikeRatio.invert(y)
+        )
+        const ep = eps[d3.minIndex(eps, e => e.distY)]
+        
+        if (eps.length == 0 || ep.distY > 25) return
+        
+        tooltip = { ...ep, x: clientX, y: clientY }
+        
+        svg.selectAll(`.moving-chart-${ep.id}`)
+            .attr('r', dotSize * 3)
+            .style('fill', COLORS.pink)
+    }
+
+    const handleMouseLeave = () => {
+        // Clear last selected
+        if (tooltip) {
+            svg.selectAll(`.moving-chart-${tooltip.id}`)
+                .attr('r', dotSize)
+                .style('fill', COLORS.gray)
+            tooltip = null
+        }
+    }
+
     onMount(async () => {
         // Wait for container to render
         await tick()
 
-        svg = d3.select(element)
-            .append('svg')
-            .attr('width', width + margin.left + margin.right)
-            .attr('height', height + margin.top + margin.bottom)
-            .append('g')
-            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-
-        x = d3.scaleTime()
+        xDate = d3.scaleTime()
             .range([0, width])
 
         yViews = d3.scaleLinear()            
@@ -139,6 +174,13 @@
             .range([height, 0])
         
         updateDomains()
+
+        svg = d3.select(element)
+            .append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .append('g')
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
         // Horizontal lines for axis
         const axisLineWidth = 1
@@ -156,11 +198,12 @@
             .attr('opacity', .75)
             
         axisLines
-            .append('text')
+            .append('text')            
             .attr('font-size', 10)
             .attr('x', 0)
             .attr('y', i => yLikeRatio(i / 10) - axisLineWidth / 2 - 4)
             .text(i => `${formatBigNumber(yViews.invert(yLikeRatio(i / 10) - axisLineWidth / 2))} views`)
+            .attr('class', 'views-labels')
             .attr('fill', COLORS.darkGray)            
             .attr('opacity', .75)
 
@@ -171,12 +214,13 @@
             .attr('x', width - 40)
             .attr('y', i => yLikeRatio(i / 10) - axisLineWidth / 2 - 4)
             .text(i => `${Math.round(yLikeRatio.invert(yLikeRatio(i / 10) - axisLineWidth / 2) * 100)}% liked`)
+            .attr('class', 'like-ratio-labels')
             .attr('fill', COLORS.darkGray)            
             .attr('opacity', .75)
 
         // View count
         viewsLine = d3.line()
-            .x(d => x(d.published))
+            .x(d => xDate(d.published))
             .y(d => yViews(d.views))
             .curve(d3.curveCardinal.tension(0.5))
 
@@ -192,7 +236,7 @@
 
         // Like ratio
         likeRatioLine = d3.line()                
-            .x((d) => x(d.published))
+            .x((d) => xDate(d.published))
             .y((d) => yLikeRatio(likeRatio(d.id)))
             .curve(d3.curveCardinal.tension(0.5))
 
@@ -226,8 +270,13 @@
 </EpisodeTooltip>
 
 <div class='container' bind:clientWidth={containerWidth}>
-    <div bind:this={element}></div>
-    <div class='cover'></div>
+    <div 
+        bind:this={element}
+        on:mousemove={handleMouseMove}
+        on:drag={handleMouseMove}
+        on:mouseleave={handleMouseLeave}
+        on:mouseleave={handleMouseLeave}
+    ></div>
 </div>
 
 <style>
