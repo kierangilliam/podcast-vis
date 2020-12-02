@@ -23,6 +23,8 @@
 		1547, // Colin Quinn
 		1549, // Tom Papa
 		1498, // jon stewart
+		1562, // dave smith
+		1563, // tony hinchcliffe
 		1567,
 	]
 
@@ -106,7 +108,7 @@
 				if (keys.length == 2) {
 					const ratio = Math.min(segments[keys[0]], segments[keys[1]]) / 
 						Math.max(segments[keys[0]], segments[keys[1]])
-					return ratio > .05
+					if (ratio < .05) return false
 				}
 
 				return !BLACKLIST.includes(episode(id).number)
