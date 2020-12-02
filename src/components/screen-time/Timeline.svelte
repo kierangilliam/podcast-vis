@@ -3,7 +3,7 @@
     import { clickOutside } from '@lib/utils'
     import Tooltip from '../Tooltip.svelte'
     import { onMount } from 'svelte'
-    import { getTimelineData } from '@lib/data'
+    import { requestTimelineData, timelines } from '@lib/data'
     import type { Timeline, TimelineCluster, Timestamp } from '@lib/types'
     
     export let episodeID: string
@@ -14,10 +14,9 @@
     let element: HTMLElement
     let width: number
 
-    let timelines: Timeline[]
     let timeline: Timeline, expanded: TimelineCluster[]
     
-    $: timeline = timelines && timelines.find(t => t.id === episodeID)
+    $: timeline = $timelines && $timelines.find(t => t.id === episodeID)
     $: expanded = timeline && expandAt && filtered()
 
     const as_timestamp = (playhead: number): string => {
@@ -57,9 +56,7 @@
 
     const setExpanded = ({ offsetX }) => { expandAt = offsetX / width }
 
-    onMount(async () => {
-        timelines = await getTimelineData()
-    })
+    onMount(() => requestTimelineData())
 </script>
 
 {#if expanded}

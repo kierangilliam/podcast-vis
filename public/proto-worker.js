@@ -1,4 +1,3 @@
-importScripts("https://unpkg.com/comlink/dist/umd/comlink.js")
 importScripts('https://unpkg.com/pbf@3.0.5/dist/pbf.js')
 
 async function getBuffer(endpoint) {
@@ -38,30 +37,13 @@ async function getTimelineData() {
     return timelines
 }
 
-Comlink.expose({
-    getEpisodeSimilarityData,
-    getTimelineData,
-});
-
-// https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-function str2ab(str) {
-    var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
-    var bufView = new Uint16Array(buf);
-    for (var i = 0, strLen = str.length; i < strLen; i++) {
-        bufView[i] = str.charCodeAt(i);
-    }
-
-    return buf;
-}
-
-
 self.onmessage = async (message) => {
     const enc = new TextEncoder(); // always utf-8
 
     if (message.data === 'Timelines') {
         const timelines = await getTimelineData()
         const ab = enc.encode(JSON.stringify({ timelines }))
-        self.postMessage(ab, [ab])
+        self.postMessage(ab, [ab.buffer])
         return
     }
 
