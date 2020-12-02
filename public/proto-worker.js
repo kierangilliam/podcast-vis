@@ -34,6 +34,7 @@ async function getTimelineData() {
     const buffer = await getBuffer('./screen_time_timelines')
     const pbf = new Pbf(new Uint8Array(buffer))
     const { timelines } = Timelines.read(pbf)
+
     return timelines
 }
 
@@ -42,6 +43,32 @@ Comlink.expose({
     getTimelineData,
 });
 
+// https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
+function str2ab(str) {
+    var buf = new ArrayBuffer(str.length * 2); // 2 bytes for each char
+    var bufView = new Uint16Array(buf);
+    for (var i = 0, strLen = str.length; i < strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+}
+
+
+self.onmessage = async (message) => {
+    if (message.data === 'Timelines') {
+        const timelines = await getTimelineData()
+        const ab = str2ab(JSON.stringify({ timelines }))
+        self.postMessage(ab, [ab])
+        return
+    } else if (message.data === 'EpisodeSimilarity') {
+        const [episodeSimilarityTable, idLookupTable] = await getEpisodeSimilarityData()
+        const ab = str2ab(JSON.stringify({ episodeSimilarityTable, idLookupTable }))
+        self.postMessage(ab, [ab])
+        return
+    }
+
+    console.error('Datatype requested unknown:', message.data)
+}
 
 
 ////////////////////////////////////////////////////////////////
