@@ -127,7 +127,7 @@
 	This method relied heavily on the TF-IDF scores addressed above.
 	We can treat the TF-IDF scores as vectors and use the cosine angle between two vectors 
 	to score their similarity. 
-	If that made sense, great, if not, <A href='tfidf'>this article</A>
+	If that made sense, great, if not, <A href='tf-idf'>this article</A>
 	does a good job at explaining this concept.	
 </p>
 
