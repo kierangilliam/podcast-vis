@@ -7,8 +7,6 @@ const protoWorker = new Worker("proto-worker.js")
 
 
 protoWorker.addEventListener('message', function (event) {
-    console.log('event', event, typeof event.data)
-
     if (event.data instanceof Uint8Array) {
         console.time('Parsing ArrayBuffer to JSON (Main thread)')
         const jsonString = (new TextDecoder("utf-8")).decode(event.data)
@@ -16,7 +14,6 @@ protoWorker.addEventListener('message', function (event) {
         console.timeEnd('Parsing ArrayBuffer to JSON (Main thread)')
 
         if (parsed.timelines) {
-            console.timeEnd('Load Timelines Data (Worker)')
             timelines.set(parsed.timelines)
             return
         }
@@ -34,8 +31,6 @@ protoWorker.addEventListener('message', function (event) {
             epSims.set(parsed.episodeSimilarityTable)
             epSimReverseIdLookup.set(reverseIdLookup)
             epSimIdLookup.set(idLookup)
-
-            console.timeEnd('Load Episode Similarity Data (Worker)')
             return
         }
 
@@ -46,7 +41,6 @@ protoWorker.addEventListener('message', function (event) {
 
 
 setTimeout(() => {
-    console.time('Load Episode Similarity Data (Worker)')
     protoWorker.postMessage('EpisodeSimilarity')
 }, 500)
 
@@ -77,6 +71,5 @@ export const epSimReverseIdLookup = writable<any>(null)
 
 export const timelines = writable<Timeline[]>(null)
 export function requestTimelineData() {
-    console.time('Load Timelines Data (Worker)')
     protoWorker.postMessage('Timelines')
 }

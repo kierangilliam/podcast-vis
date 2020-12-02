@@ -41,20 +41,24 @@ self.onmessage = async (message) => {
     const enc = new TextEncoder(); // always utf-8
 
     if (message.data === 'Timelines') {
+        console.time('Load Timelines Data (Worker)')
         const timelines = await getTimelineData()
         const ab = enc.encode(JSON.stringify({ timelines }))
         self.postMessage(ab, [ab.buffer])
+        console.timeEnd('Load Timelines Data (Worker)')
         return
     }
 
     else if (message.data === 'EpisodeSimilarity') {
+        console.time('Load Episode Similarity Data (Worker)')
         const [episodeSimilarityTable, idLookupTable] = await getEpisodeSimilarityData()
 
-        console.time('str2ab - epsim')
+        console.time('Episode Similarity: Object Array Buffer (worker)')
         const ab = enc.encode(JSON.stringify({ episodeSimilarityTable, idLookupTable }))
-        console.timeEnd('str2ab - epsim')
+        console.timeEnd('Episode Similarity: Object Array Buffer (worker)')
 
         self.postMessage(ab, [ab.buffer])
+        console.timeEnd('Load Episode Similarity Data (Worker)')
         return
     }
 
