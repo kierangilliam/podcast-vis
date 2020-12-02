@@ -11,6 +11,7 @@
         'https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API',
         'https://github.com/pyannote',
         'https://modelzoo.co/model/deepspeech2',
+        'https://developer.mozilla.org/en-US/docs/Web/API/Transferable',
     ]
 
     const link = links.find(link => link.includes(href))

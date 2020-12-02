@@ -178,8 +178,8 @@
 </p>
 
 <p>
-	Instead of chopping up a csv, I used protobufs, instead, to minimize the footprint of the data.
-	The aforementioned 1,000,000 row file as a csv is about ~60mb. 
+	I used protobufs, instead, to minimize the footprint of the data.
+	The previously mentioned million-row file as a csv is about ~60mb. 
 	When converted to protobufs, it takes up around ~15mb.
 </p>
 
@@ -195,7 +195,7 @@
 	The <A href='Intersection_Observer'>Intersection Observer API</A>
 	allows you to subscribe to an element's visibility status. 
 	The use case here was obvious and simple: don't render animating content when the 
-	user could not see that section of the page.
+	user cannot see that section of the page.
 </p>
 
 <h5>Web Workers</h5>
@@ -203,9 +203,11 @@
 <p>
 	<A href='Web_Workers'>Web Workers</A>
 	allow you to execute javascript off of the main thread. 
-	This is handy when you, for example, have some computationally heavy work that you 
-	need to do client-side but don't want the webpage to render clunkily.
-	I used webworkers to download and parse my data.
+	This is handy when you have some computationally heavy work that you 
+	need to do client-side but don't want to block the main thread that renders content.
+	I used webworkers to download and parse my data. 
+	For the protobuf data, I use <A href="Transferable">transferables</A> so that data isn't copied from
+	the worker thread to the main thread. Instead, the ownership is transferred from one process to the next.
 </p>
 
 <h5>Like Ratio / Views Line Chart</h5>
@@ -221,8 +223,8 @@
 <h5>Svelte</h5>
 
 <p>
-	Finally, I need to mention Svelte. Svelte is a faster and lightweight
-	alternative to frameworks like React, Angular, or Vue. 
+	Finally, I need to mention Svelte. 
+	Svelte is a faster and lightweight alternative to frameworks like React, Angular, or Vue. 
 	Furthermore, it is very straightforward to use, making the design iteration phase fairly quick.
 </p>
 
