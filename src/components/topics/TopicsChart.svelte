@@ -196,8 +196,9 @@
     <div 
         bind:this={element}
         on:mousemove={handleMouseMove}
-        on:drag={handleMouseMove}
-        on:mouseleave={handleMouseLeave}
+        on:touchstart={handleMouseMove}
+        on:touchmove={handleMouseMove}
+        on:touchend={handleMouseLeave}
         on:mouseleave={handleMouseLeave}
     ></div>
 </div>
