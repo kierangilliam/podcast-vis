@@ -3,10 +3,11 @@
     import * as d3 from 'd3'
     import { H5 } from '@ollopa/cedar'
     import { COLORS } from '@lib/constants'
-    import { formatDate } from '@lib/utils'
+    import { formatDate, isMobile } from '@lib/utils'
     import type { Episode } from '@lib/types'
     import ReverseStem from '../ReverseStem.svelte'
     import EpisodeTooltip from '../EpisodeTooltip.svelte'
+    import { clickOutside } from '@lib/utils'
 
     interface DataPoint extends Episode {
         termFrequency: number
@@ -118,6 +119,9 @@
 
     const handleMouseMove = (e) => {
         const { offsetX, offsetY, clientX, clientY } = e
+        
+        // Handle only touch events on mobile
+        if (e.type === 'mousemove' && isMobile) return
 
         // Clear last selected
         if (tooltip) handleMouseLeave()
@@ -128,7 +132,7 @@
         const ep = eps[d3.minIndex(eps, e => e.distY)]
         
         if (eps.length == 0 || ep.distY > 25) return
-        
+
         tooltip = { ...ep, x: clientX, y: clientY }
 
         svg.select(`#topics-chart-${ep.id}`)
@@ -197,9 +201,12 @@
     </H5>
     <div 
         bind:this={element}
+        on:click={handleMouseMove}
         on:mousemove={handleMouseMove}
         on:touchstart={handleMouseMove}
         on:touchmove={handleMouseMove}
+
+        use:clickOutside={handleMouseLeave}
         on:touchend={handleMouseLeave}
         on:mouseleave={handleMouseLeave}
     ></div>

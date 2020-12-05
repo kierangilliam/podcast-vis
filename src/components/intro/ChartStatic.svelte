@@ -1,11 +1,12 @@
 <script lang='ts'>
     import { getContext, onMount, tick } from 'svelte'
     import * as d3 from 'd3'
-    import { formatBigNumber, formatViews, likeRatio } from '@lib/utils'
+    import { formatBigNumber, formatViews, isMobile, likeRatio } from '@lib/utils'
     import { COLORS } from '@lib/constants'
     import type { Episode } from '@lib/types'
     import { tweened } from 'svelte/motion'
     import type { Writable } from 'svelte/store'
+    import { clickOutside } from '@lib/utils'
     import EpisodeTooltip from '../EpisodeTooltip.svelte'
 
     export let previousStart: Date, previousEnd: Date
@@ -57,33 +58,31 @@
     const handleChartUpdate = (_) => {
         if (!svg) return
 
+        // Toggle lines in the background and the relevant axis labels
         if (tooltip?.showViews) {
-            viewsLines.attr('stroke-opacity', 1)
+            viewsLines.attr('visibility', 'visible')
             viewsPoints.style('fill', d => d.id === tooltip.id ? COLORS.pink : 'none')
             svg.selectAll('.views-labels').attr('fill', COLORS.darkGray)
             return
-        } else if (viewsLines.attr('stroke-opacity') == 1) {
-            svg.selectAll('.views-labels').attr('fill', COLORS.gray)
-            viewsLines.attr('stroke-opacity', 0)
+        } else if (viewsLines.attr('visibility') === 'visible') {
+            viewsLines.attr('visibility', 'hidden')
+            svg.selectAll('.views-labels').attr('fill', COLORS.gray)            
         } 
         
         else if (tooltip?.showLikeRatio) {
-            likeRatioLines.attr('stroke-opacity', 1)            
+            likeRatioLines.attr('visibility', 'visible')
             likesPoints.style('fill', d => d.id === tooltip.id ? COLORS.pink : 'none')
             svg.selectAll('.like-ratio-labels').attr('fill', COLORS.darkGray)
             return
-        } else if (likeRatioLines.attr('stroke-opacity') == 1) {
-            likeRatioLines.attr('stroke-opacity', 0)
+        } else if (likeRatioLines.attr('visibility') === 'visible') {
+            likeRatioLines.attr('visibility', 'hidden')
             svg.selectAll('.like-ratio-labels').attr('fill', COLORS.gray)
         }
 
         updateDomains()
 
         viewsPoints.style('fill', d => withinDateExtent(d) ? viewsColor : COLORS.gray)
-
         likesPoints.style('fill', d => withinDateExtent(d) ? likeRatioColor : COLORS.gray)
-
-        // svg.selectAll('axis-lines').attr('opacity', tooltip ? 1 : .7)
     }
 
     const makePoints = ({ name, color, y }) =>
@@ -125,6 +124,9 @@
 
     const handleMouseMove = (e) => {
         const { offsetY, clientY, clientX, offsetX } = e
+
+        // Handle only touch events on mobile
+        if (e.type === 'mousemove' && isMobile) return
 
         // Clear last selected
         if (tooltip) {
@@ -219,6 +221,18 @@
             .attr('fill', COLORS.darkGray)            
             .attr('opacity', .75)
 
+        viewsPoints = makePoints({ 
+            name: 'views', 
+            color: d => withinDateExtent(d) ? viewsColor : COLORS.gray,
+            y: (d) => yViews(d.views),
+        })
+        
+        likesPoints = makePoints({ 
+            name: 'likeRatio', 
+            color: d => withinDateExtent(d) ? likeRatioColor : COLORS.gray,
+            y: d => yLikeRatio(likeRatio(d.id)),
+        })
+
         // View count
         viewsLine = d3.line()
             .x(d => xDate(d.published))
@@ -231,7 +245,8 @@
             .attr('stroke', viewsColor)
             .attr('stroke-width', strokeWidth)
             .attr('d', viewsLine)
-            .attr('stroke-opacity', 0)
+            .attr('stroke-opacity', 1)
+            .attr('visibility', 'hidden')
 
         likeColorGradient(svg, yLikeRatio)
 
@@ -247,19 +262,8 @@
             .attr('stroke', 'url(#like-gradient)')
             .attr('stroke-width', strokeWidth)
             .attr('d', likeRatioLine)    
-            .attr('stroke-opacity', 0)
-
-        viewsPoints = makePoints({ 
-            name: 'views', 
-            color: d => withinDateExtent(d) ? viewsColor : COLORS.gray,
-            y: (d) => yViews(d.views),
-        })
-        
-        likesPoints = makePoints({ 
-            name: 'likeRatio', 
-            color: d => withinDateExtent(d) ? likeRatioColor : COLORS.gray,
-            y: d => yLikeRatio(likeRatio(d.id)),
-        })
+            .attr('stroke-opacity', 1)
+            .attr('visibility', 'hidden')        
     })
 </script>
 
@@ -274,8 +278,11 @@
     <div 
         bind:this={element}
         on:mousemove={handleMouseMove}
+        on:click={handleMouseMove}
         on:touchstart={handleMouseMove}
         on:touchmove={handleMouseMove}
+
+        use:clickOutside={handleMouseLeave}
         on:mouseleave={handleMouseLeave}
         on:touchend={handleMouseLeave}
     ></div>

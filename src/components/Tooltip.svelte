@@ -14,23 +14,34 @@
 </script>
 
 {#if x && y}
-    <div 
-        bind:this={tooltipElem} 
-        class='tooltip' 
-        style={tooltipStyle}
-        transition:fly={{ y: 20, duration: 150 }}
-    >
-        <slot />
+    <div class='background'>
+        <div 
+            bind:this={tooltipElem} 
+            class='tooltip' 
+            style={tooltipStyle}
+            transition:fly={{ y: 20, duration: 150 }}
+        >
+            <slot />
+        </div>
     </div>
 {/if}
 
 <style>
+    .background {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 400;
+    }
+
     .tooltip {
         --tooltipSize: 8px;
         --tooltipLeft: calc(50% - var(--tooltipSize) / 2);
         --tooltipBorderWidth: 2px;
 
-        position: fixed;
+        position: absolute;
         z-index: 100;
         background: var(--lightGray);
         border: var(--tooltipBorderWidth) solid var(--black);
