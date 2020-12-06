@@ -8,12 +8,13 @@
     import { wordOccurrences } from '@lib/data'
     import type { Bin } from './topics'
     import { onMount, tick } from 'svelte'
+    import { ID } from '@lib/stores'
 
     type ChartDataPoint = Episode & { termFrequency: number }
 
     // Episode ids that are emphasized on the chart
     let highlighted: string[]
-    let pinnedWord = 'mask'
+    let pinnedWord
     let width: number
     let mounted = false
     let bins: Bin[] = null
@@ -50,6 +51,14 @@
     }
 
     onMount(async () => {
+        // TODO this should be in settings
+        if ($ID === 'jre') {
+            pinnedWord = 'mask'
+        }
+        if ($ID === 'lex') {
+            pinnedWord = 'death'
+        }
+
         await tick()
         mounted = true
     })

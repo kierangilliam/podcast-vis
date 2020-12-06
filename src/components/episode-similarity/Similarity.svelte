@@ -4,6 +4,7 @@
     import SimilarityMatrix from './SimilarityMatrix.svelte'
     import { episode } from '@lib/utils'
     import { epSimIdLookup, epSimReverseIdLookup, epSims } from '@lib/data';
+    import { ID } from '@lib/stores'
 
     let matrixData, comparedAllIdNum: number, comparedAllId: string
 
@@ -13,8 +14,6 @@
 
     function dataReady(_) {
         if (!$epSims) return
-
-        console.log($epSims)
 
         randomizeMatrix()
 
@@ -26,16 +25,22 @@
         // Return default blank 5 row array for DOM sizing purposes
         if (!$epSims || !comparedAllIdNum) return [[], [], [], [], []]
 
-        return $epSims
+        let data = $epSims
             .filter(({ idNum1, idNum2 }) => (idNum1 == comparedAllIdNum) || (idNum2 == comparedAllIdNum))
             .map(fillInIDs)
             .sort((a, b) => b.similarity - a.similarity)
             // [Other episode id, similarity]
-            .map(({ similarity, id1, id2, idNum1 }) => ([comparedAllIdNum == idNum1 ? id2 : id1, similarity]))
-            // Filter non-main episodes
+            .map(({ similarity, id1, id2, idNum1 }) => ([comparedAllIdNum == idNum1 ? id2 : id1, similarity]))            
+            
+
+        // TODO this should be in settings
+        // Filter non-main episodes
+        if ($ID === 'jre' || $ID === 'lex') {
             // TODO should also filter in MMA?
-            .filter(([id, _]) => episode(id).main)
-            .slice(0, 100)
+            data = data.filter(([id, _]) => episode(id).main)
+        }
+
+        return data.slice(0, 100)
     }
 
     const fillInIDs = ({ idNum1, idNum2, similarity }) => ({
