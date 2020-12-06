@@ -71,9 +71,6 @@ self.onmessage = async (message) => {
     else if (message.data === 'EpisodeSimilarity') {
         console.time('Load Episode Similarity Data (Worker)')
         const [episodeSimilarityTable, idLookupTable] = await getEpisodeSimilarityData()
-
-        console.log('Ep sim data', episodeSimilarityTable)
-
         console.time('Episode Similarity: Object Array Buffer (worker)')
         const ab = enc.encode(JSON.stringify({ episodeSimilarityTable, idLookupTable }))
         console.timeEnd('Episode Similarity: Object Array Buffer (worker)')
