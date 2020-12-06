@@ -92,6 +92,39 @@
 <h4>Topics</h4>
 
 <p>
+	The inspiration for Topics Over Time came from <A href="10.1145">this</A>
+	paper by one of my professors. 
+	In this paper, the authors talk about tags and the "Blogosphere."
+	They state that user generated tags can perform well at determining the broad group of a blog, 
+	but perform less well at describing the contents of an individual article. 
+	I believe the same can be said for podcasts.
+</p>
+
+<p>
+	YouTube videos often carry “tags”. For example, on a video with the guest Tristan Harris, 
+	the episode is tagged as, 
+	<i>
+		Joe Rogan Experience, JRE, Joe, Rogan, MMA, stand, up, 
+		funny, Freak, Party, Joe Rogan, Tristan Harris. 
+	</i>
+	It isn’t until the 14th tag until we see the guest’s name in the tags. 
+	This episode is about Tristan Harris describing the negative consequences that social media platforms have on society. 
+	The last seven tags on this video are 
+	<i>
+		Facebook, Twitter, Instagram, Google, Apple, Android, iPhone.
+	</i> 
+	They <i>hint</i> at the episode contents... but still do a rather poor job. 
+	Episode descriptions offer a little more insight into the topics discussed, 
+	but, because many JRE episodes tend to be a few hours long, 
+	descriptions are insufficient at capturing everything discussed.
+</p>
+
+<p>
+	I mimic the approach by Brooks and Montanez
+	by using TF-IDF to drive automated topic extraction from the caption data.
+</p>
+
+<p>
 	Loosely, TF-IDF is a cheap algorithm that gives each word in a document (an episode, in this case)
 	an <i>importance</i> score. Words that appear commonly in all documents are given a low score.
 	Words that appear many times in a handful of documents, but seldom in the majority, are given

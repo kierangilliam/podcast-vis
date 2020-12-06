@@ -12,6 +12,7 @@
         'https://github.com/pyannote',
         'https://modelzoo.co/model/deepspeech2',
         'https://developer.mozilla.org/en-US/docs/Web/API/Transferable',
+        'https://dl.acm.org/doi/10.1145/1135777.1135869', // Brooks Paper
     ]
 
     const link = links.find(link => link.includes(href))
