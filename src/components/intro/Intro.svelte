@@ -104,24 +104,17 @@
         <ChartMoving {start} {end} {episodes} />
     </div>
     <div class='explanation'>
-        <!--
-        PIE
-            *WHAT DOES PREVIOUS MEAN
-        TOPICS OVER TIME EXPLANATION
-            *CHART SHOULD BE ON THE RIGHT
-            **SEARCH FOR A KEYWORD
-            *TOPICS CHART -> REVERSE STEM HOVER
-            WHAT ARE THE GRAYED OUT THIGNS
-            *REVERSE STEM STOPS BOUNCING 
-            **number - number show ep titles
-        COS SIM MATRIX
-            *interaction
-         -->
-         Above shows the like ratio (in green) and view count (in purple) for the episodes around 
-         {formatDateForExplanation(start, end)}.
-         <Spacer />
-         This window is highlighted in the following chart.
-         Mouse over a datapoint below to see more details.
+        Above and below are two charts reiterating the same data from YouTube.
+        <ul>
+            <li>The higher green line indicates the percentage of likes a video got.</li>
+            <li>The lower purple line shows the view count.</li>
+        </ul>
+        <Spacer />
+        The above chart shows the likes-ratio/views for the episodes around
+        <i>{formatDateForExplanation(start, end)}</i>.         
+         <Spacer s={2} />
+        Below, this window is highlighted with color in the following chart.
+        Mouse over a datapoint below to see more details.
     </div>
     <div class='static'>
         <ChartStatic 
@@ -156,8 +149,7 @@
     }
 
     .explanation {
-        text-align: center;
-        width: 80%;
+        max-width: 40rem;
         margin-bottom: var(--s-12);
     }
 
@@ -165,6 +157,9 @@
     @media screen and (max-width: 450px) {
         .moving, .static {
             width: 100vw;
+        }
+        .explanation {
+           width: 90vw;
         }
     }
 </style>
