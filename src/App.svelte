@@ -10,7 +10,7 @@
 	import { Flex, Spacer } from '@ollopa/cedar'
 	import { onMount } from 'svelte'
 
-	if (window.location.host === 'localhost:5000') $ID = 'lex'
+	if (window.location.host === 'localhost:5000') $ID = 'jre'
 	if (window.location.host === 'joerogan.faith') $ID = 'jre'
 	if (window.location.host === 'lexfridman.faith') $ID = 'lex'
 
@@ -66,11 +66,12 @@
 
 			<div class='callout'>
 				<!-- TODO Hacky -->
-				Like this visualization of the {$ID === 'jre' ? 'Joe Rogan Experience' : 'Lex Fridman'} podcast?
-				Check out the same visualizations for the 
+				After you check out the following visualizations for 
+				the {$ID === 'jre' ? 'Joe Rogan Experience' : 'Lex Fridman'} podcast,
+				be sure to check out the same visualizations for the 
 				<a href={$ID !== 'jre' ? 'https://joerogan.faith' : 'https://lexfridman.faith'}>
 					{$ID !== 'jre' ? 'Joe Rogan Experience' : 'Lex Fridman Podcast'}
-				</a> podcast.
+				</a> podcast!
 			</div>
 
 			<Section stretch>
