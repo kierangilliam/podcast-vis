@@ -1,12 +1,13 @@
 <script lang='ts'>	
 	import { H3, Spacer } from '@ollopa/cedar'
 	import Search from '../Search.svelte'
-	import { onMount, tick } from 'svelte'
+	import { tick } from 'svelte'
 	import DonutChart from './DonutChart.svelte'
 	import Timeline from './Timeline.svelte'	
 	import { episode, isMobile } from '@lib/utils'
 	import { screenTime } from '@lib/data'
-	import { COLORS } from '@lib/constants'
+	import { COLORS, JRE_BLACKLIST, LEX_WHITELIST } from '@lib/constants'
+	import { ID } from '@lib/stores'
 
 	let data
 	let segments: {}
@@ -14,38 +15,7 @@
 	let episodeID = null
 	let searchableEpisodes
 	let searchVisible = false
-	let containerWidth: number	
-
-	const blacklist = [
-		1520, 
-		1521, 
-		1529, // whitney cummings & annie
-		1547, // Colin Quinn
-		1549, // Tom Papa
-		1498, // jon stewart
-		1562, // dave smith
-		1563, // tony hinchcliffe
-		1567,
-	]
-
-	const maybeBlacklist = [
-		1555, // alex jones and tim dillon
-		1497, // joe schilling
-		1487, // Janet Zuccarini & Evan Funke
-		1481, // adam eget
-		1466, // Jessimae Peluso
-		1463, // Tom Green
-		1459, // Tom ONell
-		1446, // Bert Kreischer
-		1440, // Fortune Feimster
-		1433, // Michael Yo
-		1421, // Jim Norton
-		1420, // Mark Normand
-		1405, // Sober October 3 Recap
-		1400, // Tony Hinchcliffe
-	]
-
-	const BLACKLIST = [...blacklist, ...maybeBlacklist]
+	let containerWidth: number		
 
 	$: onDataUpdate($screenTime)
 	$: episodeUpdate(episodeID)
@@ -78,11 +48,13 @@
 
 		if (!$screenTime) return
 			
-		data = $screenTime.sort((a, b) =>
+		data = $screenTime
+			.sort((a, b) =>
                 // @ts-ignore
                 episode(a.id).published - episode(b.id).published
-            )
-            .filter(({ segments, id }) => {
+			)
+			.filter(ep => episode(ep.id).main)
+			.filter(({ segments, id }) => {
                 const keys = Object.keys(segments)
                 // If there is just 1 segment, the video averaging did not go as planned
                 if (keys.length == 1) return false
@@ -94,12 +66,23 @@
                     if (ratio < .05) return false
                 }
 
-                return !BLACKLIST.includes(episode(id).number)
+                return true
             })
+		
 
 		searchableEpisodes = data.map(({ id }) => id)
+		episodeID = data[Math.floor(data.length * .8)].id
 
-		episodeID = 'qxOeWuAHOiw' // Kanye Episode
+		// TODO refactor to a setting obj
+		if ($ID === 'jre') {
+			episodeID = 'qxOeWuAHOiw' // Kanye Episode
+			data = data.filter(({ id }) => 
+				!JRE_BLACKLIST.includes(episode(id).number)
+			)			
+		} else if ($ID === 'lex') {
+			episodeID = '_L3gNaAVjQ4' // George Hotz
+			data = data.filter(({ id }) => LEX_WHITELIST.includes(episode(id).number))
+		}		
 	}
 </script>
 
