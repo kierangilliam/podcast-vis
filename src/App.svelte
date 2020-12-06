@@ -10,7 +10,7 @@
 	import { Flex, Spacer } from '@ollopa/cedar'
 	import { onMount } from 'svelte'
 
-	if (window.location.host === 'localhost:5000') $ID = 'jre'
+	if (window.location.host === 'localhost:5000') $ID = 'lex'
 	if (window.location.host === 'joerogan.faith') $ID = 'jre'
 	if (window.location.host === 'lexfridman.faith') $ID = 'lex'
 
@@ -18,7 +18,7 @@
 		window.scrollTo(0, 0)
 	})
 
-	const defaultSubtitle = '' // TODO
+	const defaultSubtitle = 'Visualizations of Deep Podcast Features'
 
 	const sites = {
 		jre: {
@@ -108,8 +108,8 @@
 	.callout {
 		background: var(--blue);
 		color: var(--white);
-		padding: var(--s-4) 0;
-		width: 100%;
+		padding: var(--s-4) var(--s-3);
+		width: 100vw;
 		text-align: center;
 		font-size: 1.1rem;
 	}
