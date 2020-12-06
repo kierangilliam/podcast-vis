@@ -1,9 +1,22 @@
 importScripts('https://unpkg.com/pbf@3.0.5/dist/pbf.js')
 
+let GLOBAL_ID = ""
+
 async function getBuffer(endpoint) {
-    const response = await fetch(endpoint)
-    const data = await response.arrayBuffer();
-    return data;
+    if (GLOBAL_ID === "") {
+        const e = 'Set ID to retrieve buffers'
+        console.error('proto-worker:', e)
+        throw new Error(e)
+    }
+
+    const response = await fetch(`./data/${GLOBAL_ID}/${endpoint}`)
+
+    if (response.status === 404) {
+        throw Error(`Could not fetch ${GLOBAL_ID}, ${response.statusText}`)
+    }
+
+    const data = await response.arrayBuffer()
+    return data
 }
 
 async function getEpisodeSimilarityData() {
@@ -20,7 +33,7 @@ async function getEpisodeSimilarityData() {
     }
 
     const [epSimBuffer, idLookupBuffer] = await Promise.all(
-        [getBuffer('./ep_sim'), getBuffer('./ep_sim_id_lookup')]
+        [getBuffer('ep_sim'), getBuffer('ep_sim_id_lookup')]
     )
 
     const episodeSimilarityTable = loadSims(epSimBuffer)
@@ -30,7 +43,7 @@ async function getEpisodeSimilarityData() {
 }
 
 async function getTimelineData() {
-    const buffer = await getBuffer('./screen_time_timelines')
+    const buffer = await getBuffer('screen_time_timelines')
     const pbf = new Pbf(new Uint8Array(buffer))
     const { timelines } = Timelines.read(pbf)
 
@@ -39,6 +52,12 @@ async function getTimelineData() {
 
 self.onmessage = async (message) => {
     const enc = new TextEncoder(); // always utf-8
+
+    if (message.data.includes('ID')) {
+        GLOBAL_ID = message.data.substring(2)
+        console.log('proto worker: setting ID', GLOBAL_ID)
+        return
+    }
 
     if (message.data === 'Timelines') {
         console.time('Load Timelines Data (Worker)')
@@ -52,6 +71,8 @@ self.onmessage = async (message) => {
     else if (message.data === 'EpisodeSimilarity') {
         console.time('Load Episode Similarity Data (Worker)')
         const [episodeSimilarityTable, idLookupTable] = await getEpisodeSimilarityData()
+
+        console.log('Ep sim data', episodeSimilarityTable)
 
         console.time('Episode Similarity: Object Array Buffer (worker)')
         const ab = enc.encode(JSON.stringify({ episodeSimilarityTable, idLookupTable }))

@@ -166,35 +166,62 @@ function dsv(delimiter) {
     };
 }
 
+const csv = dsv(",")
+
 function Fetch() {
-    const baseUrl = ""
-    const csv = dsv(",")
-
-    async function getText(endpoint = '') {
-        const response = await fetch(baseUrl + endpoint)
-        const data = await response.text();
-        return data;
+    async function getText(ID, endpoint) {
+        const response = await fetch(`./data/${ID}/${endpoint}`)
+        const data = await response.text()
+        return data
     }
 
-    async function wordOccurrences() {
-        const data = await getText('./word_occurrences.csv')
+    async function wordOccurrences(ID) {
+        const data = await getText(ID, 'word_occurrences.csv')
         const d = {}
+
         csv.parse(data).forEach(({ id, top_words }) => {
             d[id] = (0, eval)('(' + top_words + ')')
         })
+
         return d
     }
 
-    async function topTfidf() {
-        const data = await getText('./top_tfidf.csv')
+    async function topTfidf(ID) {
+        const data = await getText(ID, 'top_tfidf.csv')
         const d = {}
+
         csv.parse(data).forEach(({ id, top_words }) => {
             d[id] = (0, eval)('(' + top_words + ')')
         })
+
         return d
     }
 
-    return { wordOccurrences, topTfidf }
+    async function screenTime(ID) {
+        const formatData = data => {
+            data = (0, eval)('(' + data + ')')
+
+            const total = Object.entries(data).reduce((acc, [_, a]) => acc + a, 0)
+
+            Object.entries(data).forEach(([cluster, amount]) => {
+                // Remove items that make up less than 2% of the total
+                if (amount / total * 100 < 2) {
+                    delete data[cluster]
+                }
+            })
+
+            return data
+        }
+
+        const data = await getText(ID, 'screen_time.csv')
+
+        return csv.parse(data).map(({ id, data }) => ({
+            id,
+            segments: formatData(data),
+        }))
+    }
+
+    return { wordOccurrences, topTfidf, screenTime }
 }
 
 Comlink.expose(Fetch());
