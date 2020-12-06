@@ -27,7 +27,8 @@
 
     let element: HTMLElement
     let interval    
-    let start = new Date(2018, 1, 1)
+    // TODO Base this off of middle data of eps
+    let start = new Date(2019, 1, 1)
     let end = new Date(start.getTime() + DATE_WINDOW)
     let previousStart = start
     let previousEnd = end
@@ -43,8 +44,8 @@
             .attr('y2', y(1))
             .selectAll('stop')
             .data([
-                    { offset: '30%', color: COLORS.red }, 
-                    { offset: '60%', color: '#FFC27B' }, 
+                    { offset: '0%', color: COLORS.red }, 
+                    { offset: '40%', color: '#FFC27B' }, 
                     { offset: '100%', color: COLORS.green }
             ])
             .enter()
@@ -100,7 +101,7 @@
 
 <div bind:this={element} class='container'>
     <div class='moving'>
-        <ChartMoving {start} {end} {episodes} {transitionDuration} />
+        <ChartMoving {start} {end} {episodes} />
     </div>
     <div class='explanation'>
         <!--
