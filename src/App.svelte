@@ -64,6 +64,15 @@
 				<ScreenTime />
 			</Section>
 
+			<div class='callout'>
+				<!-- TODO Hacky -->
+				Like this visualization of the {$ID === 'jre' ? 'Joe Rogan Experience' : 'Lex Fridman'} podcast?
+				Check out the same visualizations for the 
+				<a href={$ID !== 'jre' ? 'https://joerogan.faith' : 'https://lexfridman.faith'}>
+					{$ID !== 'jre' ? 'Joe Rogan Experience' : 'Lex Fridman Podcast'}
+				</a> podcast.
+			</div>
+
 			<Section stretch>
 				<Topics />
 			</Section>
@@ -93,5 +102,20 @@
 	.subtitle {
 		text-align: center;
 		padding: 0 var(--s-4);
+	}
+
+	.callout {
+		background: var(--blue);
+		color: var(--white);
+		padding: var(--s-4) 0;
+		width: 100%;
+		text-align: center;
+		font-size: 1.1rem;
+	}
+	.callout a {
+		color: var(--white);
+	}
+	.callout a:visited {
+		color: var(--green);
 	}
 </style>
