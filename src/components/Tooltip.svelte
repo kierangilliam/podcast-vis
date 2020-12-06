@@ -1,4 +1,5 @@
 <script lang='ts'>
+    import { isMobile } from '@lib/utils'
     import { fly } from 'svelte/transition'
 
     export let x: number
@@ -34,6 +35,7 @@
         left: 0;
         right: 0;
         z-index: 400;
+        pointer-events: none;
     }
 
     .tooltip {
