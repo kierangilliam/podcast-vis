@@ -2,8 +2,7 @@
     import { Spacer } from '@ollopa/cedar'
     import { clickOutside } from '@lib/utils'
     import Tooltip from '../Tooltip.svelte'
-    import { onMount } from 'svelte'
-    import { requestTimelineData, timelines } from '@lib/data'
+    import { timelines } from '@lib/data'
     import type { Timeline, TimelineCluster, Timestamp } from '@lib/types'
     
     export let episodeID: string
@@ -55,8 +54,6 @@
     const hideExpanded = () => { expandAt = null }
 
     const setExpanded = ({ offsetX }) => { expandAt = offsetX / width }
-
-    onMount(() => requestTimelineData())
 </script>
 
 {#if expanded}

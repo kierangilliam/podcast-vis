@@ -1,11 +1,11 @@
 <script lang='ts'>	
 	import { H3, Spacer } from '@ollopa/cedar'
 	import Search from '../Search.svelte'
-	import * as d3 from 'd3'
 	import { onMount, tick } from 'svelte'
 	import DonutChart from './DonutChart.svelte'
 	import Timeline from './Timeline.svelte'	
 	import { episode, isMobile } from '@lib/utils'
+	import { screenTime } from '@lib/data'
 	import { COLORS } from '@lib/constants'
 
 	let data
@@ -47,6 +47,7 @@
 
 	const BLACKLIST = [...blacklist, ...maybeBlacklist]
 
+	$: onDataUpdate($screenTime)
 	$: episodeUpdate(episodeID)
 
 	const colors = [
@@ -71,53 +72,35 @@
 		}
 	}
 
-	onMount(async () => {
+	const onDataUpdate = async (_) => {
 		// Wait for width to render
 		await tick() 
 
-		const formatData = data => {
-			data = (0, eval)('(' + data + ')')
-
-			const total = Object.entries<number>(data)
-				.reduce((acc, [_, a]) => acc + a, 0)
-
-			Object.entries<number>(data).forEach(([cluster, amount]) => {
-				// Remove items that make up less than 2% of the total
-				if (amount / total * 100 < 2) {
-					delete data[cluster]
-				}
-			})
-			return data
-		}
-
-        data = (await d3.csv('./screen_time.csv'))
-            .map(({ id, data }) => ({
-				id, 
-                segments: formatData(data),
-			}))
-			.sort((a, b) => 
-				// @ts-ignore
-				episode(a.id).published - episode(b.id).published
-			)			
-			.filter(({ segments, id }) => {
-				const keys = Object.keys(segments)
-				// If there is just 1 segment, the video averaging did not go as planned
-				if (keys.length == 1) return false
-				// If there are two segments but one of the segments makes up for 95%
-				// of the time, there was probably an error
-				if (keys.length == 2) {
-					const ratio = Math.min(segments[keys[0]], segments[keys[1]]) / 
-						Math.max(segments[keys[0]], segments[keys[1]])
-					if (ratio < .05) return false
-				}
-
-				return !BLACKLIST.includes(episode(id).number)
-			})
+		if (!$screenTime) return
 			
+		data = $screenTime.sort((a, b) =>
+                // @ts-ignore
+                episode(a.id).published - episode(b.id).published
+            )
+            .filter(({ segments, id }) => {
+                const keys = Object.keys(segments)
+                // If there is just 1 segment, the video averaging did not go as planned
+                if (keys.length == 1) return false
+                // If there are two segments but one of the segments makes up for 95%
+                // of the time, there was probably an error
+                if (keys.length == 2) {
+                    const ratio = Math.min(segments[keys[0]], segments[keys[1]]) /
+                        Math.max(segments[keys[0]], segments[keys[1]])
+                    if (ratio < .05) return false
+                }
+
+                return !BLACKLIST.includes(episode(id).number)
+            })
+
 		searchableEpisodes = data.map(({ id }) => id)
 
 		episodeID = 'qxOeWuAHOiw' // Kanye Episode
-	})
+	}
 </script>
 
 <Search bind:episodeID bind:visible={searchVisible} {searchableEpisodes} />

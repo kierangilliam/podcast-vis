@@ -3,12 +3,13 @@
     import ChartMoving from './ChartMoving.svelte'
     import ChartStatic from './ChartStatic.svelte'
     import * as d3 from 'd3'
-    import { episodes as allEpisodes, likeRatio, setCSSVar } from '@lib/utils'
+    import { episodes as allEpisodes } from '@lib/data'
+    import { likeRatio, setCSSVar } from '@lib/utils'
     import { writable } from 'svelte/store'
     import { COLORS } from '@lib/constants'
     import { Spacer } from '@ollopa/cedar'
 
-    const episodes = allEpisodes.filter(({ main }) => main)
+    const episodes = $allEpisodes && $allEpisodes.filter(({ main }) => main)
     // 90 days
     const DATE_WINDOW = 90 * (24 * 60 * 60 * 1000)
     const transitionDuration = 5000

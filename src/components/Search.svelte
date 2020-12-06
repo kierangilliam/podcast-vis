@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Icon } from '@ollopa/cedar'
-    import { episodes } from '@lib/utils'
+    import { episodes } from '@lib/data'
     import { tick } from 'svelte'
 
     export let placeholder = 'lex fridman'
@@ -19,8 +19,8 @@
     })()
 
     const filterSearch = (_, __) => {
-		if (!search || !episodes) return []
-        return episodes
+		if (!search || !$episodes) return []
+        return $episodes
             .filter(({ id }) => 
                 searchableEpisodes ? searchableEpisodes.includes(id) : true
             )

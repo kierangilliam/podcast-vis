@@ -1,6 +1,5 @@
-import * as d3 from 'd3'
-import { writable } from 'svelte/store'
-import type { Episode } from './types'
+import { get } from 'svelte/store'
+import { episodes } from './data'
 
 export const wait = async (ms: number) =>
     new Promise(res => setTimeout(() => res(), ms))
@@ -14,24 +13,8 @@ export const getCSSVar = (name: string) =>
 export const getCSSVarPx = (name: string) =>
     parseInt(getCSSVar(name).split('px')[0])
 
-export let episodesLoaded = writable(false);
-export let episodes: Episode[] = [];
-(async () => {
-    episodes = (await d3.csv('./episodes.csv'))
-        .map(({ published, number, main, views, likes, dislikes, ...rest }) => ({
-            published: new Date(published),
-            number: +number,
-            likes: +likes,
-            dislikes: +dislikes,
-            views: +views,
-            main: main === "True" ? true : false,
-            ...rest,
-        }))
-    episodesLoaded.set(true)
-})();
-
 export const episode = (id: string) => {
-    return episodes.find(e => e.id === id)
+    return get(episodes).find(e => e.id === id)
 }
 
 export const getTitle = (id: string) => {
@@ -66,11 +49,6 @@ export const formatBigNumber = (n: number): string => {
     if (Math.abs(n) / 1_000_000 % 5 == 0) return Math.round((Math.abs(n) / 1_000_000)) + 'm'
     return (Math.abs(n) / 1_000_000).toFixed(1) + 'm'
 }
-
-export let stemToWord = null;
-(async () => {
-    stemToWord = (await (await fetch('./reverse_stem.json')).json())
-})();
 
 /** Dispatch event on click outside of node */
 export function clickOutside(node, handler: () => any) {

@@ -1,27 +1,30 @@
 <script lang='ts'>
 	import { Theme, Topics, Section, Similarity, ScreenTime, Intro, Methodology } from '@components'
-	import { episodesLoaded } from '@lib/utils'
+	import { episodes } from '@lib/data'
+	import { ID } from '@lib/stores'
 	import { Flex, Spacer } from '@ollopa/cedar'
+
+	if (
+		window.location.host === 'localhost:5000'
+		|| window.location.host === 'joerogan.faith'
+	) {
+		$ID = 'jre'
+	}
+
+	console.log(window.location.pathname)
 </script>
-
-<!--
-TODO add to sections:
-
-1. Give the user a look into the diversity in the guests 
-2. Get a general sense of what Joe talks about over time 
-3. See how much of the conversation Joe contributes to 
-4. 
--->
 
 <Theme>
 	<Flex column>
 		<Spacer s={8} />
 		<h1 class='title'>Average Joe</h1>
-		<div class="subtitle">
+		<div class='subtitle'>
 			<i><h5>2462 videos, 8,626,908 words, and 699gb of data analyzed.</h5></i>
 		</div>
 		
-		{#if $episodesLoaded}
+		{#if !$episodes}
+			Loading...
+		{:else} 
 			<Spacer s={24} />
 			<Intro />
 			<Spacer s={24} />
@@ -43,8 +46,6 @@ TODO add to sections:
 			</Section>
 
 			<Spacer s={16} />
-		{:else}
-			Loading...
 		{/if}
 
 		<!-- <Section>

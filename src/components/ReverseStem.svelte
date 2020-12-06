@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { stemToWord } from '@lib/utils'
+    import { stemToWord } from '@lib/data'
     import { getContext, onDestroy } from 'svelte'
 
     export let stem: string

@@ -5,6 +5,7 @@
     import { makeDonutChart } from './donut-chart'
     import { episode, formatViews, getTitle, likeRatio, clickOutside } from '@lib/utils'
     import { Spacer } from '@ollopa/cedar'
+import { ID } from '@lib/stores';
 
     export let episodeID: string
     export let segments: { [key: number]: number }
@@ -33,7 +34,7 @@
             .map(([cluster, value]) => ({ 
                 series: cluster, 
                 value,
-                image: `images/${episodeID}.cluster.${cluster}.jpg`,
+                image: `./data/${$ID}/images/${episodeID}.cluster.${cluster}.jpg`,
                 color: colors[cluster],
             }))
 

@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { H3, H5, Spacer } from '@ollopa/cedar'
+    import { H3, Spacer } from '@ollopa/cedar'
     import SimilarityComparedAll from './SimilarityComparedAll.svelte'
     import SimilarityMatrix from './SimilarityMatrix.svelte'
     import { episode } from '@lib/utils'
@@ -14,6 +14,8 @@
     function dataReady(_) {
         if (!$epSims) return
 
+        console.log($epSims)
+
         randomizeMatrix()
 
         comparedAllIdNum = choice()
@@ -22,7 +24,7 @@
 
     const filterComparedAllData = (_, __) => {
         // Return default blank 5 row array for DOM sizing purposes
-        if (!($epSims && comparedAllIdNum)) return [[], [], [], [], []]
+        if (!$epSims || !comparedAllIdNum) return [[], [], [], [], []]
 
         return $epSims
             .filter(({ idNum1, idNum2 }) => (idNum1 == comparedAllIdNum) || (idNum2 == comparedAllIdNum))
@@ -47,6 +49,7 @@
     const choice = () => {
         const isNotMain = true
         let choice
+        
         while (isNotMain) {
             choice = $epSims[Math.floor(Math.random() * $epSims.length)]
             choice = fillInIDs(choice)
