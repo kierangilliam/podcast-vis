@@ -28,7 +28,7 @@
     }
 
     const withinExpandedRegion = ({ start, end }: Timestamp) => 
-        start >= expandAt - (expandAmount) && end <= expandAt + (expandAmount)
+        start >= expandAt - (expandAmount * 2) && end <= expandAt + (expandAmount * 2)
                     
     const filtered = (): TimelineCluster[] => 
         timeline.clusters
