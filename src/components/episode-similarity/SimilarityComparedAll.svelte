@@ -7,6 +7,7 @@
 
     export let id: string
     export let data: [string, number, string][]
+    export let searchableEpisodes = []
     
     let container: HTMLElement
     let resultsElement: HTMLElement
@@ -29,7 +30,7 @@
 
 <!-- TODO -->
 <!-- {searchableEpisodes} -->
-<Search bind:episodeID={id} bind:visible={searchVisible}  />
+<Search bind:episodeID={id} bind:visible={searchVisible} {searchableEpisodes} />
 
 <div bind:this={container} class='container'>
     <p class='description'>Most similar podcasts to...</p>

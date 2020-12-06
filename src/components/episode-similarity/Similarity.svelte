@@ -3,12 +3,14 @@
     import SimilarityComparedAll from './SimilarityComparedAll.svelte'
     import SimilarityMatrix from './SimilarityMatrix.svelte'
     import { episode } from '@lib/utils'
-    import { epSimIdLookup, epSimReverseIdLookup, epSims } from '@lib/data';
+    import { epSimIdLookup, epSimIdLookupTable, epSimReverseIdLookup, epSims } from '@lib/data';
     import { ID } from '@lib/stores'
 
     let matrixData, comparedAllIdNum: number, comparedAllId: string
+    let searchableEpisodes = []
 
     $: dataReady($epSims)
+    $: searchableEpisodes = $epSimIdLookupTable && $epSimIdLookupTable.map(({ id }) => id)
     $: comparedAllData = filterComparedAllData($epSims, comparedAllIdNum)
     $: comparedAllIdNum = $epSimReverseIdLookup && $epSimReverseIdLookup(comparedAllId)
 
@@ -16,7 +18,7 @@
         if (!$epSims) return
 
         randomizeMatrix()
-
+        
         comparedAllIdNum = choice()
         comparedAllId = $epSimIdLookup(comparedAllIdNum)
     }
@@ -99,7 +101,7 @@
     <div class='container'>
         <SimilarityMatrix data={matrixData} on:randomize={randomizeMatrix} />
         <Spacer />
-        <SimilarityComparedAll bind:id={comparedAllId} data={comparedAllData} />
+        <SimilarityComparedAll bind:id={comparedAllId} data={comparedAllData} {searchableEpisodes} />
     </div>
 {/if}
 

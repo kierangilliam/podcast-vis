@@ -10,6 +10,7 @@ export const wordOccurrences = writable<WordOccurrences>(null)
 export const topTFIDF = writable<TopTFIDF>(null)
 export const epSims = writable<any>(null)
 export const epSimIdLookup = writable<any>(null)
+export const epSimIdLookupTable = writable<any>(null)
 export const epSimReverseIdLookup = writable<any>(null)
 export const timelines = writable<Timeline[]>(null)
 export const screenTime = writable<any>(null)
@@ -92,6 +93,7 @@ protoWorker.addEventListener('message', function (event) {
             epSims.set(parsed.episodeSimilarityTable)
             epSimReverseIdLookup.set(reverseIdLookup)
             epSimIdLookup.set(idLookup)
+            epSimIdLookupTable.set(parsed.idLookupTable)
             return
         }
 
