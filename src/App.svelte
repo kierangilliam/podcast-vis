@@ -10,7 +10,7 @@
 	import { Flex, Spacer } from '@ollopa/cedar'
 	import { onMount } from 'svelte'
 
-	if (window.location.host === 'localhost:5000') $ID = 'lex'
+	if (window.location.host === 'localhost:5000') $ID = 'jre'
 	if (window.location.host === 'joerogan.faith') $ID = 'jre'
 	if (window.location.host === 'lexfridman.faith') $ID = 'lex'
 

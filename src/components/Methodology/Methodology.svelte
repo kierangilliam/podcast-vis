@@ -107,7 +107,7 @@
 		Joe Rogan Experience, JRE, Joe, Rogan, MMA, stand, up, 
 		funny, Freak, Party, Joe Rogan, Tristan Harris. 
 	</i>
-	It isn’t until the 14th tag until we see the guest’s name in the tags. 
+	It isn’t until the 14th tag when we see the guest’s name appear. 
 	This episode is about Tristan Harris describing the negative consequences that social media platforms have on society. 
 	The last seven tags on this video are 
 	<i>
